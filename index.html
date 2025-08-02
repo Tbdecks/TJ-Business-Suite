@@ -10078,7 +10078,300 @@ content: |-
         </div>
     </div>
 </body>
-</html>
+</html>// T&J Field Services - UI Functions
+// Connect the business functions to the HTML interfaces
+
+// ===== DASHBOARD FUNCTIONS =====
+function loadDashboard() {
+    const stats = {
+        activeProjects: TJSystem.tjData.get('projects').filter(p => p.status === 'in-progress').length,
+        monthlyRevenue: TJSystem.ReportManager.getMonthlyRevenue(new Date().getMonth(), new Date().getFullYear()),
+        pendingEstimates: TJSystem.tjData.get('estimates').filter(e => e.status === 'pending').length,
+        weekJobs: TJSystem.ScheduleManager.getTodaysJobs().length
+    };
+
+    // Update dashboard stats
+    document.getElementById('active-projects').textContent = stats.activeProjects;
+    document.getElementById('monthly-revenue').textContent = TJSystem.TJUtils.formatCurrency(stats.monthlyRevenue);
+    document.getElementById('pending-estimates').textContent = stats.pendingEstimates;
+    document.getElementById('week-jobs').textContent = stats.weekJobs;
+
+    loadRecentProjects();
+}
+
+function loadRecentProjects() {
+    const projects = TJSystem.tjData.get('projects').slice(-3);
+    const container = document.getElementById('recent-projects');
+    
+    container.innerHTML = projects.map(project => {
+        const customer = TJSystem.tjData.get('customers').find(c => c.id === project.customerId);
+        const statusClass = {
+            'in-progress': 'bg-yellow-100 text-yellow-800',
+            'scheduled': 'bg-blue-100 text-blue-800',
+            'completed': 'bg-green-100 text-green-800'
+        }[project.status];
+
+        return `
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                <div>
+                    <p class="font-medium">${project.name}</p>
+                    <p class="text-sm text-gray-600">${customer?.name || 'Unknown Customer'}</p>
+                </div>
+                <span class="px-2 py-1 ${statusClass} text-xs rounded">${project.status}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+// ===== CUSTOMER FUNCTIONS =====
+function loadCustomers() {
+    const customers = TJSystem.tjData.get('customers');
+    const tbody = document.getElementById('customers-table-body');
+    
+    tbody.innerHTML = customers.map(customer => `
+        <tr>
+            <td class="px-6 py-4">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                        <span class="text-blue-600 font-bold">${customer.name.split(' ').map(n => n[0]).join('')}</span>
+                    </div>
+                    <div>
+                        <div class="font-medium text-gray-900">${customer.name}</div>
+                        <div class="text-sm text-gray-500">${customer.address}</div>
+                    </div>
+                </div>
+            </td>
+            <td class="px-6 py-4">
+                <div class="text-sm text-gray-900">${customer.phone}</div>
+                <div class="text-sm text-gray-500">${customer.email}</div>
+            </td>
+            <td class="px-6 py-4">
+                <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">${customer.projects.length} Active</span>
+            </td>
+            <td class="px-6 py-4 text-sm font-medium text-green-600">${TJSystem.TJUtils.formatCurrency(customer.totalValue)}</td>
+            <td class="px-6 py-4 text-sm font-medium">
+                <button onclick="viewCustomer(${customer.id})" class="text-blue-600 hover:text-blue-900 mr-3">View</button>
+                <button onclick="editCustomer(${customer.id})" class="text-gray-600 hover:text-gray-900 mr-3">Edit</button>
+                <button onclick="callCustomer('${customer.phone}')" class="text-green-600 hover:text-green-900">Call</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function addCustomer() {
+    const name = prompt('Customer Name:');
+    const email = prompt('Email:');
+    const phone = prompt('Phone:');
+    const address = prompt('Address:');
+    
+    if (name && email && phone && address) {
+        TJSystem.CustomerManager.add({ name, email, phone, address });
+        loadCustomers();
+        alert('Customer added successfully!');
+    }
+}
+
+function callCustomer(phone) {
+    window.open(`tel:${phone}`);
+}
+
+// ===== PROJECT FUNCTIONS =====
+function loadProjects() {
+    const projects = TJSystem.tjData.get('projects');
+    const container = document.getElementById('projects-container');
+    
+    container.innerHTML = projects.map(project => {
+        const customer = TJSystem.tjData.get('customers').find(c => c.id === project.customerId);
+        const statusClass = {
+            'in-progress': 'bg-yellow-100 text-yellow-800',
+            'scheduled': 'bg-blue-100 text-blue-800',
+            'completed': 'bg-green-100 text-green-800',
+            'on-hold': 'bg-red-100 text-red-800'
+        }[project.status];
+
+        return `
+            <div class="bg-white p-6 rounded-lg shadow border">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold">${project.name}</h3>
+                        <p class="text-gray-600">${customer?.name || 'Unknown Customer'}</p>
+                    </div>
+                    <span class="px-2 py-1 ${statusClass} text-xs rounded">${project.status}</span>
+                </div>
+                <div class="space-y-2 text-sm mb-4">
+                    <div class="flex justify-between">
+                        <span>Budget:</span>
+                        <span class="font-medium">${TJSystem.TJUtils.formatCurrency(project.budget)}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Progress:</span>
+                        <span class="font-medium">${project.progress}%</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Due Date:</span>
+                        <span class="font-medium">${TJSystem.TJUtils.formatDate(project.endDate)}</span>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="viewProject(${project.id})" class="flex-1 px-3 py-2 bg-blue-50 text-blue-600 rounded text-sm">View Details</button>
+                    <button onclick="editProject(${project.id})" class="px-3 py-2 bg-gray-50 text-gray-600 rounded text-sm">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function addProject() {
+    const customers = TJSystem.tjData.get('customers');
+    if (customers.length === 0) {
+        alert('Please add customers first!');
+        return;
+    }
+
+    const name = prompt('Project Name:');
+    const customerName = prompt('Customer Name:');
+    const customer = customers.find(c => c.name.toLowerCase().includes(customerName.toLowerCase()));
+    
+    if (!customer) {
+        alert('Customer not found!');
+        return;
+    }
+
+    const budget = parseFloat(prompt('Budget:'));
+    const startDate = prompt('Start Date (YYYY-MM-DD):');
+    
+    if (name && budget && startDate) {
+        TJSystem.ProjectManager.add({
+            name,
+            customerId: customer.id,
+            type: 'general',
+            budget,
+            startDate,
+            endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+            crew: []
+        });
+        loadProjects();
+        alert('Project added successfully!');
+    }
+}
+
+// ===== SCHEDULE FUNCTIONS =====
+function loadSchedule() {
+    const todaysJobs = TJSystem.ScheduleManager.getTodaysJobs();
+    const container = document.getElementById('todays-jobs');
+    
+    container.innerHTML = todaysJobs.map(job => {
+        const project = TJSystem.tjData.get('projects').find(p => p.id === job.projectId);
+        const customer = TJSystem.tjData.get('customers').find(c => c.id === job.customerId);
+        const statusClass = {
+            'scheduled': 'bg-yellow-100 text-yellow-800',
+            'in-progress': 'bg-blue-100 text-blue-800',
+            'completed': 'bg-green-100 text-green-800'
+        }[job.status];
+
+        return `
+            <div class="p-6 flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500">TIME</p>
+                        <p class="font-bold text-blue-600">${new Date(job.startTime).toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit'})}</p>
+                    </div>
+                    <div>
+                        <p class="font-semibold">${job.title}</p>
+                        <p class="text-sm text-gray-600">${customer?.name || 'Unknown Customer'}</p>
+                        <p class="text-xs text-gray-500">Crew: ${job.crew.join(', ')}</p>
+                    </div>
+                </div>
+                <span class="px-2 py-1 ${statusClass} text-xs rounded">${job.status}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+function scheduleJob() {
+    const projects = TJSystem.tjData.get('projects');
+    if (projects.length === 0) {
+        alert('Please create projects first!');
+        return;
+    }
+
+    const title = prompt('Job Title:');
+    const projectName = prompt('Project Name:');
+    const project = projects.find(p => p.name.toLowerCase().includes(projectName.toLowerCase()));
+    
+    if (!project) {
+        alert('Project not found!');
+        return;
+    }
+
+    const startTime = prompt('Start Time (YYYY-MM-DD HH:MM):');
+    const crew = prompt('Crew Members (comma separated):').split(',').map(s => s.trim());
+    
+    if (title && startTime) {
+        TJSystem.ScheduleManager.addAppointment({
+            title,
+            projectId: project.id,
+            customerId: project.customerId,
+            startTime: new Date(startTime).toISOString(),
+            endTime: new Date(new Date(startTime).getTime() + 4 * 60 * 60 * 1000).toISOString(), // 4 hours later
+            crew,
+            location: '',
+            description: title
+        });
+        loadSchedule();
+        alert('Job scheduled successfully!');
+    }
+}
+
+// ===== INITIALIZATION =====
+document.addEventListener('DOMContentLoaded', function() {
+    // Load sample data if empty
+    if (TJSystem.tjData.get('customers').length === 0) {
+        loadSampleData();
+    }
+
+    // Determine which page we're on and load appropriate data
+    const pageTitle = document.title;
+    
+    if (pageTitle.includes('Dashboard')) {
+        loadDashboard();
+    } else if (pageTitle.includes('Customers')) {
+        loadCustomers();
+    } else if (pageTitle.includes('Projects')) {
+        loadProjects();
+    } else if (pageTitle.includes('Schedule')) {
+        loadSchedule();
+    }
+});
+
+function loadSampleData() {
+    // Add sample customers
+    const customers = [
+        { name: 'John Johnson', email: 'john@email.com', phone: '(555) 123-4567', address: '123 Oak Street, Delmar MD' },
+        { name: 'Sarah Williams', email: 'sarah@email.com', phone: '(555) 987-6543', address: '456 Pine Avenue, Delmar MD' },
+        { name: 'Mike Davis', email: 'mike@business.com', phone: '(555) 456-7890', address: '789 Business Blvd, Salisbury MD' }
+    ];
+
+    customers.forEach(customerData => {
+        TJSystem.CustomerManager.add(customerData);
+    });
+
+    console.log('Sample data loaded successfully!');
+}
+
+// Export functions for global use
+window.TJUIFunctions = {
+    loadDashboard,
+    loadCustomers,
+    addCustomer,
+    loadProjects,
+    addProject,
+    loadSchedule,
+    scheduleJob,
+    callCustomer
+};
 
 
 };
