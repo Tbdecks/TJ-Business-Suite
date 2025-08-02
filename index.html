@@ -12734,6 +12734,430 @@ content: |-
 
         // Sidebar toggle
         function toggleS
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T&J Field Services - Management System</title>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .card-hover:hover { transform: translateY(-2px); transition: transform 0.2s; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Sidebar -->
+    <div class="fixed left-0 top-0 h-full w-64 bg-white shadow-lg border-r z-40">
+        <div class="p-6 border-b">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <i data-lucide="hammer" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900">T&J Field Services</h1>
+                    <p class="text-sm text-gray-500">Delmar, MD 21875</p>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="p-4">
+            <div class="space-y-2">
+                <a href="#" onclick="showSection('dashboard')" class="nav-item active flex items-center space-x-3 p-3 rounded-lg bg-blue-50 text-blue-600">
+                    <i data-lucide="home" class="w-5 h-5"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" onclick="showSection('customers')" class="nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-600">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                    <span>Customers</span>
+                </a>
+                <a href="#" onclick="showSection('projects')" class="nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-600">
+                    <i data-lucide="briefcase" class="w-5 h-5"></i>
+                    <span>Projects</span>
+                </a>
+                <a href="#" onclick="showSection('estimates')" class="nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-600">
+                    <i data-lucide="calculator" class="w-5 h-5"></i>
+                    <span>Estimates</span>
+                </a>
+            </div>
+        </nav>
+    </div>
 
+    <!-- Main Content -->
+    <div class="ml-64">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 id="pageTitle" class="text-2xl font-bold text-gray-900">Dashboard</h2>
+                        <p class="text-gray-600">Welcome to your T&J Field Services management system</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button onclick="quickEstimate()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center space-x-2">
+                            <i data-lucide="calculator" class="w-4 h-4"></i>
+                            <span>Quick Estimate</span>
+                        </button>
+                        <button onclick="newProject()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>New Project</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <main class="p-6">
+            <!-- Dashboard -->
+            <div id="dashboard-content">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Total Projects</p>
+                                <p id="totalProjects" class="text-3xl font-bold text-gray-900">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="briefcase" class="w-6 h-6 text-blue-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg shadow-sm border card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Customers</p>
+                                <p id="totalCustomers" class="text-3xl font-bold text-gray-900">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="users" class="w-6 h-6 text-green-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg shadow-sm border card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Revenue</p>
+                                <p id="totalRevenue" class="text-3xl font-bold text-gray-900">$0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="dollar-sign" class="w-6 h-6 text-yellow-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg shadow-sm border card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Estimates</p>
+                                <p id="totalEstimates" class="text-3xl font-bold text-gray-900">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="calculator" class="w-6 h-6 text-purple-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <button onclick="addCustomer()" class="flex items-center space-x-3 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-400 hover:bg-green-50">
+                            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="user-plus" class="w-5 h-5 text-green-600"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="font-medium text-gray-900">Add Customer</p>
+                                <p class="text-sm text-gray-600">New customer record</p>
+                            </div>
+                        </button>
+                        
+                        <button onclick="newProject()" class="flex items-center space-x-3 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50">
+                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="plus-circle" class="w-5 h-5 text-blue-600"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="font-medium text-gray-900">New Project</p>
+                                <p class="text-sm text-gray-600">Start new project</p>
+                            </div>
+                        </button>
+                        
+                        <button onclick="deckEstimate()" class="flex items-center space-x-3 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-orange-400 hover:bg-orange-50">
+                            <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="calculator" class="w-5 h-5 text-orange-600"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="font-medium text-gray-900">Deck Estimate</p>
+                                <p class="text-sm text-gray-600">Quick deck pricing</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customers Section -->
+            <div id="customers-content" class="hidden">
+                <div class="bg-white rounded-lg shadow-sm border p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900">Customer Management</h3>
+                        <button onclick="addCustomer()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2">
+                            <i data-lucide="user-plus" class="w-4 h-4"></i>
+                            <span>Add Customer</span>
+                        </button>
+                    </div>
+                    <div id="customersList" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- Projects Section -->
+            <div id="projects-content" class="hidden">
+                <div class="bg-white rounded-lg shadow-sm border p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900">Project Management</h3>
+                        <button onclick="newProject()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>New Project</span>
+                        </button>
+                    </div>
+                    <div id="projectsList" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- Estimates Section -->
+            <div id="estimates-content" class="hidden">
+                <div class="bg-white rounded-lg shadow-sm border p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6">Estimate Calculator</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-green-400 hover:bg-green-50 cursor-pointer" onclick="deckEstimate()">
+                            <i data-lucide="home" class="w-12 h-12 mx-auto mb-3 text-green-600"></i>
+                            <h4 class="font-medium text-gray-900 mb-2">Deck Building</h4>
+                            <p class="text-sm text-gray-600">Calculate deck construction costs</p>
+                        </div>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 hover:bg-blue-50 cursor-pointer" onclick="kitchenEstimate()">
+                            <i data-lucide="chef-hat" class="w-12 h-12 mx-auto mb-3 text-blue-600"></i>
+                            <h4 class="font-medium text-gray-900 mb-2">Kitchen Remodel</h4>
+                            <p class="text-sm text-gray-600">Estimate kitchen renovation costs</p>
+                        </div>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-400 hover:bg-purple-50 cursor-pointer" onclick="handymanEstimate()">
+                            <i data-lucide="wrench" class="w-12 h-12 mx-auto mb-3 text-purple-600"></i>
+                            <h4 class="font-medium text-gray-900 mb-2">Handyman Services</h4>
+                            <p class="text-sm text-gray-600">Price handyman work by the hour</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Data Storage
+        const data = {
+            customers: JSON.parse(localStorage.getItem('tj_customers') || '[]'),
+            projects: JSON.parse(localStorage.getItem('tj_projects') || '[]'),
+            estimates: JSON.parse(localStorage.getItem('tj_estimates') || '[]')
+        };
+
+        // Save data
+        function save(key, value) {
+            data[key] = value;
+            localStorage.setItem('tj_' + key, JSON.stringify(value));
+            updateStats();
+        }
+
+        // Format currency
+        function currency(amount) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount || 0);
+        }
+
+        // Update dashboard stats
+        function updateStats() {
+            document.getElementById('totalProjects').textContent = data.projects.length;
+            document.getElementById('totalCustomers').textContent = data.customers.length;
+            document.getElementById('totalEstimates').textContent = data.estimates.length;
+            
+            const revenue = data.projects.reduce((sum, p) => sum + (p.value || 0), 0);
+            document.getElementById('totalRevenue').textContent = currency(revenue);
+        }
+
+        // Navigation
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('[id$="-content"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(section + '-content').classList.remove('hidden');
+            
+            // Update nav
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('active', 'bg-blue-50', 'text-blue-600');
+                el.classList.add('text-gray-700');
+            });
+            event.target.closest('.nav-item').classList.add('active', 'bg-blue-50', 'text-blue-600');
+            
+            // Update title
+            const titles = { dashboard: 'Dashboard', customers: 'Customers', projects: 'Projects', estimates: 'Estimates' };
+            document.getElementById('pageTitle').textContent = titles[section];
+            
+            // Load section data
+            if (section === 'customers') loadCustomers();
+            if (section === 'projects') loadProjects();
+        }
+
+        // Customer functions
+        function addCustomer() {
+            const name = prompt('Customer Name:');
+            if (!name) return;
+            
+            const phone = prompt('Phone Number:');
+            const email = prompt('Email (optional):') || '';
+            const address = prompt('Address (optional):') || '';
+            
+            const customer = {
+                id: Date.now(),
+                name, phone, email, address,
+                created: new Date().toISOString()
+            };
+            
+            data.customers.push(customer);
+            save('customers', data.customers);
+            alert('Customer added successfully!');
+            if (document.getElementById('customers-content').classList.contains('hidden') === false) {
+                loadCustomers();
+            }
+        }
+
+        function loadCustomers() {
+            const container = document.getElementById('customersList');
+            if (data.customers.length === 0) {
+                container.innerHTML = '<div class="text-center py-12 text-gray-500"><p>No customers yet. Add your first customer to get started!</p></div>';
+                return;
+            }
+            
+            container.innerHTML = data.customers.map(customer => `
+                <div class="flex items-center justify-between p-4 border rounded-lg">
+                    <div>
+                        <h4 class="font-medium text-gray-900">${customer.name}</h4>
+                        <p class="text-sm text-gray-600">${customer.phone}</p>
+                        ${customer.email ? `<p class="text-sm text-gray-600">${customer.email}</p>` : ''}
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-gray-500">Added ${new Date(customer.created).toLocaleDateString()}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Project functions
+        function newProject() {
+            const name = prompt('Project Name:');
+            if (!name) return;
+            
+            const customer = prompt('Customer Name:');
+            const value = parseFloat(prompt('Project Value:') || '0');
+            const type = prompt('Project Type (Deck/Kitchen/Handyman):') || 'General';
+            
+            const project = {
+                id: Date.now(),
+                name, customer, value, type,
+                status: 'Active',
+                created: new Date().toISOString()
+            };
+            
+            data.projects.push(project);
+            save('projects', data.projects);
+            alert('Project created successfully!');
+            if (document.getElementById('projects-content').classList.contains('hidden') === false) {
+                loadProjects();
+            }
+        }
+
+        function loadProjects() {
+            const container = document.getElementById('projectsList');
+            if (data.projects.length === 0) {
+                container.innerHTML = '<div class="text-center py-12 text-gray-500"><p>No projects yet. Create your first project to get started!</p></div>';
+                return;
+            }
+            
+            container.innerHTML = data.projects.map(project => `
+                <div class="flex items-center justify-between p-4 border rounded-lg">
+                    <div>
+                        <h4 class="font-medium text-gray-900">${project.name}</h4>
+                        <p class="text-sm text-gray-600">${project.customer} • ${project.type}</p>
+                        <span class="inline-block px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">${project.status}</span>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-medium text-gray-900">${currency(project.value)}</p>
+                        <p class="text-sm text-gray-500">${new Date(project.created).toLocaleDateString()}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Estimate functions
+        function quickEstimate() { deckEstimate(); }
+
+        function deckEstimate() {
+            const length = parseFloat(prompt('Deck Length (feet):') || '0');
+            const width = parseFloat(prompt('Deck Width (feet):') || '0');
+            
+            if (length <= 0 || width <= 0) {
+                alert('Please enter valid dimensions');
+                return;
+            }
+            
+            const sqft = length * width;
+            const materials = sqft * 15;
+            const labor = sqft * 12;
+            const total = materials + labor + (materials + labor) * 0.06;
+            
+            const estimate = {
+                id: Date.now(),
+                type: 'Deck',
+                details: `${length}' x ${width}' (${sqft} sq ft)`,
+                materials, labor, total,
+                created: new Date().toISOString()
+            };
+            
+            data.estimates.push(estimate);
+            save('estimates', data.estimates);
+            
+            alert(`Deck Estimate:\n${estimate.details}\nMaterials: ${currency(materials)}\nLabor: ${currency(labor)}\nTotal: ${currency(total)}`);
+        }
+
+        function kitchenEstimate() {
+            const size = prompt('Kitchen Size (Small/Medium/Large):')?.toLowerCase();
+            const costs = { small: 15000, medium: 25000, large: 40000 };
+            const base = costs[size];
+            
+            if (!base) {
+                alert('Please enter Small, Medium, or Large');
+                return;
+            }
+            
+            const total = base * 1.06;
+            alert(`Kitchen Remodel (${size}):\nBase: ${currency(base)}\nTotal: ${currency(total)}`);
+        }
+
+        function handymanEstimate() {
+            const hours = parseFloat(prompt('Hours:') || '0');
+            if (hours <= 0) return;
+            
+            const rate = 75;
+            const total = hours * rate * 1.06;
+            alert(`Handyman: ${hours} hrs @ $${rate}/hr\nTotal: ${currency(total)}`);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+            updateStats();
+        });
+    </script>
+</body>
+</html>
 
 };
