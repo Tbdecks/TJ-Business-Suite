@@ -6906,5 +6906,304 @@ const MeasurementTools = {
     learnMore(toolName) {
         UI.showAlert(`Opening ${toolName} information...`, 'info');
     }
+};// API integrations main component for T&J Field Services
+const APIIntegrations = {
+    render() {
+        return `
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-medium">API Integrations</h3>
+                    <button onclick="APIIntegrations.testAllAPIs()" class="btn-primary">
+                        <i data-lucide="zap" class="inline w-4 h-4 mr-2"></i>
+                        Test All APIs
+                    </button>
+                </div>
+                
+                <!-- REST APIs -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">
+                        <i data-lucide="globe" class="inline w-5 h-5 mr-2"></i>
+                        REST APIs
+                    </h4>
+                    <div class="grid grid-cols-1 gap-4" id="restAPIs">
+                        <!-- REST APIs will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Webhooks -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">
+                        <i data-lucide="webhook" class="inline w-5 h-5 mr-2"></i>
+                        Webhooks
+                    </h4>
+                    <div class="space-y-4" id="webhooks">
+                        <!-- Webhooks will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Custom APIs -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">
+                        <i data-lucide="code" class="inline w-5 h-5 mr-2"></i>
+                        Custom APIs
+                    </h4>
+                    <div class="space-y-4" id="customAPIs">
+                        <!-- Custom APIs will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- API Settings -->
+                ${APISettings.render()}
+                
+                <!-- API Documentation -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">
+                        <i data-lucide="book-open" class="inline w-5 h-5 mr-2"></i>
+                        API Documentation
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="border rounded-lg p-4">
+                            <h5 class="font-medium mb-2">T&J Field Services API</h5>
+                            <p class="text-sm text-gray-600 mb-3">Complete API documentation for integrating with our system</p>
+                            <div class="flex space-x-2">
+                                <button onclick="APIIntegrations.viewDocs('internal')" class="btn-secondary text-sm">
+                                    View Docs
+                                </button>
+                                <button onclick="APIIntegrations.downloadSDK()" class="btn-secondary text-sm">
+                                    Download SDK
+                                </button>
+                            </div>
+                        </div>
+                        <div class="border rounded-lg p-4">
+                            <h5 class="font-medium mb-2">Integration Examples</h5>
+                            <p class="text-sm text-gray-600 mb-3">Code examples and tutorials for common integrations</p>
+                            <div class="flex space-x-2">
+                                <button onclick="APIIntegrations.viewExamples()" class="btn-secondary text-sm">
+                                    View Examples
+                                </button>
+                                <button onclick="APIIntegrations.openPlayground()" class="btn-secondary text-sm">
+                                    API Playground
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    load() {
+        RestAPIs.load();
+        WebhookManager.load();
+        CustomAPIs.load();
+        APISettings.load();
+        lucide.createIcons();
+    },
+    
+    testAllAPIs() {
+        UI.showAlert('Testing all API connections...', 'info');
+        setTimeout(() => {
+            UI.showAlert('All API connections tested successfully!', 'success');
+        }, 3000);
+    },
+    
+    viewDocs(type) {
+        UI.showAlert('Opening API documentation...', 'info');
+    },
+    
+    downloadSDK() {
+        UI.showAlert('Downloading SDK package...', 'info');
+        setTimeout(() => {
+            UI.showAlert('SDK downloaded successfully!', 'success');
+        }, 2000);
+    },
+    
+    viewExamples() {
+        UI.showAlert('Opening integration examples...', 'info');
+    },
+    
+    openPlayground() {
+        UI.showAlert('Opening API playground...', 'info');
+    }
+};// Custom APIs component for T&J Field Services
+const CustomAPIs = {
+    load() {
+        const customAPIs = [
+            {
+                name: 'Material Supplier API',
+                endpoint: 'https://api.supplier.com/v1',
+                type: 'External',
+                status: 'connected',
+                description: 'Integration with material supplier for pricing and availability',
+                lastSync: '15 minutes ago',
+                dataPoints: '2,341'
+            },
+            {
+                name: 'Weather Service API',
+                endpoint: 'https://api.weather.com/v1',
+                type: 'External',
+                status: 'connected',
+                description: 'Weather data for project scheduling',
+                lastSync: '1 hour ago',
+                dataPoints: '156'
+            },
+            {
+                name: 'Custom CRM Integration',
+                endpoint: 'https://custom.crm.com/api',
+                type: 'Custom',
+                status: 'development',
+                description: 'Custom integration with legacy CRM system',
+                lastSync: 'Never',
+                dataPoints: '0'
+            }
+        ];
+        
+        document.getElementById('customAPIs').innerHTML = `
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-sm text-gray-600">${customAPIs.length} custom integrations</span>
+                <button onclick="CustomAPIs.createCustomAPI()" class="btn-primary text-sm">
+                    <i data-lucide="plus" class="inline w-4 h-4 mr-2"></i>
+                    Add Custom API
+                </button>
+            </div>
+            ${customAPIs.map(api => this.renderCustomAPICard(api)).join('')}
+        `;
+        
+        lucide.createIcons();
+    },
+    
+    renderCustomAPICard(api) {
+        const statusColors = {
+            'connected': 'green',
+            'development': 'yellow',
+            'error': 'red',
+            'paused': 'gray'
+        };
+        
+        const statusColor = statusColors[api.status] || 'gray';
+        
+        return `
+            <div class="border rounded-lg p-4 mb-3">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <div class="flex items-center mb-1">
+                            <h5 class="font-medium mr-2">${api.name}</h5>
+                            <span class="text-xs px-2 py-1 bg-${statusColor === 'yellow' ? 'orange' : 'blue'}-100 text-${statusColor === 'yellow' ? 'orange' : 'blue'}-800 rounded">${api.type}</span>
+                        </div>
+                        <p class="text-sm text-gray-600">${api.description}</p>
+                        <code class="text-xs bg-gray-100 px-2 py-1 rounded mt-1 inline-block">${api.endpoint}</code>
+                    </div>
+                    <div class="text-right">
+                        <span class="w-2 h-2 rounded-full bg-${statusColor}-500 inline-block mr-2"></span>
+                        <span class="text-xs text-${statusColor}-600">${api.status}</span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-between mb-3 text-xs text-gray-500">
+                    <span>Last sync: ${api.lastSync}</span>
+                    <span>Data points: ${api.dataPoints}</span>
+                </div>
+                
+                <div class="flex space-x-2">
+                    <button onclick="CustomAPIs.testConnection('${api.name}')" class="btn-secondary text-sm">
+                        Test Connection
+                    </button>
+                    <button onclick="CustomAPIs.configure('${api.name}')" class="btn-secondary text-sm">
+                        Configure
+                    </button>
+                    <button onclick="CustomAPIs.syncNow('${api.name}')" class="btn-secondary text-sm">
+                        Sync Now
+                    </button>
+                    <button onclick="CustomAPIs.viewData('${api.name}')" class="btn-secondary text-sm">
+                        View Data
+                    </button>
+                </div>
+            </div>
+        `;
+    },
+    
+    createCustomAPI() {
+        const createModal = `
+            <div class="space-y-4">
+                <h4 class="text-lg font-medium">Create Custom API Integration</h4>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Integration Name</label>
+                        <input type="text" id="customAPIName" class="form-input" placeholder="Enter integration name">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">API Endpoint</label>
+                        <input type="url" id="customAPIEndpoint" class="form-input" placeholder="https://api.example.com/v1">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Authentication Type</label>
+                        <select id="authType" class="form-select">
+                            <option value="none">No Authentication</option>
+                            <option value="api_key">API Key</option>
+                            <option value="bearer">Bearer Token</option>
+                            <option value="oauth">OAuth 2.0</option>
+                            <option value="basic">Basic Auth</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <textarea id="customAPIDescription" class="form-textarea" rows="3" placeholder="Describe what this integration does"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Data Sync Frequency</label>
+                        <select id="syncFrequency" class="form-select">
+                            <option value="realtime">Real-time</option>
+                            <option value="hourly">Every hour</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="manual">Manual only</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex space-x-2 pt-4">
+                    <button onclick="UI.closeModal()" class="btn-secondary">Cancel</button>
+                    <button onclick="CustomAPIs.saveCustomAPI()" class="btn-primary">
+                        Create Integration
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        UI.showModal('Create Custom API', createModal);
+    },
+    
+    testConnection(apiName) {
+        UI.showAlert(`Testing connection to ${apiName}...`, 'info');
+        setTimeout(() => {
+            const success = Math.random() > 0.3; // 70% success rate
+            if (success) {
+                UI.showAlert(`${apiName} connection successful!`, 'success');
+            } else {
+                UI.showAlert(`${apiName} connection failed! Check configuration.`, 'error');
+            }
+        }, 2000);
+    },
+    
+    configure(apiName) {
+        UI.showAlert(`Opening ${apiName} configuration...`, 'info');
+    },
+    
+    syncNow(apiName) {
+        UI.showAlert(`Starting sync with ${apiName}...`, 'info');
+        setTimeout(() => {
+            UI.showAlert(`${apiName} sync completed!`, 'success');
+            this.load();
+        }, 3000);
+    },
+    
+    viewData(apiName) {
+        UI.showAlert(`Opening ${apiName} data viewer...`, 'info');
+    },
+    
+    saveCustomAPI() {
+        UI.closeModal();
+        UI.showAlert('Custom API integration created successfully!', 'success');
+        this.load();
+    }
 };
 };
