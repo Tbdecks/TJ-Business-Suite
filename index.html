@@ -1519,5 +1519,549 @@ const EventActions = {
             </div>
         `;
     }
+};// Reports display component for T&J Field Services
+const ReportsDisplay = {
+    render() {
+        return `
+            <div class="bg-white rounded-lg shadow-md p-6" id="reportDisplay">
+                ${this.showWelcome()}
+            </div>
+        `;
+    },
+    
+    showWelcome() {
+        return `
+            <div class="text-center py-12">
+                <i data-lucide="bar-chart-3" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-600 mb-2">Select a Report</h3>
+                <p class="text-gray-500">Choose a report from the list to view detailed analytics</p>
+            </div>
+        `;
+    },
+    
+    showFinancialReport() {
+        const metrics = ReportsStats.getMetrics();
+        const data = Reports.getFilteredData();
+        
+        document.getElementById('reportDisplay').innerHTML = `
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-2xl font-bold">Financial Summary</h3>
+                    <span class="text-sm text-gray-500">
+                        ${Reports.dateRange.start.toLocaleDateString()} - ${Reports.dateRange.end.toLocaleDateString()}
+                    </span>
+                </div>
+                
+                <!-- Revenue Overview -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-green-800">Total Revenue</h4>
+                        <p class="text-2xl font-bold text-green-600">${Data.formatCurrency(metrics.totalRevenue)}</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-blue-800">Average Project Value</h4>
+                        <p class="text-2xl font-bold text-blue-600">${Data.formatCurrency(metrics.averageProjectValue)}</p>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-purple-800">Projects Completed</h4>
+                        <p class="text-2xl font-bold text-purple-600">${metrics.completedProjects}</p>
+                    </div>
+                </div>
+                
+                <!-- Revenue by Project Type -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Revenue by Project Type</h4>
+                    ${this.renderRevenueByType(data.projects)}
+                </div>
+                
+                <!-- Monthly Breakdown -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Monthly Revenue Trend</h4>
+                    ${this.renderMonthlyTrend(data.projects)}
+                </div>
+            </div>
+        `;
+        
+        lucide.createIcons();
+    },
+    
+    showProjectsReport() {
+        const metrics = ReportsStats.getMetrics();
+        const data = Reports.getFilteredData();
+        
+        document.getElementById('reportDisplay').innerHTML = `
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-2xl font-bold">Project Analysis</h3>
+                    <span class="text-sm text-gray-500">
+                        ${Reports.dateRange.start.toLocaleDateString()} - ${Reports.dateRange.end.toLocaleDateString()}
+                    </span>
+                </div>
+                
+                <!-- Project Status Overview -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-yellow-50 p-4 rounded-lg text-center">
+                        <h4 class="font-semibold text-yellow-800">Pending</h4>
+                        <p class="text-2xl font-bold text-yellow-600">${metrics.pendingProjects}</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg text-center">
+                        <h4 class="font-semibold text-blue-800">In Progress</h4>
+                        <p class="text-2xl font-bold text-blue-600">${metrics.activeProjects}</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg text-center">
+                        <h4 class="font-semibold text-green-800">Completed</h4>
+                        <p class="text-2xl font-bold text-green-600">${metrics.completedProjects}</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg text-center">
+                        <h4 class="font-semibold text-gray-800">Total</h4>
+                        <p class="text-2xl font-bold text-gray-600">${metrics.totalProjects}</p>
+                    </div>
+                </div>
+                
+                <!-- Completion Rate -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-semibold mb-4">Completion Rate</h4>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex-1 bg-gray-200 rounded-full h-4">
+                            <div class="bg-green-600 h-4 rounded-full transition-all duration-300" 
+                                 style="width: ${metrics.completionRate}%"></div>
+                        </div>
+                        <span class="text-lg font-bold text-green-600">${Math.round(metrics.completionRate)}%</span>
+                    </div>
+                </div>
+                
+                <!-- Project Types -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Projects by Type</h4>
+                    ${this.renderProjectsByType(data.projects)}
+                </div>
+            </div>
+        `;
+        
+        lucide.createIcons();
+    },
+    
+    showCustomersReport() {
+        const data = Reports.getFilteredData();
+        
+        document.getElementById('reportDisplay').innerHTML = `
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-2xl font-bold">Customer Report</h3>
+                    <span class="text-sm text-gray-500">
+                        ${Reports.dateRange.start.toLocaleDateString()} - ${Reports.dateRange.end.toLocaleDateString()}
+                    </span>
+                </div>
+                
+                <!-- Customer Metrics -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-purple-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-purple-800">New Customers</h4>
+                        <p class="text-2xl font-bold text-purple-600">${data.customers.length}</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-blue-800">Total Customers</h4>
+                        <p class="text-2xl font-bold text-blue-600">${Data.customers.length}</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-green-800">Repeat Customers</h4>
+                        <p class="text-2xl font-bold text-green-600">${this.getRepeatCustomers()}</p>
+                    </div>
+                </div>
+                
+                <!-- Top Customers -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Top Customers by Project Value</h4>
+                    ${this.renderTopCustomers()}
+                </div>
+            </div>
+        `;
+        
+        lucide.createIcons();
+    },
+    
+    renderRevenueByType(projects) {
+        const typeRevenue = {};
+        projects.forEach(project => {
+            typeRevenue[project.type] = (typeRevenue[project.type] || 0) + (project.value || 0);
+        });
+        
+        return `
+            <div class="space-y-2">
+                ${Object.entries(typeRevenue).map(([type, revenue]) => `
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                        <span class="font-medium">${type}</span>
+                        <span class="text-green-600 font-bold">${Data.formatCurrency(revenue)}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    },
+    
+    renderProjectsByType(projects) {
+        const typeCount = {};
+        projects.forEach(project => {
+            typeCount[project.type] = (typeCount[project.type] || 0) + 1;
+        });
+        
+        return `
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                ${Object.entries(typeCount).map(([type, count]) => `
+                    <div class="bg-gray-50 p-4 rounded-lg text-center">
+                        <h5 class="font-medium text-gray-800">${type}</h5>
+                        <p class="text-xl font-bold text-blue-600">${count}</p>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    },
+    
+    getRepeatCustomers() {
+        const customerProjectCount = {};
+        Data.projects.forEach(project => {
+            customerProjectCount[project.customerId] = (customerProjectCount[project.customerId] || 0) + 1;
+        });
+        
+        return Object.values(customerProjectCount).filter(count => count > 1).length;
+    },
+    
+    renderTopCustomers() {
+        const customerRevenue = {};
+        Data.projects.forEach(project => {
+            customerRevenue[project.customerId] = (customerRevenue[project.customerId] || 0) + (project.value || 0);
+        });
+        
+        const topCustomers = Object.entries(customerRevenue)
+            .sort(([,a], [,b]) => b - a)
+            .slice(0, 5)
+            .map(([customerId, revenue]) => {
+                const customer = Data.customers.find(c => c.id === customerId);
+                return { customer: customer?.name || 'Unknown', revenue };
+            });
+        
+        return `
+            <div class="space-y-2">
+                ${topCustomers.map((item, index) => `
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-6 h-6 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center text-sm font-bold">
+                                ${index + 1}
+                            </span>
+                            <span class="font-medium">${item.customer}</span>
+                        </div>
+                        <span class="text-green-600 font-bold">${Data.formatCurrency(item.revenue)}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+};// Custom report builder for T&J Field Services
+const ReportsCustom = {
+    showBuilder() {
+        UI.showModal('Custom Report Builder', this.renderBuilder(), [
+            { text: 'Generate Report', type: 'primary', onclick: 'ReportsCustom.generateCustomReport()' },
+            { text: 'Cancel', type: 'secondary', onclick: 'this.closest(".fixed").remove()' }
+        ]);
+    },
+    
+    renderBuilder() {
+        return `
+            <div class="space-y-6">
+                <!-- Report Type -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Report Type</label>
+                    <select id="customReportType" class="form-select">
+                        <option value="summary">Summary Report</option>
+                        <option value="detailed">Detailed Analysis</option>
+                        <option value="comparison">Comparison Report</option>
+                    </select>
+                </div>
+                
+                <!-- Data Sources -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Include Data From</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="includeProjects" checked class="form-checkbox">
+                            <span class="ml-2">Projects</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="includeCustomers" checked class="form-checkbox">
+                            <span class="ml-2">Customers</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="includeSchedule" class="form-checkbox">
+                            <span class="ml-2">Schedule/Events</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Metrics -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Metrics to Include</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="metricRevenue" checked class="form-checkbox">
+                            <span class="ml-2">Revenue</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="metricProjects" checked class="form-checkbox">
+                            <span class="ml-2">Project Count</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="metricCompletion" class="form-checkbox">
+                            <span class="ml-2">Completion Rate</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="metricCustomers" class="form-checkbox">
+                            <span class="ml-2">Customer Growth</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Grouping -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Group Data By</label>
+                    <select id="customGroupBy" class="form-select">
+                        <option value="none">No Grouping</option>
+                        <option value="month">Month</option>
+                        <option value="quarter">Quarter</option>
+                        <option value="type">Project Type</option>
+                        <option value="status">Project Status</option>
+                        <option value="customer">Customer</option>
+                    </select>
+                </div>
+                
+                <!-- Filters -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Filters</label>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">Project Status</label>
+                            <select id="filterStatus" class="form-select text-sm">
+                                <option value="">All Statuses</option>
+                                <option value="pending">Pending</option>
+                                <option value="in-progress">In Progress</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">Project Type</label>
+                            <select id="filterType" class="form-select text-sm">
+                                <option value="">All Types</option>
+                                <option value="deck">Deck Building</option>
+                                <option value="remodeling">Remodeling</option>
+                                <option value="handyman">Handyman</option>
+                                <option value="renovation">Renovation</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">Minimum Project Value</label>
+                            <input type="number" id="filterMinValue" placeholder="0" class="form-input text-sm">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    generateCustomReport() {
+        const config = this.collectConfig();
+        const data = this.getFilteredData(config);
+        const reportContent = this.buildCustomReport(config, data);
+        
+        document.getElementById('reportDisplay').innerHTML = reportContent;
+        document.querySelector('.fixed').remove();
+        
+        // Update current report
+        Reports.currentReport = 'custom';
+        
+        // Update active report in list
+        document.querySelectorAll('.report-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        lucide.createIcons();
+        UI.showAlert('Custom report generated successfully!');
+    },
+    
+    collectConfig() {
+        return {
+            type: document.getElementById('customReportType').value,
+            includeProjects: document.getElementById('includeProjects').checked,
+            includeCustomers: document.getElementById('includeCustomers').checked,
+            includeSchedule: document.getElementById('includeSchedule').checked,
+            metrics: {
+                revenue: document.getElementById('metricRevenue').checked,
+                projects: document.getElementById('metricProjects').checked,
+                completion: document.getElementById('metricCompletion').checked,
+                customers: document.getElementById('metricCustomers').checked
+            },
+            groupBy: document.getElementById('customGroupBy').value,
+            filters: {
+                status: document.getElementById('filterStatus').value,
+                type: document.getElementById('filterType').value,
+                minValue: parseFloat(document.getElementById('filterMinValue').value) || 0
+            }
+        };
+    },
+    
+    getFilteredData(config) {
+        const baseData = Reports.getFilteredData();
+        
+        // Apply additional filters
+        let projects = baseData.projects;
+        
+        if (config.filters.status) {
+            projects = projects.filter(p => p.status === config.filters.status);
+        }
+        
+        if (config.filters.type) {
+            projects = projects.filter(p => p.type === config.filters.type);
+        }
+        
+        if (config.filters.minValue > 0) {
+            projects = projects.filter(p => (p.value || 0) >= config.filters.minValue);
+        }
+        
+        return {
+            ...baseData,
+            projects: projects
+        };
+    },
+    
+    buildCustomReport(config, data) {
+        const title = this.getCustomReportTitle(config);
+        
+        return `
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-2xl font-bold">${title}</h3>
+                    <span class="text-sm text-gray-500">
+                        ${Reports.dateRange.start.toLocaleDateString()} - ${Reports.dateRange.end.toLocaleDateString()}
+                    </span>
+                </div>
+                
+                ${config.metrics.revenue || config.metrics.projects || config.metrics.completion || config.metrics.customers ? 
+                    this.renderCustomMetrics(config, data) : ''}
+                
+                ${config.includeProjects ? this.renderProjectsSection(config, data) : ''}
+                
+                ${config.includeCustomers ? this.renderCustomersSection(config, data) : ''}
+                
+                ${config.includeSchedule ? this.renderScheduleSection(config, data) : ''}
+                
+                ${config.groupBy !== 'none' ? this.renderGroupedData(config, data) : ''}
+            </div>
+        `;
+    },
+    
+    getCustomReportTitle(config) {
+        const typeNames = {
+            'summary': 'Custom Summary Report',
+            'detailed': 'Custom Detailed Analysis',
+            'comparison': 'Custom Comparison Report'
+        };
+        return typeNames[config.type] || 'Custom Report';
+    },
+    
+    renderCustomMetrics(config, data) {
+        const metrics = [];
+        
+        if (config.metrics.revenue) {
+            const totalRevenue = data.projects.reduce((sum, p) => sum + (p.value || 0), 0);
+            metrics.push({ label: 'Total Revenue', value: Data.formatCurrency(totalRevenue), color: 'green' });
+        }
+        
+        if (config.metrics.projects) {
+            metrics.push({ label: 'Total Projects', value: data.projects.length, color: 'blue' });
+        }
+        
+        if (config.metrics.completion) {
+            const completed = data.projects.filter(p => p.status === 'completed').length;
+            const rate = data.projects.length > 0 ? Math.round((completed / data.projects.length) * 100) : 0;
+            metrics.push({ label: 'Completion Rate', value: `${rate}%`, color: 'purple' });
+        }
+        
+        if (config.metrics.customers) {
+            metrics.push({ label: 'New Customers', value: data.customers.length, color: 'orange' });
+        }
+        
+        return `
+            <div class="grid grid-cols-1 md:grid-cols-${Math.min(metrics.length, 4)} gap-6">
+                ${metrics.map(metric => `
+                    <div class="bg-${metric.color}-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-${metric.color}-800">${metric.label}</h4>
+                        <p class="text-2xl font-bold text-${metric.color}-600">${metric.value}</p>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    },
+    
+    renderProjectsSection(config, data) {
+        return `
+            <div class="bg-white border rounded-lg p-6">
+                <h4 class="text-lg font-semibold mb-4">Projects Overview</h4>
+                <div class="space-y-2">
+                    ${data.projects.slice(0, 10).map(project => `
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                            <div>
+                                <div class="font-medium">${project.name}</div>
+                                <div class="text-sm text-gray-500">${project.type} • ${project.status}</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-green-600">${Data.formatCurrency(project.value || 0)}</div>
+                                <div class="text-sm text-gray-500">${Data.formatDate(project.dateCreated)}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                ${data.projects.length > 10 ? `<p class="text-sm text-gray-500 mt-4">... and ${data.projects.length - 10} more projects</p>` : ''}
+            </div>
+        `;
+    },
+    
+    renderCustomersSection(config, data) {
+        return `
+            <div class="bg-white border rounded-lg p-6">
+                <h4 class="text-lg font-semibold mb-4">Customers Overview</h4>
+                <div class="space-y-2">
+                    ${data.customers.slice(0, 5).map(customer => `
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                            <div>
+                                <div class="font-medium">${customer.name}</div>
+                                <div class="text-sm text-gray-500">${customer.email || customer.primaryPhone}</div>
+                            </div>
+                            <div class="text-sm text-gray-500">${Data.formatDate(customer.dateCreated)}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    },
+    
+    renderScheduleSection(config, data) {
+        return `
+            <div class="bg-white border rounded-lg p-6">
+                <h4 class="text-lg font-semibold mb-4">Schedule Overview</h4>
+                <div class="text-center py-4 text-gray-500">
+                    <p>Schedule data would be displayed here</p>
+                    <p class="text-sm">${data.events ? data.events.length : 0} events in selected period</p>
+                </div>
+            </div>
+        `;
+    },
+    
+    renderGroupedData(config, data) {
+        return `
+            <div class="bg-white border rounded-lg p-6">
+                <h4 class="text-lg font-semibold mb-4">Data Grouped by ${config.groupBy}</h4>
+                <div class="text-center py-4 text-gray-500">
+                    <p>Grouped analysis would be displayed here</p>
+                </div>
+            </div>
+        `;
+    }
 };
 };
