@@ -6263,5 +6263,648 @@ const MediaServices = {
         UI.closeModal();
         UI.showAlert(`${serviceName} configuration saved!`, 'success');
     }
+};// Storage usage component for T&J Field Services
+const StorageUsage = {
+    render() {
+        return `
+            <div class="bg-white border rounded-lg p-6">
+                <h4 class="text-lg font-medium mb-4">Storage Usage</h4>
+                <div id="storageUsageContent">
+                    <!-- Storage usage content will be loaded here -->
+                </div>
+            </div>
+        `;
+    },
+    
+    load() {
+        this.renderUsage();
+    },
+    
+    renderUsage() {
+        const usageData = {
+            total: '100 GB',
+            used: '42.3 GB',
+            available: '57.7 GB',
+            percentage: 42,
+            breakdown: [
+                { type: 'Photos', size: '28.5 GB', percentage: 67, color: 'blue' },
+                { type: 'Documents', size: '8.2 GB', percentage: 19, color: 'green' },
+                { type: 'Videos', size: '4.1 GB', percentage: 10, color: 'purple' },
+                { type: 'Other', size: '1.5 GB', percentage: 4, color: 'gray' }
+            ],
+            services: [
+                { name: 'Google Drive', used: '15.2 GB', total: '100 GB', percentage: 15 },
+                { name: 'Local Storage', used: '27.1 GB', total: '500 GB', percentage: 5 }
+            ]
+        };
+        
+        document.getElementById('storageUsageContent').innerHTML = `
+            <!-- Overall Usage -->
+            <div class="mb-6">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium">Total Storage Used</span>
+                    <span class="text-sm text-gray-600">${usageData.used} / ${usageData.total}</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
+                    <div class="bg-blue-600 h-3 rounded-full transition-all duration-300" 
+                         style="width: ${usageData.percentage}%"></div>
+                </div>
+                <div class="flex justify-between text-xs text-gray-500">
+                    <span>Used: ${usageData.used}</span>
+                    <span>Available: ${usageData.available}</span>
+                </div>
+            </div>
+            
+            <!-- Usage Breakdown -->
+            <div class="mb-6">
+                <h5 class="font-medium mb-3">Storage Breakdown</h5>
+                <div class="space-y-3">
+                    ${usageData.breakdown.map(item => `
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 bg-${item.color}-500 rounded-full mr-3"></div>
+                                <span class="text-sm">${item.type}</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <span class="text-sm text-gray-600">${item.size}</span>
+                                <div class="w-16 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-${item.color}-500 h-2 rounded-full" 
+                                         style="width: ${item.percentage}%"></div>
+                                </div>
+                                <span class="text-xs text-gray-500 w-8">${item.percentage}%</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <!-- Service Usage -->
+            <div class="mb-6">
+                <h5 class="font-medium mb-3">Usage by Service</h5>
+                <div class="space-y-3">
+                    ${usageData.services.map(service => `
+                        <div class="border rounded-lg p-3">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-medium text-sm">${service.name}</span>
+                                <span class="text-sm text-gray-600">${service.used} / ${service.total}</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-blue-600 h-2 rounded-full" 
+                                     style="width: ${service.percentage}%"></div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <!-- Storage Actions -->
+            <div class="flex flex-wrap gap-2">
+                <button onclick="StorageUsage.optimizeStorage()" class="btn-secondary text-sm">
+                    <i data-lucide="zap" class="inline w-4 h-4 mr-2"></i>
+                    Optimize Storage
+                </button>
+                <button onclick="StorageUsage.cleanupFiles()" class="btn-secondary text-sm">
+                    <i data-lucide="trash-2" class="inline w-4 h-4 mr-2"></i>
+                    Cleanup Files
+                </button>
+                <button onclick="StorageUsage.exportUsage()" class="btn-secondary text-sm">
+                    <i data-lucide="download" class="inline w-4 h-4 mr-2"></i>
+                    Export Report
+                </button>
+                <button onclick="StorageUsage.upgradeStorage()" class="btn-primary text-sm">
+                    <i data-lucide="arrow-up" class="inline w-4 h-4 mr-2"></i>
+                    Upgrade Storage
+                </button>
+            </div>
+        `;
+        
+        lucide.createIcons();
+    },
+    
+    optimizeStorage() {
+        UI.showAlert('Optimizing storage usage...', 'info');
+        setTimeout(() => {
+            UI.showAlert('Storage optimization completed! Freed up 2.1 GB', 'success');
+            this.refresh();
+        }, 3000);
+    },
+    
+    cleanupFiles() {
+        const cleanupModal = `
+            <div class="space-y-4">
+                <h4 class="text-lg font-medium">Cleanup Files</h4>
+                <div class="space-y-3">
+                    <p class="text-sm text-gray-600">Select file types to clean up:</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input type="checkbox" class="form-checkbox">
+                                <span class="ml-3 text-sm">Duplicate files</span>
+                            </div>
+                            <span class="text-sm text-gray-500">~1.2 GB</span>
+                        </label>
+                        <label class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input type="checkbox" class="form-checkbox">
+                                <span class="ml-3 text-sm">Old temporary files</span>
+                            </div>
+                            <span class="text-sm text-gray-500">~0.8 GB</span>
+                        </label>
+                        <label class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input type="checkbox" class="form-checkbox">
+                                <span class="ml-3 text-sm">Cached thumbnails</span>
+                            </div>
+                            <span class="text-sm text-gray-500">~0.3 GB</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="flex space-x-2 pt-4">
+                    <button onclick="UI.closeModal()" class="btn-secondary">Cancel</button>
+                    <button onclick="StorageUsage.performCleanup()" class="btn-primary">
+                        Start Cleanup
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        UI.showModal('Cleanup Files', cleanupModal);
+    },
+    
+    performCleanup() {
+        UI.closeModal();
+        UI.showAlert('Cleaning up selected files...', 'info');
+        setTimeout(() => {
+            UI.showAlert('Cleanup completed! Freed up 2.3 GB', 'success');
+            this.refresh();
+        }, 4000);
+    },
+    
+    exportUsage() {
+        UI.showAlert('Exporting storage usage report...', 'info');
+        setTimeout(() => {
+            UI.showAlert('Storage usage report exported successfully!', 'success');
+        }, 1500);
+    },
+    
+    upgradeStorage() {
+        const upgradeModal = `
+            <div class="space-y-4">
+                <h4 class="text-lg font-medium">Upgrade Storage</h4>
+                <div class="space-y-3">
+                    <div class="grid grid-cols-1 gap-3">
+                        <div class="border rounded-lg p-3 cursor-pointer hover:border-blue-500">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h5 class="font-medium">200 GB Plan</h5>
+                                    <p class="text-sm text-gray-600">Double your current storage</p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-medium">$9.99/month</div>
+                                    <div class="text-sm text-gray-500">+$5/month</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border rounded-lg p-3 cursor-pointer hover:border-blue-500">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h5 class="font-medium">500 GB Plan</h5>
+                                    <p class="text-sm text-gray-600">5x your current storage</p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-medium">$19.99/month</div>
+                                    <div class="text-sm text-gray-500">+$15/month</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border rounded-lg p-3 cursor-pointer hover:border-blue-500 border-blue-200 bg-blue-50">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h5 class="font-medium text-blue-900">1 TB Plan</h5>
+                                    <p class="text-sm text-blue-700">Unlimited for most businesses</p>
+                                    <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">Recommended</span>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-medium text-blue-900">$29.99/month</div>
+                                    <div class="text-sm text-blue-600">+$25/month</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex space-x-2 pt-4">
+                    <button onclick="UI.closeModal()" class="btn-secondary">Cancel</button>
+                    <button onclick="StorageUsage.selectPlan()" class="btn-primary">
+                        Upgrade Now
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        UI.showModal('Upgrade Storage', upgradeModal);
+    },
+    
+    selectPlan() {
+        UI.closeModal();
+        UI.showAlert('Redirecting to upgrade page...', 'info');
+    },
+    
+    refresh() {
+        this.renderUsage();
+    }
+};id: tj-tools-integrations
+name: T&J Tools Integrations
+type: code.js
+content: |-
+// Tools integrations component for T&J Field Services
+const ToolsIntegrations = {
+    render() {
+        return `
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-medium">Tools Integrations</h3>
+                    <button onclick="ToolsIntegrations.testAllConnections()" class="btn-primary">
+                        <i data-lucide="zap" class="inline w-4 h-4 mr-2"></i>
+                        Test All
+                    </button>
+                </div>
+                
+                <!-- Project Management Tools -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">
+                        <i data-lucide="clipboard" class="inline w-5 h-5 mr-2"></i>
+                        Project Management
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${this.renderProjectTools()}
+                    </div>
+                </div>
+                
+                <!-- Design & CAD Tools -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">
+                        <i data-lucide="pen-tool" class="inline w-5 h-5 mr-2"></i>
+                        Design & CAD Tools
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${this.renderDesignTools()}
+                    </div>
+                </div>
+                
+                <!-- Measurement & Estimation -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">
+                        <i data-lucide="ruler" class="inline w-5 h-5 mr-2"></i>
+                        Measurement & Estimation
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${this.renderMeasurementTools()}
+                    </div>
+                </div>
+                
+                <!-- Productivity Tools -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">
+                        <i data-lucide="briefcase" class="inline w-5 h-5 mr-2"></i>
+                        Productivity Tools
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${this.renderProductivityTools()}
+                    </div>
+                </div>
+                
+                <!-- Tools Settings -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">Tools Integration Settings</h4>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Data Sync Frequency</label>
+                                <select id="toolsSyncFreq" class="form-select">
+                                    <option value="realtime">Real-time</option>
+                                    <option value="hourly">Every hour</option>
+                                    <option value="daily">Daily</option>
+                                    <option value="manual">Manual only</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Default Export Format</label>
+                                <select id="exportFormat" class="form-select">
+                                    <option value="pdf">PDF</option>
+                                    <option value="dwg">DWG</option>
+                                    <option value="csv">CSV</option>
+                                    <option value="json">JSON</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="autoImportProjects" class="form-checkbox" checked>
+                                <span class="ml-3">Automatically import projects from connected tools</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="syncMeasurements" class="form-checkbox" checked>
+                                <span class="ml-3">Sync measurements and estimates automatically</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="shareDesigns" class="form-checkbox">
+                                <span class="ml-3">Share design files with customers automatically</span>
+                            </label>
+                        </div>
+                        
+                        <button onclick="ToolsIntegrations.saveSettings()" class="btn-primary">
+                            Save Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    renderProjectTools() {
+        const projectTools = [
+            {
+                name: 'Trello',
+                status: 'available',
+                description: 'Visual project management',
+                icon: 'trello',
+                color: 'blue',
+                features: ['Kanban boards', 'Task tracking', 'Team collaboration']
+            },
+            {
+                name: 'Asana',
+                status: 'available',
+                description: 'Team project management',
+                icon: 'check-circle',
+                color: 'pink',
+                features: ['Project timelines', 'Task dependencies', 'Progress tracking']
+            },
+            {
+                name: 'Monday.com',
+                status: 'available',
+                description: 'Work operating system',
+                icon: 'calendar',
+                color: 'orange',
+                features: ['Custom workflows', 'Automation', 'Time tracking']
+            },
+            {
+                name: 'Basecamp',
+                status: 'available',
+                description: 'Project organization',
+                icon: 'mountain',
+                color: 'green',
+                features: ['Message boards', 'To-do lists', 'File sharing']
+            }
+        ];
+        
+        return projectTools.map(tool => this.renderToolCard(tool, 'project')).join('');
+    },
+    
+    renderDesignTools() {
+        const designTools = [
+            {
+                name: 'AutoCAD',
+                status: 'available',
+                description: 'Professional CAD software',
+                icon: 'pen-tool',
+                color: 'red',
+                features: ['2D/3D design', 'Technical drawings', 'Precision tools']
+            },
+            {
+                name: 'SketchUp',
+                status: 'available',
+                description: '3D modeling software',
+                icon: 'box',
+                color: 'blue',
+                features: ['3D modeling', 'Deck design', 'Material visualization']
+            },
+            {
+                name: 'Deck Designer',
+                status: 'connected',
+                description: 'Specialized deck design tool',
+                icon: 'home',
+                color: 'brown',
+                features: ['Deck layouts', 'Material lists', 'Cost estimates']
+            },
+            {
+                name: 'Chief Architect',
+                status: 'available',
+                description: 'Home design software',
+                icon: 'layout',
+                color: 'purple',
+                features: ['Home design', '3D rendering', 'Construction docs']
+            }
+        ];
+        
+        return designTools.map(tool => this.renderToolCard(tool, 'design')).join('');
+    },
+    
+    renderMeasurementTools() {
+        const measurementTools = [
+            {
+                name: 'MagicPlan',
+                status: 'available',
+                description: 'Floor plan measurement',
+                icon: 'ruler',
+                color: 'blue',
+                features: ['AR measurement', 'Floor plans', 'Area calculation']
+            },
+            {
+                name: 'RoofSnap',
+                status: 'available',
+                description: 'Aerial measurement',
+                icon: 'map',
+                color: 'green',
+                features: ['Satellite imagery', 'Roof measurement', 'Reports']
+            },
+            {
+                name: 'PlanSwift',
+                status: 'available',
+                description: 'Digital takeoff software',
+                icon: 'calculator',
+                color: 'orange',
+                features: ['Digital takeoffs', 'Cost estimation', 'Bid preparation']
+            },
+            {
+                name: 'Measure Square',
+                status: 'available',
+                description: 'Flooring measurement',
+                icon: 'square',
+                color: 'purple',
+                features: ['Floor measurement', 'Material calculation', 'Waste factors']
+            }
+        ];
+        
+        return measurementTools.map(tool => this.renderToolCard(tool, 'measurement')).join('');
+    },
+    
+    renderProductivityTools() {
+        const productivityTools = [
+            {
+                name: 'Zapier',
+                status: 'available',
+                description: 'Workflow automation',
+                icon: 'zap',
+                color: 'orange',
+                features: ['App connections', 'Automation', 'Workflow triggers']
+            },
+            {
+                name: 'IFTTT',
+                status: 'available',
+                description: 'Simple automation',
+                icon: 'link',
+                color: 'blue',
+                features: ['Simple triggers', 'Device integration', 'Notifications']
+            },
+            {
+                name: 'Microsoft Power Automate',
+                status: 'available',
+                description: 'Business process automation',
+                icon: 'workflow',
+                color: 'blue',
+                features: ['Business workflows', 'Data integration', 'Approvals']
+            },
+            {
+                name: 'Integromat',
+                status: 'available',
+                description: 'Advanced automation',
+                icon: 'settings',
+                color: 'purple',
+                features: ['Complex scenarios', 'Data transformation', 'Error handling']
+            }
+        ];
+        
+        return productivityTools.map(tool => this.renderToolCard(tool, 'productivity')).join('');
+    },
+    
+    renderToolCard(tool, category) {
+        const isConnected = tool.status === 'connected';
+        return `
+            <div class="border rounded-lg p-4 ${isConnected ? 'border-green-200 bg-green-50' : 'border-gray-200'}">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-${tool.color}-100 rounded-lg flex items-center justify-center mr-3">
+                            <i data-lucide="${tool.icon}" class="w-5 h-5 text-${tool.color}-600"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-medium">${tool.name}</h5>
+                            <p class="text-sm text-gray-600">${tool.description}</p>
+                        </div>
+                    </div>
+                    <span class="w-2 h-2 rounded-full ${isConnected ? 'bg-green
+// Measurement tools component for T&J Field Services
+const MeasurementTools = {
+    load() {
+        const measurementTools = [
+            {
+                name: 'MagicPlan',
+                status: 'available',
+                description: 'Floor plan measurement',
+                icon: 'ruler',
+                color: 'blue',
+                features: ['AR measurement', 'Floor plans', 'Area calculation']
+            },
+            {
+                name: 'RoofSnap',
+                status: 'available',
+                description: 'Aerial measurement',
+                icon: 'map',
+                color: 'green',
+                features: ['Satellite imagery', 'Roof measurement', 'Reports']
+            },
+            {
+                name: 'PlanSwift',
+                status: 'available',
+                description: 'Digital takeoff software',
+                icon: 'calculator',
+                color: 'orange',
+                features: ['Digital takeoffs', 'Cost estimation', 'Bid preparation']
+            },
+            {
+                name: 'Measure Square',
+                status: 'available',
+                description: 'Flooring measurement',
+                icon: 'square',
+                color: 'purple',
+                features: ['Floor measurement', 'Material calculation', 'Waste factors']
+            }
+        ];
+        
+        document.getElementById('measurementTools').innerHTML = 
+            measurementTools.map(tool => this.renderToolCard(tool)).join('');
+        
+        lucide.createIcons();
+    },
+    
+    renderToolCard(tool) {
+        const isConnected = tool.status === 'connected';
+        return `
+            <div class="border rounded-lg p-4 ${isConnected ? 'border-green-200 bg-green-50' : 'border-gray-200'}">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-${tool.color}-100 rounded-lg flex items-center justify-center mr-3">
+                            <i data-lucide="${tool.icon}" class="w-5 h-5 text-${tool.color}-600"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-medium">${tool.name}</h5>
+                            <p class="text-sm text-gray-600">${tool.description}</p>
+                        </div>
+                    </div>
+                    <span class="w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-400'}"></span>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="flex flex-wrap gap-1">
+                        ${tool.features.map(feature => `
+                            <span class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">${feature}</span>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div class="flex space-x-2">
+                    ${isConnected ? `
+                        <button onclick="MeasurementTools.startMeasurement('${tool.name}')" 
+                                class="btn-secondary text-sm flex-1">
+                            Start Measuring
+                        </button>
+                        <button onclick="MeasurementTools.configure('${tool.name}')" 
+                                class="btn-secondary text-sm">
+                            Settings
+                        </button>
+                    ` : `
+                        <button onclick="MeasurementTools.connect('${tool.name}')" 
+                                class="btn-primary text-sm flex-1">
+                            Connect
+                        </button>
+                        <button onclick="MeasurementTools.learnMore('${tool.name}')" 
+                                class="btn-secondary text-sm">
+                            Info
+                        </button>
+                    `}
+                </div>
+            </div>
+        `;
+    },
+    
+    connect(toolName) {
+        UI.showAlert(`Connecting to ${toolName}...`, 'info');
+        setTimeout(() => {
+            UI.showAlert(`${toolName} connected successfully!`, 'success');
+            this.load();
+        }, 2000);
+    },
+    
+    configure(toolName) {
+        UI.showAlert(`Opening ${toolName} configuration...`, 'info');
+    },
+    
+    startMeasurement(toolName) {
+        UI.showAlert(`Starting measurement with ${toolName}...`, 'info');
+    },
+    
+    learnMore(toolName) {
+        UI.showAlert(`Opening ${toolName} information...`, 'info');
+    }
 };
 };
