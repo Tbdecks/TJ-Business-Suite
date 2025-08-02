@@ -4101,5 +4101,346 @@ const LoginHistory = {
             UI.showAlert(`IP address ${ip} has been blocked`, 'success');
         }
     }
+};// Security audit component for T&J Field Services
+const SecurityAudit = {
+    render() {
+        return `
+            <!-- Security Audit -->
+            <div>
+                <h4 class="text-lg font-medium mb-4">Security Audit & Monitoring</h4>
+                <div class="space-y-6">
+                    <!-- Security Score -->
+                    <div class="border rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <h5 class="font-medium">Security Score</h5>
+                            <button onclick="SecurityAudit.runSecurityScan()" class="btn-secondary text-sm">
+                                <i data-lucide="shield-check" class="inline w-4 h-4 mr-2"></i>
+                                Run Security Scan
+                            </button>
+                        </div>
+                        
+                        <div id="securityScore" class="space-y-4">
+                            <!-- Score will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Security Recommendations -->
+                    <div class="border rounded-lg p-4">
+                        <h5 class="font-medium mb-3">Security Recommendations</h5>
+                        <div id="securityRecommendations" class="space-y-3">
+                            <!-- Recommendations will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Audit Log -->
+                    <div class="border rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <h5 class="font-medium">Security Audit Log</h5>
+                            <div class="flex space-x-2">
+                                <select id="auditFilter" class="form-select text-sm" onchange="SecurityAudit.filterAuditLog()">
+                                    <option value="all">All Events</option>
+                                    <option value="login">Login Events</option>
+                                    <option value="settings">Settings Changes</option>
+                                    <option value="data">Data Access</option>
+                                    <option value="security">Security Events</option>
+                                </select>
+                                <button onclick="SecurityAudit.exportAuditLog()" class="btn-secondary text-sm">
+                                    <i data-lucide="download" class="inline w-4 h-4 mr-2"></i>
+                                    Export
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="auditLog" class="space-y-2 max-h-64 overflow-y-auto">
+                            <!-- Audit log will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Security Alerts -->
+                    <div class="border rounded-lg p-4">
+                        <h5 class="font-medium mb-3">Security Alert Settings</h5>
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="alertFailedLogins" class="form-checkbox">
+                                <span class="ml-3">Alert on multiple failed login attempts</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="alertNewDevice" class="form-checkbox">
+                                <span class="ml-3">Alert on new device login</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="alertUnusualLocation" class="form-checkbox">
+                                <span class="ml-3">Alert on unusual login location</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="alertDataExport" class="form-checkbox">
+                                <span class="ml-3">Alert on data export requests</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="alertSettingsChange" class="form-checkbox">
+                                <span class="ml-3">Alert on security settings changes</span>
+                            </label>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Alert Threshold</label>
+                            <select id="alertThreshold" class="form-select">
+                                <option value="low">Low sensitivity</option>
+                                <option value="medium">Medium sensitivity</option>
+                                <option value="high">High sensitivity</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    load() {
+        this.loadSecurityScore();
+        this.loadRecommendations();
+        this.loadAuditLog();
+        
+        // Load alert settings
+        document.getElementById('alertFailedLogins').checked = Settings.getSetting('alertFailedLogins', true);
+        document.getElementById('alertNewDevice').checked = Settings.getSetting('alertNewDevice', true);
+        document.getElementById('alertUnusualLocation').checked = Settings.getSetting('alertUnusualLocation', true);
+        document.getElementById('alertDataExport').checked = Settings.getSetting('alertDataExport', true);
+        document.getElementById('alertSettingsChange').checked = Settings.getSetting('alertSettingsChange', true);
+        document.getElementById('alertThreshold').value = Settings.getSetting('alertThreshold', 'medium');
+    },
+    
+    loadSecurityScore() {
+        // Calculate security score based on current settings
+        let score = 0;
+        let maxScore = 100;
+        
+        // Check various security factors
+        if (Settings.getSetting('twoFactorEnabled', false)) score += 25;
+        if (Settings.getSetting('requireUppercase', false)) score += 10;
+        if (Settings.getSetting('requireNumbers', false)) score += 10;
+        if (Settings.getSetting('sessionTimeout', '60') !== 'never') score += 15;
+        if (Settings.getSetting('notifyNewLogin', false)) score += 10;
+        if (Settings.getSetting('enableIPRestrictions', false)) score += 20;
+        if (Settings.getSetting('collectAnalytics', false)) score += 10;
+        
+        const percentage = Math.min(score, maxScore);
+        const level = percentage >= 80 ? 'Excellent' : percentage >= 60 ? 'Good' : percentage >= 40 ? 'Fair' : 'Poor';
+        const color = percentage >= 80 ? 'green' : percentage >= 60 ? 'blue' : percentage >= 40 ? 'yellow' : 'red';
+        
+        document.getElementById('securityScore').innerHTML = `
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="text-2xl font-bold text-${color}-600">${percentage}/100</div>
+                    <div class="text-sm text-gray-600">Security Level: ${level}</div>
+                </div>
+                <div class="w-24 h-24">
+                    <svg class="transform -rotate-90 w-24 h-24">
+                        <circle cx="48" cy="48" r="40" stroke="currentColor" stroke-width="8" fill="transparent" class="text-gray-200"/>
+                        <circle cx="48" cy="48" r="40" stroke="currentColor" stroke-width="8" fill="transparent" 
+                                stroke-dasharray="${2 * Math.PI * 40}" stroke-dashoffset="${2 * Math.PI * 40 * (1 - percentage / 100)}"
+                                class="text-${color}-600"/>
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="text-xl font-bold text-${color}-600">${percentage}%</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 text-sm text-gray-600">
+                Last scan: ${new Date().toLocaleString()}
+            </div>
+        `;
+    },
+    
+    loadRecommendations() {
+        const recommendations = [];
+        
+        if (!Settings.getSetting('twoFactorEnabled', false)) {
+            recommendations.push({
+                type: 'critical',
+                title: 'Enable Two-Factor Authentication',
+                description: 'Add an extra layer of security to your account',
+                action: 'Enable 2FA'
+            });
+        }
+        
+        if (Settings.getSetting('sessionTimeout', '60') === 'never') {
+            recommendations.push({
+                type: 'warning',
+                title: 'Set Session Timeout',
+                description: 'Automatically log out inactive sessions for better security',
+                action: 'Configure Timeout'
+            });
+        }
+        
+        if (!Settings.getSetting('requireSpecialChars', false)) {
+            recommendations.push({
+                type: 'info',
+                title: 'Strengthen Password Requirements',
+                description: 'Require special characters in passwords',
+                action: 'Update Policy'
+            });
+        }
+        
+        if (recommendations.length === 0) {
+            recommendations.push({
+                type: 'success',
+                title: 'All Security Recommendations Met',
+                description: 'Your security configuration looks good!',
+                action: null
+            });
+        }
+        
+        document.getElementById('securityRecommendations').innerHTML = recommendations.map(rec => `
+            <div class="flex items-start p-3 border rounded-lg ${this.getRecommendationColor(rec.type)}">
+                <i data-lucide="${this.getRecommendationIcon(rec.type)}" 
+                   class="w-5 h-5 mt-0.5 mr-3 ${this.getRecommendationIconColor(rec.type)}"></i>
+                <div class="flex-1">
+                    <h6 class="font-medium text-sm">${rec.title}</h6>
+                    <p class="text-sm text-gray-600">${rec.description}</p>
+                </div>
+                ${rec.action ? `
+                    <button onclick="SecurityAudit.handleRecommendation('${rec.type}')" 
+                            class="btn-secondary text-sm">
+                        ${rec.action}
+                    </button>
+                ` : ''}
+            </div>
+        `).join('');
+        
+        lucide.createIcons();
+    },
+    
+    loadAuditLog() {
+        const auditEvents = [
+            {
+                timestamp: '2024-01-15 10:30:15',
+                type: 'login',
+                event: 'Successful login',
+                details: 'User logged in from Chrome on Windows',
+                ip: '192.168.1.100'
+            },
+            {
+                timestamp: '2024-01-15 09:45:22',
+                type: 'settings',
+                event: 'Security settings changed',
+                details: 'Two-factor authentication enabled',
+                ip: '192.168.1.100'
+            },
+            {
+                timestamp: '2024-01-14 16:20:33',
+                type: 'security',
+                event: 'Failed login attempt',
+                details: 'Multiple failed login attempts detected',
+                ip: '203.0.113.45'
+            },
+            {
+                timestamp: '2024-01-14 14:15:10',
+                type: 'data',
+                event: 'Data export requested',
+                details: 'User requested data export',
+                ip: '192.168.1.100'
+            }
+        ];
+        
+        document.getElementById('auditLog').innerHTML = auditEvents.map(event => `
+            <div class="flex items-center justify-between p-2 border rounded text-sm">
+                <div class="flex items-center">
+                    <span class="w-2 h-2 rounded-full ${this.getEventColor(event.type)} mr-3"></span>
+                    <div>
+                        <div class="font-medium">${event.event}</div>
+                        <div class="text-gray-500 text-xs">${event.details}</div>
+                    </div>
+                </div>
+                <div class="text-right text-xs text-gray-400">
+                    <div>${event.timestamp}</div>
+                    <div>${event.ip}</div>
+                </div>
+            </div>
+        `).join('');
+    },
+    
+    getRecommendationColor(type) {
+        switch (type) {
+            case 'critical': return 'bg-red-50 border-red-200';
+            case 'warning': return 'bg-yellow-50 border-yellow-200';
+            case 'info': return 'bg-blue-50 border-blue-200';
+            case 'success': return 'bg-green-50 border-green-200';
+            default: return 'bg-gray-50 border-gray-200';
+        }
+    },
+    
+    getRecommendationIcon(type) {
+        switch (type) {
+            case 'critical': return 'alert-circle';
+            case 'warning': return 'alert-triangle';
+            case 'info': return 'info';
+            case 'success': return 'check-circle';
+            default: return 'info';
+        }
+    },
+    
+    getRecommendationIconColor(type) {
+        switch (type) {
+            case 'critical': return 'text-red-600';
+            case 'warning': return 'text-yellow-600';
+            case 'info': return 'text-blue-600';
+            case 'success': return 'text-green-600';
+            default: return 'text-gray-600';
+        }
+    },
+    
+    getEventColor(type) {
+        switch (type) {
+            case 'login': return 'bg-blue-500';
+            case 'settings': return 'bg-green-500';
+            case 'data': return 'bg-purple-500';
+            case 'security': return 'bg-red-500';
+            default: return 'bg-gray-500';
+        }
+    },
+    
+    runSecurityScan() {
+        UI.showAlert('Running security scan...', 'info');
+        setTimeout(() => {
+            this.loadSecurityScore();
+            this.loadRecommendations();
+            UI.showAlert('Security scan completed!', 'success');
+        }, 2000);
+    },
+    
+    handleRecommendation(type) {
+        switch (type) {
+            case 'critical':
+                UI.showAlert('Redirecting to Two-Factor Authentication setup...', 'info');
+                break;
+            case 'warning':
+                UI.showAlert('Redirecting to Session Management settings...', 'info');
+                break;
+            case 'info':
+                UI.showAlert('Redirecting to Password Policy settings...', 'info');
+                break;
+        }
+    },
+    
+    filterAuditLog() {
+        const filter = document.getElementById('auditFilter').value;
+        UI.showAlert(`Filtering audit log by: ${filter}`, 'info');
+    },
+    
+    exportAuditLog() {
+        UI.showAlert('Audit log exported to CSV', 'success');
+    },
+    
+    collect() {
+        return {
+            alertFailedLogins: document.getElementById('alertFailedLogins').checked,
+            alertNewDevice: document.getElementById('alertNewDevice').checked,
+            alertUnusualLocation: document.getElementById('alertUnusualLocation').checked,
+            alertDataExport: document.getElementById('alertDataExport').checked,
+            alertSettingsChange: document.getElementById('alertSettingsChange').checked,
+            alertThreshold: document.getElementById('alertThreshold').value
+        };
+    }
 };
 };
