@@ -2063,5 +2063,755 @@ const ReportsCustom = {
             </div>
         `;
     }
-};
+};// General settings component for T&J Field Services
+const SettingsGeneral = {
+    render() {
+        return `
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-semibold">General Settings</h3>
+                    <button onclick="SettingsGeneral.save()" class="btn-primary">
+                        <i data-lucide="save" class="inline w-4 h-4 mr-2"></i>
+                        Save Changes
+                    </button>
+                </div>
+                
+                <div class="space-y-8">
+                    <!-- Company Information -->
+                    <div>
+                        <h4 class="text-lg font-medium mb-4">Company Information</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+                                <input type="text" id="companyName" class="form-input" 
+                                       placeholder="T&J Field Services">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Time Zone</label>
+                                <select id="timezone" class="form-select">
+                                    <option value="America/New_York">Eastern Time (ET)</option>
+                                    <option value="America/Chicago">Central Time (CT)</option>
+                                    <option value="America/Denver">Mountain Time (MT)</option>
+                                    <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Date & Time Format -->
+                    <div>
+                        <h4 class="text-lg font-medium mb-4">Date & Time Format</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Date Format</label>
+                                <select id="dateFormat" class="form-select">
+                                    <option value="MM/DD/YYYY">MM/DD/YYYY (12/31/2024)</option>
+                                    <option value="DD/MM/YYYY">DD/MM/YYYY (31/12/2024)</option>
+                                    <option value="YYYY-MM-DD">YYYY-MM-DD (2024-12-31)</option>
+                                    <option value="MMM DD, YYYY">MMM DD, YYYY (Dec 31, 2024)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Time Format</label>
+                                <select id="timeFormat" class="form-select">
+                                    <option value="12">12-hour (2:30 PM)</option>
+                                    <option value="24">24-hour (14:30)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Currency</label>
+                                <select id="currency" class="form-select">
+                                    <option value="USD">USD ($)</option>
+                                    <option value="CAD">CAD (C$)</option>
+                                    <option value="EUR">EUR (€)</option>
+                                    <option value="GBP">GBP (£)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Language & Region -->
+                    <div>
+                        <h4 class="text-lg font-medium mb-4">Language & Region</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Language</label>
+                                <select id="language" class="form-select">
+                                    <option value="en">English</option>
+                                    <option value="es">Spanish</option>
+                                    <option value="fr">French</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Theme</label>
+                                <select id="theme" class="form-select">
+                                    <option value="light">Light</option>
+                                    <option value="dark">Dark</option>
+                                    <option value="auto">Auto (System)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Interface Preferences -->
+                    <div>
+                        <h4 class="text-lg font-medium mb-4">Interface Preferences</h4>
+                        <div class="space-y-4">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="sidebarCollapsed" class="form-checkbox">
+                                <span class="ml-3">Start with sidebar collapsed</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="showWelcomeMessage" class="form-checkbox">
+                                <span class="ml-3">Show welcome message on dashboard</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="enableAnimations" class="form-checkbox">
+                                <span class="ml-3">Enable page animations</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Preview -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="text-lg font-medium mb-3">Preview</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span>Current Date:</span>
+                                <span id="previewDate" class="font-mono"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Current Time:</span>
+                                <span id="previewTime" class="font-mono"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Sample Amount:</span>
+                                <span id="previewCurrency" class="font-mono"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    load() {
+        // Load current settings into form
+        document.getElementById('companyName').value = Settings.getSetting('companyName', 'T&J Field Services');
+        document.getElementById('timezone').value = Settings.getSetting('timezone', 'America/New_York');
+        document.getElementById('dateFormat').value = Settings.getSetting('dateFormat', 'MM/DD/YYYY');
+        document.getElementById('timeFormat').value = Settings.getSetting('timeFormat', '12');
+        document.getElementById('currency').value = Settings.getSetting('currency', 'USD');
+        document.getElementById('language').value = Settings.getSetting('language', 'en');
+        document.getElementById('theme').value = Settings.getSetting('theme', 'light');
+        document.getElementById('sidebarCollapsed').checked = Settings.getSetting('sidebarCollapsed', false);
+        document.getElementById('showWelcomeMessage').checked = Settings.getSetting('showWelcomeMessage', true);
+        document.getElementById('enableAnimations').checked = Settings.getSetting('enableAnimations', true);
+        
+        // Add event listeners for preview updates
+        ['dateFormat', 'timeFormat', 'currency'].forEach(id => {
+            document.getElementById(id).addEventListener('change', this.updatePreview.bind(this));
+        });
+        
+        this.updatePreview();
+    },
+    
+    updatePreview() {
+        const dateFormat = document.getElementById('dateFormat').value;
+        const timeFormat = document.getElementById('timeFormat').value;
+        const currency = document.getElementById('currency').value;
+        
+        const now = new Date();
+        
+        // Update date preview
+        let dateStr = '';
+        switch(dateFormat) {
+            case 'MM/DD/YYYY':
+                dateStr = now.toLocaleDateString('en-US');
+                break;
+            case 'DD/MM/YYYY':
+                dateStr = now.toLocaleDateString('en-GB');
+                break;
+            case 'YYYY-MM-DD':
+                dateStr = now.toISOString().split('T')[0];
+                break;
+            case 'MMM DD, YYYY':
+                dateStr = now.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+                break;
+        }
+        document.getElementById('previewDate').textContent = dateStr;
+        
+        // Update time preview
+        const timeStr = timeFormat === '12' ? 
+            now.toLocaleTimeString('en-US', { hour12: true }) :
+            now.toLocaleTimeString('en-US', { hour12: false });
+        document.getElementById('previewTime').textContent = timeStr;
+        
+        // Update currency preview
+        const currencySymbols = {
+            'USD': '$',
+            'CAD': 'C$',
+            'EUR': '€',
+            'GBP': '£'
+        };
+        document.getElementById('previewCurrency').textContent = `${currencySymbols[currency]}1,234.56`;
+    },
+    
+    save() {
+        // Collect all form values
+        const formData = {
+            companyName: document.getElementById('companyName').value,
+            timezone: document.getElementById('timezone').value,
+            dateFormat: document.getElementById('dateFormat').value,
+            timeFormat: document.getElementById('timeFormat').value,
+            currency: document.getElementById('currency').value,
+            language: document.getElementById('language').value,
+            theme: document.getElementById('theme').value,
+            sidebarCollapsed: document.getElementById('sidebarCollapsed').checked,
+            showWelcomeMessage: document.getElementById('showWelcomeMessage').checked,
+            enableAnimations: document.getElementById('enableAnimations').checked
+        };
+        
+        // Update settings
+        Object.keys(formData).forEach(key => {
+            Settings.updateSetting(key, formData[key]);
+        });
+        
+        // Apply theme change immediately if needed
+        if (formData.theme !== Settings.getSetting('theme')) {
+            this.applyTheme(formData.theme);
+        }
+        
+        UI.showAlert('General settings saved successfully!', 'success');
+    },
+    
+    applyTheme(theme) {
+        // Theme application logic would go here
+        // For now, just store the preference
+        document.documentElement.setAttribute('data-theme', theme);
+    }
+};id: tj-settings-business
+name: T&J Settings Business
+type: code.js
+content: |-
+// Business settings component for T&J Field Services
+const SettingsBusiness = {
+    render() {
+        return `
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-semibold">Business Information</h3>
+                    <button onclick="SettingsBusiness.save()" class="btn-primary">
+                        <i data-lucide="save" class="inline w-4 h-4 mr-2"></i>
+                        Save Changes
+                    </button>
+                </div>
+                
+                <div class="space-y-8">
+                    <!-- Basic Business Info -->
+                    <div>
+                        <h4 class="text-lg font-medium mb-4">Basic Information</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Business Name</label>
+                                <input type="text" id="businessName" class="form-input" 
+                                       placeholder="T&J Field Services">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Business Type</label>
+                                <select id="businessType" class="form-select">
+                                    <option value="contractor">General Contractor</option>
+                                    <option value="remodeling">Remodeling Company</option>
+                                    <option value="handyman">Handyman Services</option>
+                                    <option value="specialty">Specialty Contractor</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Business Description</label>
+                            <textarea id="businessDescription" rows="3" class="form-textarea" 
+                                      placeholder="Professional remodeling, deck building, and handyman services in Delmar, Maryland"></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Contact Information -->
+                    <div>
+                        <h4 class="text-lg font-medium mb-4">Contact Information</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Primary Phone</label>
+                                <input type="tel" id="businessPhone" class="form-input" 
+                                       placeholder="(555) 123-4567">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Secondary Phone</label>
+                                <input type="tel" id="businessPhone2" class="form-input" 
+                                       placeholder="(555) 123-4568">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Business Email</label>
+                                <input type="email" id="businessEmail" class="form-input" 
+                                       placeholder="info@tjfieldservices.com">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Website</label>
+                                <input type="url" id="businessWebsite" class="form-input" 
+                                       placeholder="https://www.tjfieldservices.com">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Address Information -->
+                    <div>
+                        <h4 class="text-lg font-medium mb-4">Business Address</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Street Address</label>
+                                <input type="text" id="businessStreet" class="form-input" 
+                                       placeholder="123 Main Street">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                                    <input type="text" id="businessCity" class="form-input" 
+                                           placeholder="Delmar">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">State</label>
+                                    <input type="text" id="businessState" class="form-input" 
+                                           placeholder="Maryland">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">ZIP Code</label>
+                                    <input type="text" id="businessZip" class="form-input" 
+                                           placeholder="21875">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Service Areas -->
+                    <div>
+                        <h4 class="text-lg font-medium mb-4">Service Areas</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Primary Service Radius (miles)</label>
+                                <input type="number" id="serviceRadius" class="form-input" 
+                                       placeholder="25" min="1" max="100">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Service Areas (one per line)</label>
+                                <textarea id="serviceAreas" rows="4" class="form-textarea" 
+                                          placeholder="Delmar, MD&#10;Salisbury, MD&#10;Ocean City, MD&#10;Berlin, MD"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Licensing & Insurance -->
+                    <div>
+                        <h4 class="text-lg font-medium mb-4">Licensing & Insurance</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">License Number</label>
+                                <input type="text" id="licenseNumber" class="form-input" 
+                                       placeholder="MD-CONTRACTOR-123456">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">License Expiration</label>
+                                <input type="date" id="licenseExpiration" class="form-input">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Insurance Company</label>
+                                <input type="text" id="insuranceCompany" class="form-input" 
+                                       placeholder="ABC Insurance Co.">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Policy Number</label>
+                                <input type="text" id="insurancePolicy" class="form-input" 
+                                       placeholder="POL-123456789">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Insurance Coverage Amount</label>
+                            <select id="insuranceCoverage" class="form-select">
+                                <option value="500000">$500,000</option>
+                                <option value="1000000">$1,000,000</option>
+                                <option value="2000000">$2,000,000</option>
+                                <option value="5000000">$5,000,000</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Business Hours -->
+                    <div>
+                        <h4 class="text-lg font-medium mb-4">Business Hours</h4>
+                        <div class="space-y-3">
+                            ${this.renderBusinessHours()}
+                        </div>
+                    </div>
+                    
+                    <!-- Social Media -->
+// Business address component for T&J Field Services
+const BusinessAddress = {
+    render() {
+        return `
+            <!-- Address Information -->
+            <div>
+                <h4 class="text-lg font-medium mb-4">Business Address</h4>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Street Address</label>
+                        <input type="text" id="businessStreet" class="form-input" 
+                               placeholder="123 Main Street">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                            <input type="text" id="businessCity" class="form-input" 
+                                   placeholder="Delmar">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">State</label>
+                            <select id="businessState" class="form-select">
+                                <option value="">Select State</option>
+                                ${this.renderStateOptions()}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">ZIP Code</label>
+                            <input type="text" id="businessZip" class="form-input" 
+                                   placeholder="21875">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mailing Address -->
+                <div class="mt-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h5 class="text-md font-medium">Mailing Address</h5>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="sameAsBusinessAddress" class="form-checkbox" 
+                                   onchange="BusinessAddress.toggleMailingAddress()">
+                            <span class="ml-2 text-sm">Same as business address</span>
+                        </label>
+                    </div>
+                    
+                    <div id="mailingAddressFields" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Mailing Street Address</label>
+                            <input type="text" id="mailingStreet" class="form-input" 
+                                   placeholder="P.O. Box 123">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                                <input type="text" id="mailingCity" class="form-input" 
+                                       placeholder="Delmar">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">State</label>
+                                <select id="mailingState" class="form-select">
+                                    <option value="">Select State</option>
+                                    ${this.renderStateOptions()}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">ZIP Code</label>
+                                <input type="text" id="mailingZip" class="form-input" 
+                                       placeholder="21875">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    renderStateOptions() {
+        const states = [
+            'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
+            'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
+            'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+            'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
+            'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'
+        ];
+        
+        return states.map(state => `<option value="${state}">${state}</option>`).join('');
+    },
+    
+    toggleMailingAddress() {
+        const sameAddress = document.getElementById('sameAsBusinessAddress').checked;
+        const mailingFields = document.getElementById('mailingAddressFields');
+        
+        if (sameAddress) {
+            mailingFields.style.display = 'none';
+            // Copy business address to mailing address
+            document.getElementById('mailingStreet').value = document.getElementById('businessStreet').value;
+            document.getElementById('mailingCity').value = document.getElementById('businessCity').value;
+            document.getElementById('mailingState').value = document.getElementById('businessState').value;
+            document.getElementById('mailingZip').value = document.getElementById('businessZip').value;
+        } else {
+            mailingFields.style.display = 'block';
+        }
+    },
+    
+    load() {
+        document.getElementById('businessStreet').value = Settings.getSetting('businessStreet', '');
+        document.getElementById('businessCity').value = Settings.getSetting('businessCity', 'Delmar');
+        document.getElementById('businessState').value = Settings.getSetting('businessState', 'MD');
+        document.getElementById('businessZip').value = Settings.getSetting('businessZip', '21875');
+        
+        document.getElementById('mailingStreet').value = Settings.getSetting('mailingStreet', '');
+        document.getElementById('mailingCity').value = Settings.getSetting('mailingCity', '');
+        document.getElementById('mailingState').value = Settings.getSetting('mailingState', '');
+        document.getElementById('mailingZip').value = Settings.getSetting('mailingZip', '');
+        
+        const sameAddress = Settings.getSetting('sameAsBusinessAddress', true);
+        document.getElementById('sameAsBusinessAddress').checked = sameAddress;
+        this.toggleMailingAddress();
+    },
+    
+    collect() {
+        return {
+            businessStreet: document.getElementById('businessStreet').value,
+            businessCity: document.getElementById('businessCity').value,
+            businessState: document.getElementById('businessState').value,
+            businessZip: document.getElementById('businessZip').value,
+            mailingStreet: document.getElementById('mailingStreet').value,
+            mailingCity: document.getElementById('mailingCity').value,
+            mailingState: document.getElementById('mailingState').value,
+            mailingZip: document.getElementById('mailingZip').value,
+            sameAsBusinessAddress: document.getElementById('sameAsBusinessAddress').checked
+        };
+    }
+};id: tj-business-license
+name: T&J Business License Component
+type: code.js
+content: |-
+// Business license component for T&J Field Services
+const BusinessLicense = {
+    render() {
+        return `
+            <!-- Licensing & Insurance -->
+            <div>
+                <h4 class="text-lg font-medium mb-4">Licensing & Insurance</h4>
+                
+                <!-- License Information -->
+                <div class="mb-6">
+                    <h5 class="text-md font-medium mb-3">License Information</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">License Number</label>
+                            <input type="text" id="licenseNumber" class="form-input" 
+                                   placeholder="MD-CONTRACTOR-123456">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">License Type</label>
+                            <select id="licenseType" class="form-select">
+                                <option value="general">General Contractor</option>
+                                <option value="specialty">Specialty Contractor</option>
+                                <option value="handyman">Handyman License</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">License Expiration</label>
+                            <input type="date" id="licenseExpiration" class="form-input">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Issuing State</label>
+                            <select id="licenseState" class="form-select">
+                                <option value="MD">Maryland</option>
+                                <option value="DE">Delaware</option>
+                                <option value="VA">Virginia</option>
+                                <option value="PA">Pennsylvania</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Insurance Information -->
+                <div class="mb-6">
+                    <h5 class="text-md font-medium mb-3">Insurance Information</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Insurance Company</label>
+                            <input type="text" id="insuranceCompany" class="form-input" 
+                                   placeholder="ABC Insurance Co.">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Policy Number</label>
+                            <input type="text" id="insurancePolicy" class="form-input" 
+                                   placeholder="POL-123456789">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Coverage Amount</label>
+                            <select id="insuranceCoverage" class="form-select">
+                                <option value="500000">$500,000</option>
+                                <option value="1000000">$1,000,000</option>
+                                <option value="2000000">$2,000,000</option>
+                                <option value="5000000">$5,000,000</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Policy Expiration</label>
+                            <input type="date" id="insuranceExpiration" class="form-input">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bonding Information -->
+                <div class="mb-6">
+                    <h5 class="text-md font-medium mb-3">Bonding Information</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="isBonded" class="form-checkbox">
+                                <span class="ml-3">Business is bonded</span>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Bond Amount</label>
+                            <input type="number" id="bondAmount" class="form-input" 
+                                   placeholder="50000">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Bonding Company</label>
+                            <input type="text" id="bondingCompany" class="form-input" 
+                                   placeholder="XYZ Bonding Co.">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Bond Expiration</label>
+                            <input type="date" id="bondExpiration" class="form-input">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Certifications -->
+                <div>
+                    <h5 class="text-md font-medium mb-3">Professional Certifications</h5>
+                    <div class="space-y-3">
+                        <div id="certificationsList">
+                            <!-- Certifications will be loaded here -->
+                        </div>
+                        <button type="button" onclick="BusinessLicense.addCertification()" 
+                                class="btn-secondary text-sm">
+                            <i data-lucide="plus" class="inline w-4 h-4 mr-2"></i>
+                            Add Certification
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    load() {
+        document.getElementById('licenseNumber').value = Settings.getSetting('licenseNumber', '');
+        document.getElementById('licenseType').value = Settings.getSetting('licenseType', 'general');
+        document.getElementById('licenseExpiration').value = Settings.getSetting('licenseExpiration', '');
+        document.getElementById('licenseState').value = Settings.getSetting('licenseState', 'MD');
+        
+        document.getElementById('insuranceCompany').value = Settings.getSetting('insuranceCompany', '');
+        document.getElementById('insurancePolicy').value = Settings.getSetting('insurancePolicy', '');
+        document.getElementById('insuranceCoverage').value = Settings.getSetting('insuranceCoverage', '1000000');
+        document.getElementById('insuranceExpiration').value = Settings.getSetting('insuranceExpiration', '');
+        
+        document.getElementById('isBonded').checked = Settings.getSetting('isBonded', false);
+        document.getElementById('bondAmount').value = Settings.getSetting('bondAmount', '');
+        document.getElementById('bondingCompany').value = Settings.getSetting('bondingCompany', '');
+        document.getElementById('bondExpiration').value = Settings.getSetting('bondExpiration', '');
+        
+        this.loadCertifications();
+    },
+    
+    loadCertifications() {
+        const certifications = Settings.getSetting('certifications', []);
+        const container = document.getElementById('certificationsList');
+        
+        container.innerHTML = certifications.map((cert, index) => 
+            this.renderCertification(cert, index)
+        ).join('');
+        
+        if (certifications.length === 0) {
+            this.addCertification();
+        }
+    },
+    
+    renderCertification(cert = {}, index) {
+        return `
+            <div class="certification-item grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border rounded-lg">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Certification Name</label>
+                    <input type="text" class="form-input text-sm" 
+                           value="${cert.name || ''}" 
+                           placeholder="e.g., OSHA 30-Hour">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Issuing Organization</label>
+                    <input type="text" class="form-input text-sm" 
+                           value="${cert.issuer || ''}" 
+                           placeholder="e.g., OSHA">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Expiration Date</label>
+                    <input type="date" class="form-input text-sm" 
+                           value="${cert.expiration || ''}">
+                </div>
+                <div class="flex items-end">
+                    <button type="button" onclick="BusinessLicense.removeCertification(this)" 
+                            class="btn-secondary text-sm text-red-600 hover:text-red-800">
+                        <i data-lucide="trash-2" class="inline w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    },
+    
+    addCertification() {
+        const container = document.getElementById('certificationsList');
+        const index = container.children.length;
+        container.insertAdjacentHTML('beforeend', this.renderCertification({}, index));
+        lucide.createIcons();
+    },
+    
+    removeCertification(button) {
+        button.closest('.certification-item').remove();
+    },
+    
+    collect() {
+        // Collect certifications
+        const certifications = [];
+        document.querySelectorAll('.certification-item').forEach(item => {
+            const inputs = item.querySelectorAll('input');
+            if (inputs[0].value.trim()) {
+                certifications.push({
+                    name: inputs[0].value,
+                    issuer: inputs[1].value,
+                    expiration: inputs[2].value
+                });
+            }
+        });
+        
+        return {
+            licenseNumber: document.getElementById('licenseNumber').value,
+            licenseType: document.getElementById('licenseType').value,
+            licenseExpiration: document.getElementById('licenseExpiration').value,
+            licenseState: document.getElementById('licenseState').value,
+            insuranceCompany: document.getElementById('insuranceCompany').value,
+            insurancePolicy: document.getElementById('insurancePolicy').value,
+            insuranceCoverage: document.getElementById('insuranceCoverage').value,
+            insuranceExpiration: document.getElementById('insuranceExpiration').value,
+            isBonded: document.getElementById('isBonded').checked,
+            bondAmount: document.getElementById('bondAmount').value,
+            bondingCompany: document.getElementById('
+
 };
