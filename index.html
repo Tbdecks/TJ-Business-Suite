@@ -536,5 +536,299 @@ const EstimatesList = {
         
         UI.showAlert('Estimates exported successfully!');
     }
+};// Customer form component for T&J Field Services
+const CustomerForm = {
+    render() {
+        return `
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold">Add New Customer</h3>
+                    <button onclick="Customers.cancelEdit()" id="cancelEdit" class="text-gray-400 hover:text-gray-600 hidden">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                
+                <form id="customerForm" onsubmit="Customers.saveCustomer(event)">
+                    ${this.renderBasicInfo()}
+                    ${this.renderContactInfo()}
+                    ${this.renderAddressInfo()}
+                    ${this.renderAdditionalInfo()}
+                    ${this.renderActions()}
+                </form>
+            </div>
+        `;
+    },
+    
+    renderBasicInfo() {
+        return `
+            <!-- Basic Information -->
+            <div class="mb-6">
+                <h4 class="font-medium text-gray-900 mb-3">Basic Information</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                        <input type="text" id="customerFullName" required class="form-input">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Company (Optional)</label>
+                        <input type="text" id="customerCompany" class="form-input">
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    renderContactInfo() {
+        return `
+            <!-- Contact Information -->
+            <div class="mb-6">
+                <h4 class="font-medium text-gray-900 mb-3">Contact Information</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Primary Phone *</label>
+                        <input type="tel" id="customerPrimaryPhone" required class="form-input">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Secondary Phone</label>
+                        <input type="tel" id="customerSecondaryPhone" class="form-input">
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                    <input type="email" id="customerEmailAddress" class="form-input">
+                </div>
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Preferred Contact Method</label>
+                    <select id="preferredContact" class="form-select">
+                        <option value="phone">Phone</option>
+                        <option value="email">Email</option>
+                        <option value="text">Text Message</option>
+                        <option value="any">Any Method</option>
+                    </select>
+                </div>
+            </div>
+        `;
+    },
+    
+    renderAddressInfo() {
+        return `
+            <!-- Address Information -->
+            <div class="mb-6">
+                <h4 class="font-medium text-gray-900 mb-3">Address Information</h4>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Street Address</label>
+                    <input type="text" id="customerStreetAddress" class="form-input">
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                        <input type="text" id="customerCity" class="form-input" value="Delmar">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">State</label>
+                        <select id="customerState" class="form-select">
+                            <option value="MD" selected>Maryland</option>
+                            <option value="DE">Delaware</option>
+                            <option value="VA">Virginia</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">ZIP Code</label>
+                        <input type="text" id="customerZip" class="form-input" value="21875">
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    renderAdditionalInfo() {
+        return `
+            <!-- Additional Information -->
+            <div class="mb-6">
+                <h4 class="font-medium text-gray-900 mb-3">Additional Information</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Customer Source</label>
+                        <select id="customerSource" class="form-select">
+                            <option value="">How did they find us?</option>
+                            <option value="referral">Referral</option>
+                            <option value="google">Google Search</option>
+                            <option value="facebook">Facebook</option>
+                            <option value="nextdoor">Nextdoor</option>
+                            <option value="yard-sign">Yard Sign</option>
+                            <option value="repeat">Repeat Customer</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Customer Type</label>
+                        <select id="customerType" class="form-select">
+                            <option value="residential">Residential</option>
+                            <option value="commercial">Commercial</option>
+                            <option value="property-manager">Property Manager</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                    <textarea id="customerNotes" rows="3" class="form-textarea" 
+                              placeholder="Any special notes about this customer..."></textarea>
+                </div>
+            </div>
+        `;
+    },
+    
+    renderActions() {
+        return `
+            <!-- Actions -->
+            <div class="flex space-x-4">
+                <button type="submit" class="btn-primary flex-1">
+                    <i data-lucide="user-plus" class="inline w-4 h-4 mr-2"></i>
+                    Add Customer
+                </button>
+                <button type="button" onclick="CustomerForm.clear()" class="btn-secondary">
+                    Clear
+                </button>
+            </div>
+        `;
+    },
+    
+    collectData() {
+        return {
+            name: document.getElementById('customerFullName').value,
+            company: document.getElementById('customerCompany').value,
+            primaryPhone: document.getElementById('customerPrimaryPhone').value,
+            secondaryPhone: document.getElementById('customerSecondaryPhone').value,
+            email: document.getElementById('customerEmailAddress').value,
+            preferredContact: document.getElementById('preferredContact').value,
+            address: this.getFullAddress(),
+            streetAddress: document.getElementById('customerStreetAddress').value,
+            city: document.getElementById('customerCity').value,
+            state: document.getElementById('customerState').value,
+            zip: document.getElementById('customerZip').value,
+            source: document.getElementById('customerSource').value,
+            type: document.getElementById('customerType').value,
+            notes: document.getElementById('customerNotes').value
+        };
+    },
+    
+    getFullAddress() {
+        const street = document.getElementById('customerStreetAddress').value;
+        const city = document.getElementById('customerCity').value;
+        const state = document.getElementById('customerState').value;
+        const zip = document.getElementById('customerZip').value;
+        
+        return [street, city, state, zip].filter(part => part.trim()).join(', ');
+    },
+    
+    loadData(customer) {
+        document.getElementById('customerFullName').value = customer.name || '';
+        document.getElementById('customerCompany').value = customer.company || '';
+        document.getElementById('customerPrimaryPhone').value = customer.primaryPhone || '';
+        document.getElementById('customerSecondaryPhone').value = customer.secondaryPhone || '';
+        document.getElementById('customerEmailAddress').value = customer.email || '';
+        document.getElementById('preferredContact').value = customer.preferredContact || 'phone';
+        document.getElementById('customerStreetAddress').value = customer.streetAddress || '';
+        document.getElementById('customerCity').value = customer.city || 'Delmar';
+        document.getElementById('customerState').value = customer.state || 'MD';
+        document.getElementById('customerZip').value = customer.zip || '21875';
+        document.getElementById('customerSource').value = customer.source || '';
+        document.getElementById('customerType').value = customer.type || 'residential';
+        document.getElementById('customerNotes').value = customer.notes || '';
+        
+        // Show cancel button
+        document.getElementById('cancelEdit').classList.remove('hidden');
+    },
+    
+    clear() {
+        UI.clearForm(document.getElementById('customerForm'));
+        
+        // Reset defaults
+        document.getElementById('customerCity').value = 'Delmar';
+        document.getElementById('customerState').value = 'MD';
+        document.getElementById('customerZip').value = '21875';
+        document.getElementById('preferredContact').value = 'phone';
+        document.getElementById('customerType').value = 'residential';
+        
+        // Hide cancel button
+        document.getElementById('cancelEdit').classList.add('hidden');
+    }
+};// Customers export component for T&J Field Services
+const CustomersExport = {
+    export() {
+        const data = Data.customers.map(customer => ({
+            name: customer.name,
+            company: customer.company || '',
+            phone: customer.primaryPhone,
+            email: customer.email || '',
+            address: customer.address || '',
+            type: customer.type || 'residential',
+            dateAdded: customer.dateAdded
+        }));
+        
+        const csv = [
+            'Name,Company,Phone,Email,Address,Type,Date Added',
+            ...data.map(row => `"${row.name}","${row.company}","${row.phone}","${row.email}","${row.address}","${row.type}","${row.dateAdded}"`)
+        ].join('\n');
+        
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'customers.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        UI.showAlert('Customers exported successfully!');
+    },
+    
+    exportToVCF(id) {
+        const customer = Data.customers.find(c => c.id === id);
+        if (customer) {
+            const vcf = [
+                'BEGIN:VCARD',
+                'VERSION:3.0',
+                `FN:${customer.name}`,
+                `TEL:${customer.primaryPhone}`,
+                customer.email ? `EMAIL:${customer.email}` : '',
+                customer.address ? `ADR:;;${customer.address};;;` : '',
+                'END:VCARD'
+            ].filter(line => line).join('\n');
+            
+            const blob = new Blob([vcf], { type: 'text/vcard' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${customer.name.replace(/\s+/g, '_')}.vcf`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            UI.showAlert('Contact exported to VCF!');
+        }
+    }
+};// Projects filter component for T&J Field Services
+const ProjectsFilter = {
+    render() {
+        return `
+            <!-- Search and Filters -->
+            <div class="mb-4 space-y-3">
+                <input type="text" id="projectSearch" placeholder="Search projects..." 
+                       onkeyup="ProjectsList.search()" class="form-input">
+                
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="ProjectsList.filter('all')" 
+                            class="filter-btn active" data-filter="all">All</button>
+                    <button onclick="ProjectsList.filter('active')" 
+                            class="filter-btn" data-filter="active">Active</button>
+                    <button onclick="ProjectsList.filter('pending')" 
+                            class="filter-btn" data-filter="pending">Pending</button>
+                    <button onclick="ProjectsList.filter('completed')" 
+                            class="filter-btn" data-filter="completed">Completed</button>
+                    <button onclick="ProjectsList.filter('high-priority')" 
+                            class="filter-btn" data-filter="high-priority">High Priority</button>
+                </div>
+            </div>
+        `;
+    }
 };
 };
