@@ -1,4 +1,4 @@
-  id: tj-business-suite-complete
+id: tj-complete-system
 name: T&J Field Services - Complete Business Management System
 type: html
 content: |-
@@ -68,7 +68,6 @@ content: |-
 
       <!-- Main Content -->
       <main class="container mx-auto px-4 py-6">
-          
           <!-- Dashboard Section -->
           <section id="dashboard" class="section active">
               <h2 class="text-3xl font-bold mb-6 text-gray-800">Business Dashboard</h2>
@@ -517,7 +516,78 @@ content: |-
 
               const estimate = {
                   id: Date.now(),
-                  date: new Date().to          <!-- Estimates Section -->
+                  date: new Date().toLocaleDateString(),
+                  customerName: customerName,
+                  projectType: projectType          <!-- Dashboard Section -->
+          <section id="dashboard" class="section active">
+              <h2 class="text-3xl font-bold mb-6 text-gray-800">Business Dashboard</h2>
+              
+              <!-- Key Metrics -->
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                  <div class="bg-white p-6 rounded-lg shadow-md card">
+                      <div class="flex items-center justify-between">
+                          <div>
+                              <p class="text-sm font-medium text-gray-600">Total Estimates</p>
+                              <p class="text-2xl font-bold text-gray-900" id="totalEstimates">0</p>
+                          </div>
+                          <i data-lucide="file-text" class="w-8 h-8 text-blue-600"></i>
+                      </div>
+                  </div>
+                  
+                  <div class="bg-white p-6 rounded-lg shadow-md card">
+                      <div class="flex items-center justify-between">
+                          <div>
+                              <p class="text-sm font-medium text-gray-600">Active Customers</p>
+                              <p class="text-2xl font-bold text-gray-900" id="activeCustomers">0</p>
+                          </div>
+                          <i data-lucide="users" class="w-8 h-8 text-green-600"></i>
+                      </div>
+                  </div>
+                  
+                  <div class="bg-white p-6 rounded-lg shadow-md card">
+                      <div class="flex items-center justify-between">
+                          <div>
+                              <p class="text-sm font-medium text-gray-600">Active Projects</p>
+                              <p class="text-2xl font-bold text-gray-900" id="activeProjects">0</p>
+                          </div>
+                          <i data-lucide="briefcase" class="w-8 h-8 text-orange-600"></i>
+                      </div>
+                  </div>
+                  
+                  <div class="bg-white p-6 rounded-lg shadow-md card">
+                      <div class="flex items-center justify-between">
+                          <div>
+                              <p class="text-sm font-medium text-gray-600">Monthly Revenue</p>
+                              <p class="text-2xl font-bold text-gray-900" id="monthlyRevenue">$0</p>
+                          </div>
+                          <i data-lucide="dollar-sign" class="w-8 h-8 text-purple-600"></i>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- Quick Actions -->
+              <div class="bg-white rounded-lg shadow-md p-6">
+                  <h3 class="text-xl font-semibold mb-4">Quick Actions</h3>
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <button onclick="showSection('estimates')" class="bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                          <i data-lucide="plus" class="w-5 h-5 mx-auto mb-2"></i>
+                          New Estimate
+                      </button>
+                      <button onclick="showSection('customers')" class="bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-colors">
+                          <i data-lucide="user-plus" class="w-5 h-5 mx-auto mb-2"></i>
+                          Add Customer
+                      </button>
+                      <button onclick="showSection('projects')" class="bg-orange-600 text-white px-4 py-3 rounded-lg hover:bg-orange-700 transition-colors">
+                          <i data-lucide="folder-plus" class="w-5 h-5 mx-auto mb-2"></i>
+                          New Project
+                      </button>
+                      <button onclick="showSection('schedule')" class="bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors">
+                          <i data-lucide="calendar-plus" class="w-5 h-5 mx-auto mb-2"></i>
+                          Schedule Job
+                      </button>
+                  </div>
+              </div>
+          </section>          <!-- Estimates Section -->
           <section id="estimates" class="section">
               <h2 class="text-3xl font-bold mb-6 text-gray-800">Project Estimates</h2>
               
@@ -582,6 +652,10 @@ content: |-
                           <div>
                               <label class="block text-sm font-medium text-gray-700 mb-2">Square Footage</label>
                               <input type="number" id="squareFootage" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                          </div>
+                          <div>
+                              <label class="block text-sm font-medium text-gray-700 mb-2">Customer Phone</label>
+                              <input type="tel" id="customerPhone" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                           </div>
                       </div>
 
@@ -700,13 +774,396 @@ content: |-
                       </table>
                   </div>
               </div>
-          </section>          // Save estimate
-          let estimates = JSON.parse(localStorage.getItem('estimates')) || [];
+          </section>          <!-- Customers Section -->
+          <section id="customers" class="section">
+              <h2 class="text-3xl font-bold mb-6 text-gray-800">Customer Management</h2>
+              
+              <!-- Add New Customer -->
+              <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                  <h3 class="text-xl font-semibold mb-4">Add New Customer</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-2">Customer Name</label>
+                          <input type="text" id="newCustomerName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      </div>
+                      <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                          <input type="tel" id="newCustomerPhone" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      </div>
+                      <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                          <input type="email" id="newCustomerEmail" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      </div>
+                      <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                          <input type="text" id="newCustomerAddress" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      </div>
+                  </div>
+                  <div class="mt-4">
+                      <button onclick="addCustomer()" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                          <i data-lucide="user-plus" class="inline w-4 h-4 mr-2"></i>Add Customer
+                      </button>
+                  </div>
+              </div>
 
+              <!-- Customer List -->
+              <div class="bg-white rounded-lg shadow-md p-6">
+                  <h3 class="text-xl font-semibold mb-4">Customer List</h3>
+                  <div class="overflow-x-auto">
+                      <table class="min-w-full table-auto">
+                          <thead class="bg-gray-50">
+                              <tr>
+                                  <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Name</th>
+                                  <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Phone</th>
+                                  <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Email</th>
+                                  <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Address</th>
+                                  <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Actions</th>
+                              </tr>
+                          </thead>
+                          <tbody id="customersTable">
+                              <tr>
+                                  <td colspan="5" class="px-4 py-8 text-center text-gray-500">No customers yet. Add your first customer above!</td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          </section>
+
+          <!-- Projects Section -->
+          <section id="projects" class="section">
+              <h2 class="text-3xl font-bold mb-6 text-gray-800">Project Management</h2>
+              
+              <!-- Project Status Cards -->
+              <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                  <div class="bg-blue-100 p-6 rounded-lg">
+                      <h3 class="text-lg font-semibold text-blue-800">Pending</h3>
+                      <p class="text-2xl font-bold text-blue-900" id="pendingProjects">0</p>
+                  </div>
+                  <div class="bg-yellow-100 p-6 rounded-lg">
+                      <h3 class="text-lg font-semibold text-yellow-800">In Progress</h3>
+                      <p class="text-2xl font-bold text-yellow-900" id="inProgressProjects">0</p>
+                  </div>
+                  <div class="bg-green-100 p-6 rounded-lg">
+                      <h3 class="text-lg font-semibold text-green-800">Completed</h3>
+                      <p class="text-2xl font-bold text-green-900" id="completedProjects">0</p>
+                  </div>
+                  <div class="bg-red-100 p-6 rounded-lg">
+                      <h3 class="text-lg font-semibold text-red-800">On Hold</h3>
+                      <p class="text-2xl font-bold text-red-900" id="onHoldProjects">0</p>
+                  </div>
+              </div>
+
+              <div class="bg-white rounded-lg shadow-md p-6">
+                  <h3 class="text-xl font-semibold mb-4">Active Projects</h3>
+                  <div class="overflow-x-auto">
+                      <table class="min-w-full table-auto">
+                          <thead class="bg-gray-50">
+                              <tr>
+                                  <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Project</th>
+                                  <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Customer</th>
+                                  <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Status</th>
+                                  <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Start Date</th>
+                                  <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Value</th>
+                                  <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Actions</th>
+                              </tr>
+                          </thead>
+                          <tbody id="projectsTable">
+                              <tr>
+                                  <td colspan="6" class="px-4 py-8 text-center text-gray-500">No active projects. Convert estimates to projects!</td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          </section>
+
+          <!-- Inventory Section -->
+          <section id="inventory" class="section">
+              <h2 class="text-3xl font-bold mb-6 text-gray-800">Inventory Management</h2>
+              
+              <!-- Quick Add Inventory -->
+              <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                  <h3 class="text-xl font-semibold mb-4">Add Inventory Item</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                      <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-2">Item Name</label>
+                          <input type="text" id="itemName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      </div>
+                      <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
+                          <input type="number" id="itemQuantity" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      </div>
+                      <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-2">Unit Cost ($)</label>
+                          <input type="number" id="itemCost" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      </div>
+                      <div class="flex items-end">
+                          <button onclick="addInventoryItem()" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                              <i data-lucide="plus" class="inline w-4 h-4 mr-2"></i>Add Item
+                          </button>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- Inventory List -->
+              <div class="bg-white rounded-lg shadow-md p-6">
+                  <h3 class="text-xl font-semibold mb-4">Current Inventory</h3>
+                  <div class="overflow-x-auto">
+                      <table class="min-w-full table-auto">
+                          <thead class="bg-gray-50">
+                              <tr>
+                                  <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Item</th>
+                                  <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Quantity</th>
+                                  <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Unit Cost</th>
+                                  <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Total Value</th>
+                                  <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Actions</th>
+                              </tr>
+                          </thead>
+                          <tbody id="inventoryTable">
+                              <tr>
+                                  <td colspan="5" class="px-4 py-8 text-center text-gray-500">No inventory items yet. Add your first item above!</td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          </section>
+
+          <!-- Schedule Section -->
+          <section id="schedule" class="section">
+              <h2 class="text-3xl font-bold mb-6 text-gray-800">Schedule Management</h2>
+              
+              <!-- Calendar View -->
+              <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                  <h3 class="text-xl font-semibold mb-4">This Week's Schedule</h3>
+                  <div class="grid grid-cols-7 gap-2 mb-4">
+                      <div class="text-center font-medium text-gray-700">Sun</div>
+                      <div class="text-center font-medium text-gray-700">Mon</div>
+                      <div class="text-center font-medium text-gray-700">Tue</div>
+                      <div class="text-center font-medium text-gray-700">Wed</div>
+                      <div class="text-center font-medium text-gray-700">Thu</div>
+                      <div class="text-center font-medium text-gray-700">Fri</div>
+                      <div class="text-center font-medium text-gray-700">Sat</div>
+                  </div>
+                  <div id="calendarGrid" class="grid grid-cols-7 gap-2">
+                      <!-- Calendar days will be populated by JavaScript -->
+                  </div>
+              </div>
+
+              <!-- Add Appointment -->
+              <div class="bg-white rounded-lg shadow-md p-6">
+                  <h3 class="text-xl font-semibold mb-4">Schedule New Appointment</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                          <input type="date" id="appointmentDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      </div>
+                      <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-2">Time</label>
+                          <input type="time" id="appointmentTime" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      </div>
+                      <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-2">Customer</label>
+                          <input type="text" id="appointmentCustomer" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      </div>
+                  </div>
+                  <div class="mt-4">
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                      <textarea id="appointmentDescription" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                  </div>
+                  <div class="mt-4">
+                      <button onclick="addAppointment()" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                          <i data-lucide="calendar-plus" class="inline w-4 h-4 mr-2"></i>Schedule Appointment
+                      </button>
+                  </div>
+              </div>
+          </section>
+
+          <!-- Reports Section -->
+          <section id="reports" class="section">
+              <h2 class="text-3xl font-bold mb-6 text-gray-800">Business Reports</h2>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                  <div class="bg-white p-6 rounded-lg shadow-md">
+                      <h3 class="text-lg font-semibold mb-2">Total Estimate Value</h3>
+                      <p class="text-2xl font-bold text-blue-600" id="reportTotalValue">$0</p>
+                  </div>
+                  
+                  <div class="bg-white p-6 rounded-lg shadow-md">
+                      <h3 class="text-lg font-semibold mb-2">Average Estimate</h3>
+                      <p class="text-2xl font-bold text-green-600" id="reportAvgValue">$0</p>
+                  </div>
+                  
+                  <div class="bg-white p-6 rounded-lg shadow-md">
+                      <h3 class="text-lg font-semibold mb-2">Estimate Conversion Rate</h3>
+                      <p class="text-2xl font-bold text-orange-600" id="reportConversionRate">0%</p>
+                  </div>
+                  
+                  <div class="bg-white p-6 rounded-lg shadow-md">
+                      <h3 class="text-lg font-semibold mb-2">Total Inventory Value</h3>
+                      <p class="text-2xl font-bold text-purple-600" id="reportInventoryValue">$0</p>
+                  </div>
+              </div>
+              
+              <!-- Monthly Performance Chart -->
+              <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                  <h3 class="text-xl font-semibold mb-4">Monthly Performance</h3>
+                  <div class="h-64 flex items-center justify-center bg-gray-50 rounded">
+                      <p class="text-gray-500">Chart visualization coming soon...</p>
+                  </div>
+              </div>
+
+              <!-- Recent Activity -->
+              <div class="bg-white rounded-lg shadow-md p-6">
+                  <h3 class="text-xl font-semibold mb-4">Recent Business Activity</h3>
+                  <div id="recentActivity" class="space-y-3">
+                      <p class="text-gray-500">No recent activity to display.</p>
+                  </div>
+              </div>
+          </section>
+
+      </main>
+
+      <!-- Footer -->
+      <footer class="bg-gray-800 text-white py-8 mt-12">
+          <div class="container mx-auto px-4 text-center">
+              <p>&copy; 2024 T&J Field Services. All rights reserved.</p>
+              <p class="text-gray-400 mt-2">Serving Delmar, MD and surrounding areas</p>
+          </div>
+      </footer>      <script>
+          // Initialize Lucide icons
+          lucide.createIcons();
+
+          // Global data storage
+          let estimates = JSON.parse(localStorage.getItem('estimates')) || [];
+          let customers = JSON.parse(localStorage.getItem('customers')) || [];
+          let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+          let appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+
+          // Navigation functionality
+          function showSection(sectionId) {
+              // Hide all sections
+              const sections = document.querySelectorAll('.section');
+              sections.forEach(section => section.classList.remove('active'));
+              
+              // Show selected section
+              document.getElementById(sectionId).classList.add('active');
+              
+              // Update dashboard stats when showing dashboard
+              if (sectionId === 'dashboard') {
+                  updateDashboardStats();
+              }
+              
+              // Load section-specific data
+              switch(sectionId) {
+                  case 'customers':
+                      loadCustomers();
+                      break;
+                  case 'inventory':
+                      loadInventory();
+                      break;
+                  case 'estimates':
+                      loadEstimates();
+                      break;
+                  case 'reports':
+                      updateReports();
+                      break;
+              }
+          }
+
+          // Estimate Templates
+          const templates = {
+              deck: {
+                  projectType: 'deck',
+                  squareFootage: 192,
+                  projectDescription: 'Standard pressure-treated deck (12x16) with railings, stairs, and proper footings',
+                  materialsCost: 3500,
+                  laborHours: 32,
+                  equipmentCost: 200,
+                  permitsCost: 150
+              },
+              kitchen: {
+                  projectType: 'remodel',
+                  squareFootage: 150,
+                  projectDescription: 'Full kitchen remodel including cabinets, countertops, appliances, flooring, and electrical',
+                  materialsCost: 15000,
+                  laborHours: 80,
+                  equipmentCost: 500,
+                  permitsCost: 300
+              },
+              bathroom: {
+                  projectType: 'renovation',
+                  squareFootage: 50,
+                  projectDescription: 'Complete bathroom renovation with tile, fixtures, vanity, plumbing, and electrical',
+                  materialsCost: 5000,
+                  laborHours: 40,
+                  equipmentCost: 300,
+                  permitsCost: 200
+              },
+              handyman: {
+                  projectType: 'handyman',
+                  projectDescription: 'General handyman services - full day rate including minor repairs and maintenance',
+                  materialsCost: 100,
+                  laborHours: 8,
+                  equipmentCost: 50,
+                  permitsCost: 0
+              },
+              repair: {
+                  projectType: 'repair',
+                  projectDescription: 'General repair work - assessment and basic repairs',
+                  materialsCost: 200,
+                  laborHours: 4,
+                  equipmentCost: 25,
+                  permitsCost: 0
+              }
+          };
+
+          function loadTemplate(templateName) {
+              const template = templates[templateName];
+              if (template) {
+                  document.getElementById('projectType').value = template.projectType;
+                  document.getElementById('squareFootage').value = template.squareFootage || '';
+                  document.getElementById('projectDescription').value = template.projectDescription;
+                  document.getElementById('materialsCost').value = template.materialsCost;
+                  document.getElementById('laborHours').value = template.laborHours;
+                  document.getElementById('equipmentCost').value = template.equipmentCost;
+                  document.getElementById('permitsCost').value = template.permitsCost;
+                  calculateTotal();
+              }
+          }
+
+          // Calculate total estimate
+          function calculateTotal() {
+              const materials = parseFloat(document.getElementById('materialsCost').value) || 0;
+              const laborHours = parseFloat(document.getElementById('laborHours').value) || 0;
+              const laborRate = parseFloat(document.getElementById('laborRate').value) || 75;
+              const equipment = parseFloat(document.getElementById('equipmentCost').value) || 0;
+              const permits = parseFloat(document.getElementById('permitsCost').value) || 0;
+              const profitMargin = parseFloat(document.getElementById('profitMargin').value) || 20;
+
+              const labor = laborHours * laborRate;
+              const subtotal = materials + labor + equipment + permits;
+              const profit = subtotal * (profitMargin / 100);
+              const total = subtotal + profit;
+
+              // Update summary
+              document.getElementById('summaryMaterials').textContent = `$${materials.toFixed(2)}`;
+              document.getElementById('summaryLabor').textContent = `$${labor.toFixed(2)}`;
+              document.getElementById('summaryEquipment').textContent = `$${equipment.toFixed(2)}`;
+              document.getElementById('summaryPermits').textContent = `$${permits.toFixed(2)}`;
+              document.getElementById('summarySubtotal').textContent = `$${subtotal.toFixed(2)}`;
+              document.getElementById('summaryProfit').textContent = `$${profit.toFixed(2)}`;
+              document.getElementById('summaryTotal').textContent = `$${total.toFixed(2)}`;
+          }
+
+          // Save estimate
           function saveEstimate() {
               const customerName = document.getElementById('customerName').value;
               const projectType = document.getElementById('projectType').value;
-              const total = document.getElementById('summaryTotal').textContent;
+              const projectAddress = document.getElementById('projectAddress').value;
+              const customerPhone = document.getElementById('customerPhone').value;
+              const total = parseFloat(document.getElementById('summaryTotal').textContent.replace('$', ''));
 
               if (!customerName || !projectType) {
                   alert('Please fill in customer name and project type');
@@ -717,70 +1174,27 @@ content: |-
                   id: Date.now(),
                   date: new Date().toLocaleDateString(),
                   customerName: customerName,
+                  customerPhone: customerPhone,
                   projectType: projectType,
-                  projectAddress: document.getElementById('projectAddress').value,
+                  projectAddress: projectAddress,
                   squareFootage: document.getElementById('squareFootage').value,
-                  projectDescription: document.getElementById('projectDescription').value,
-                  materialsCost: document.getElementById('materialsCost').value,
-                  laborHours: document.getElementById('laborHours').value,
-                  laborRate: document.getElementById('laborRate').value,
-                  equipmentCost: document.getElementById('equipmentCost').value,
-                  permitsCost: document.getElementById('permitsCost').value,
-                  profitMargin: document.getElementById('profitMargin').value,
+                  description: document.getElementById('projectDescription').value,
+                  materials: parseFloat(document.getElementById('materialsCost').value) || 0,
+                  laborHours: parseFloat(document.getElementById('laborHours').value) || 0,
+                  laborRate: parseFloat(document.getElementById('laborRate').value) || 75,
+                  equipment: parseFloat(document.getElementById('equipmentCost').value) || 0,
+                  permits: parseFloat(document.getElementById('permitsCost').value) || 0,
+                  profitMargin: parseFloat(document.getElementById('profitMargin').value) || 20,
                   total: total,
-                  status: 'Draft'
+                  status: 'pending'
               };
 
               estimates.push(estimate);
               localStorage.setItem('estimates', JSON.stringify(estimates));
               
               alert('Estimate saved successfully!');
-              updateEstimatesTable();
-              updateDashboardStats();
-          }
-
-          // Update estimates table
-          function updateEstimatesTable() {
-              const tableBody = document.getElementById('estimatesTable');
-              
-              if (estimates.length === 0) {
-                  tableBody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">No estimates yet. Create your first estimate above!</td></tr>';
-                  return;
-              }
-
-              tableBody.innerHTML = estimates.slice(-10).reverse().map(estimate => `
-                  <tr class="border-b hover:bg-gray-50">
-                      <td class="px-4 py-2">${estimate.date}</td>
-                      <td class="px-4 py-2">${estimate.customerName}</td>
-                      <td class="px-4 py-2 capitalize">${estimate.projectType}</td>
-                      <td class="px-4 py-2 font-semibold">${estimate.total}</td>
-                      <td class="px-4 py-2">
-                          <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">${estimate.status}</span>
-                      </td>
-                      <td class="px-4 py-2">
-                          <button onclick="viewEstimate(${estimate.id})" class="text-blue-600 hover:text-blue-800 mr-2">View</button>
-                          <button onclick="deleteEstimate(${estimate.id})" class="text-red-600 hover:text-red-800">Delete</button>
-                      </td>
-                  </tr>
-              `).join('');
-          }
-
-          // View estimate
-          function viewEstimate(id) {
-              const estimate = estimates.find(e => e.id === id);
-              if (estimate) {
-                  alert(`Estimate Details:\n\nCustomer: ${estimate.customerName}\nProject: ${estimate.projectType}\nTotal: ${estimate.total}\nDate: ${estimate.date}`);
-              }
-          }
-
-          // Delete estimate
-          function deleteEstimate(id) {
-              if (confirm('Are you sure you want to delete this estimate?')) {
-                  estimates = estimates.filter(e => e.id !== id);
-                  localStorage.setItem('estimates', JSON.stringify(estimates));
-                  updateEstimatesTable();
-                  updateDashboardStats();
-              }
+              loadEstimates();
+              clearForm();
           }
 
           // Generate PDF
@@ -798,37 +1212,41 @@ content: |-
 
               // Header
               doc.setFontSize(20);
-              doc.text('T&J Field Services', 20, 20);
+              doc.text('T&J FIELD SERVICES', 20, 20);
               doc.setFontSize(12);
-              doc.text('Delmar, MD 21875 - Licensed & Insured', 20, 30);
-              
-              // Title
+              doc.text('Professional Remodeling & Deck Building', 20, 30);
+              doc.text('Delmar, MD 21875 | Licensed & Insured', 20, 40);
+
+              // Estimate details
               doc.setFontSize(16);
-              doc.text('PROJECT ESTIMATE', 20, 50);
+              doc.text('PROJECT ESTIMATE', 20, 60);
               
-              // Customer Info
               doc.setFontSize(12);
-              doc.text(`Customer: ${customerName}`, 20, 70);
-              doc.text(`Project Type: ${projectType}`, 20, 80);
-              doc.text(`Address: ${document.getElementById('projectAddress').value}`, 20, 90);
+              doc.text(`Customer: ${customerName}`, 20, 80);
+              doc.text(`Project Type: ${projectType}`, 20, 90);
               doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 100);
               
-              // Cost Breakdown
-              doc.text('COST BREAKDOWN:', 20, 120);
-              doc.text(`Materials: ${document.getElementById('summaryMaterials').textContent}`, 30, 135);
-              doc.text(`Labor: ${document.getElementById('summaryLabor').textContent}`, 30, 145);
-              doc.text(`Equipment: ${document.getElementById('summaryEquipment').textContent}`, 30, 155);
-              doc.text(`Permits: ${document.getElementById('summaryPermits').textContent}`, 30, 165);
-              doc.text(`Profit: ${document.getElementById('summaryProfit').textContent}`, 30, 175);
+              if (document.getElementById('projectAddress').value) {
+                  doc.text(`Address: ${document.getElementById('projectAddress').value}`, 20, 110);
+              }
+
+              // Cost breakdown
+              doc.text('COST BREAKDOWN:', 20, 130);
+              doc.text(`Materials: ${document.getElementById('summaryMaterials').textContent}`, 30, 145);
+              doc.text(`Labor: ${document.getElementById('summaryLabor').textContent}`, 30, 155);
+              doc.text(`Equipment: ${document.getElementById('summaryEquipment').textContent}`, 30, 165);
+              doc.text(`Permits: ${document.getElementById('summaryPermits').textContent}`, 30, 175);
+              doc.text(`Subtotal: ${document.getElementById('summarySubtotal').textContent}`, 30, 185);
+              doc.text(`Profit: ${document.getElementById('summaryProfit').textContent}`, 30, 195);
               
-              // Total
               doc.setFontSize(14);
-              doc.text(`TOTAL ESTIMATE: ${document.getElementById('summaryTotal').textContent}`, 20, 195);
-              
-              // Footer
+              doc.text(`TOTAL: ${document.getElementById('summaryTotal').textContent}`, 30, 210);
+
+              // Terms
               doc.setFontSize(10);
-              doc.text('This estimate is valid for 30 days. Terms and conditions apply.', 20, 250);
-              
+              doc.text('Terms: 50% deposit required. Work guaranteed for 1 year.', 20, 240);
+              doc.text('Estimate valid for 30 days.', 20, 250);
+
               doc.save(`${customerName}_Estimate_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`);
           }
 
@@ -840,33 +1258,227 @@ content: |-
               calculateTotal();
           }
 
-          // Update dashboard stats
-          function updateDashboardStats() {
-              const totalEstimates = estimates.length;
-              const totalValue = estimates.reduce((sum, est) => {
-                  const value = parseFloat(est.total.replace('$', '').replace(',', '')) || 0;
-                  return sum + value;
-              }, 0);
-              const avgValue = totalEstimates > 0 ? totalValue / totalEstimates : 0;
+          // Load estimates table
+          function loadEstimates() {
+              const tbody = document.getElementById('estimatesTable');
+              if (estimates.length === 0) {
+                  tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">No estimates yet. Create your first estimate above!</td></tr>';
+                  return;
+              }
 
-              document.getElementById('totalEstimates').textContent = totalEstimates;
-              document.getElementById('activeCustomers').textContent = new Set(estimates.map(e => e.customerName)).size;
-              document.getElementById('activeProjects').textContent = estimates.filter(e => e.status !== 'Completed').length;
-              document.getElementById('monthlyRevenue').textContent = `$${totalValue.toLocaleString()}`;
-              
-              // Update reports
-              document.getElementById('reportTotalValue').textContent = `$${totalValue.toLocaleString()}`;
-              document.getElementById('reportAvgValue').textContent = `$${avgValue.toLocaleString()}`;
-              document.getElementById('reportConversionRate').textContent = '75%'; // Placeholder
-              document.getElementById('reportInventoryValue').textContent = '$25,000'; // Placeholder
+              tbody.innerHTML = estimates.map(estimate => `
+                  <tr class="border-b hover:bg-gray-50">
+                      <td class="px-4 py-2">${estimate.date}</td>
+                      <td class="px-4 py-2">${estimate.customerName}</td>
+                      <td class="px-4 py-2 capitalize">${estimate.projectType}</td>
+                      <td class="px-4 py-2">$${estimate.total.toFixed(2)}</td>
+                      <td class="px-4 py-2">
+                          <span class="px-2 py-1 text-xs rounded-full ${estimate.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : estimate.status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                              ${estimate.status}
+                          </span>
+                      </td>
+                      <td class="px-4 py-2">
+                          <button onclick="viewEstimate(${estimate.id})" class="text-blue-600 hover:text-blue-800 mr-2">View</button>
+                          <button onclick="deleteEstimate(${estimate.id})" class="text-red-600 hover:text-red-800">Delete</button>
+                      </td>
+                  </tr>
+              `).join('');
           }
 
-          // Initialize on page load
+          // Customer Management
+          function addCustomer() {
+              const name = document.getElementById('newCustomerName').value;
+              const phone = document.getElementById('newCustomerPhone').value;
+              const email = document.getElementById('newCustomerEmail').value;
+              const address = document.getElementById('newCustomerAddress').value;
+
+              if (!name || !phone) {
+                  alert('Please fill in customer name and phone number');
+                  return;
+              }
+
+              const customer = {
+                  id: Date.now(),
+                  name: name,
+                  phone: phone,
+                  email: email,
+                  address: address,
+                  dateAdded: new Date().toLocaleDateString()
+              };
+
+              customers.push(customer);
+              localStorage.setItem('customers', JSON.stringify(customers));
+              
+              // Clear form
+              document.getElementById('newCustomerName').value = '';
+              document.getElementById('newCustomerPhone').value = '';
+              document.getElementById('newCustomerEmail').value = '';
+              document.getElementById('newCustomerAddress').value = '';
+              
+              loadCustomers();
+              alert('Customer added successfully!');
+          }
+
+          function loadCustomers() {
+              const tbody = document.getElementById('customersTable');
+              if (customers.length === 0) {
+                  tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">No customers yet. Add your first customer above!</td></tr>';
+                  return;
+              }
+
+              tbody.innerHTML = customers.map(customer => `
+                  <tr class="border-b hover:bg-gray-50">
+                      <td class="px-4 py-2">${customer.name}</td>
+                      <td class="px-4 py-2">${customer.phone}</td>
+                      <td class="px-4 py-2">${customer.email || '-'}</td>
+                      <td class="px-4 py-2">${customer.address || '-'}</td>
+                      <td class="px-4 py-2">
+                          <button onclick="editCustomer(${customer.id})" class="text-blue-600 hover:text-blue-800 mr-2">Edit</button>
+                          <button onclick="deleteCustomer(${customer.id})" class="text-red-600 hover:text-red-800">Delete</button>
+                      </td>
+                  </tr>
+              `).join('');
+          }
+
+          // Inventory Management
+          function addInventoryItem() {
+              const name = document.getElementById('itemName').value;
+              const quantity = parseInt(document.getElementById('itemQuantity').value);
+              const cost = parseFloat(document.getElementById('itemCost').value);
+
+              if (!name || !quantity || !cost) {
+                  alert('Please fill in all inventory fields');
+                  return;
+              }
+
+              const item = {
+                  id: Date.now(),
+                  name: name,
+                  quantity: quantity,
+                  cost: cost,
+                  totalValue: quantity * cost,
+                  dateAdded: new Date().toLocaleDateString()
+              };
+
+              inventory.push(item);
+              localStorage.setItem('inventory', JSON.stringify(inventory));
+              
+              // Clear form
+              document.getElementById('itemName').value = '';
+              document.getElementById('itemQuantity').value = '';
+              document.getElementById('itemCost').value = '';
+              
+              loadInventory();
+              alert('Inventory item added successfully!');
+          }
+
+          function loadInventory() {
+              const tbody = document.getElementById('inventoryTable');
+              if (inventory.length === 0) {
+                  tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">No inventory items yet. Add your first item above!</td></tr>';
+                  return;
+              }
+
+              tbody.innerHTML = inventory.map(item => `
+                  <tr class="border-b hover:bg-gray-50">
+                      <td class="px-4 py-2">${item.name}</td>
+                      <td class="px-4 py-2">${item.quantity}</td>
+                      <td class="px-4 py-2">$${item.cost.toFixed(2)}</td>
+                      <td class="px-4 py-2">$${item.totalValue.toFixed(2)}</td>
+                      <td class="px-4 py-2">
+                          <button onclick="editInventory(${item.id})" class="text-blue-600 hover:text-blue-800 mr-2">Edit</button>
+                          <button onclick="deleteInventory(${item.id})" class="text-red-600 hover:text-red-800">Delete</button>
+                      </td>
+                  </tr>
+              `).join('');
+          }
+
+          // Dashboard Stats
+          function updateDashboardStats() {
+              document.getElementById('totalEstimates').textContent = estimates.length;
+              document.getElementById('activeCustomers').textContent = customers.length;
+              document.getElementById('activeProjects').textContent = estimates.filter(e => e.status === 'approved').length;
+              
+              const totalRevenue = estimates.reduce((sum, est) => sum + (est.total || 0), 0);
+              document.getElementById('monthlyRevenue').textContent = `$${totalRevenue.toFixed(0)}`;
+          }
+
+          // Reports
+          function updateReports() {
+              const totalValue = estimates.reduce((sum, est) => sum + (est.total || 0), 0);
+              const avgValue = estimates.length > 0 ? totalValue / estimates.length : 0;
+              const inventoryValue = inventory.reduce((sum, item) => sum + (item.totalValue || 0), 0);
+              
+              document.getElementById('reportTotalValue').textContent = `$${totalValue.toFixed(0)}`;
+              document.getElementById('reportAvgValue').textContent = `$${avgValue.toFixed(0)}`;
+              document.getElementById('reportInventoryValue').textContent = `$${inventoryValue.toFixed(0)}`;
+              document.getElementById('reportConversionRate').textContent = '75%'; // Placeholder
+          }
+
+          // Delete functions
+          function deleteEstimate(id) {
+              if (confirm('Are you sure you want to delete this estimate?')) {
+                  estimates = estimates.filter(est => est.id !== id);
+                  localStorage.setItem('estimates', JSON.stringify(estimates));
+                  loadEstimates();
+              }
+          }
+
+          function deleteCustomer(id) {
+              if (confirm('Are you sure you want to delete this customer?')) {
+                  customers = customers.filter(cust => cust.id !== id);
+                  localStorage.setItem('customers', JSON.stringify(customers));
+                  loadCustomers();
+              }
+          }
+
+          function deleteInventory(id) {
+              if (confirm('Are you sure you want to delete this inventory item?')) {
+                  inventory = inventory.filter(item => item.id !== id);
+                  localStorage.setItem('inventory', JSON.stringify(inventory));
+                  loadInventory();
+              }
+          }
+
+          // Schedule Management
+          function addAppointment() {
+              const date = document.getElementById('appointmentDate').value;
+              const time = document.getElementById('appointmentTime').value;
+              const customer = document.getElementById('appointmentCustomer').value;
+              const description = document.getElementById('appointmentDescription').value;
+
+              if (!date || !time || !customer) {
+                  alert('Please fill in date, time, and customer');
+                  return;
+              }
+
+              const appointment = {
+                  id: Date.now(),
+                  date: date,
+                  time: time,
+                  customer: customer,
+                  description: description
+              };
+
+              appointments.push(appointment);
+              localStorage.setItem('appointments', JSON.stringify(appointments));
+              
+              // Clear form
+              document.getElementById('appointmentDate').value = '';
+              document.getElementById('appointmentTime').value = '';
+              document.getElementById('appointmentCustomer').value = '';
+              document.getElementById('appointmentDescription').value = '';
+              
+              alert('Appointment scheduled successfully!');
+          }
+
+          // Initialize app
           document.addEventListener('DOMContentLoaded', function() {
-              updateEstimatesTable();
               updateDashboardStats();
-              calculateTotal();
+              loadEstimates();
+              lucide.createIcons();
           });
       </script>
+
   </body>
   </html>
