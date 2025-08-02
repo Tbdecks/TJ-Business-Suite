@@ -1,4 +1,428 @@
-<!<!<!<!<!<!<!DOCTYPE html>
+<!<!<!<!<!<!<!<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T&J Field Services - Management System</title>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .card-hover:hover { transform: translateY(-2px); transition: transform 0.2s; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Sidebar -->
+    <div class="fixed left-0 top-0 h-full w-64 bg-white shadow-lg border-r z-40">
+        <div class="p-6 border-b">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <i data-lucide="hammer" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900">T&J Field Services</h1>
+                    <p class="text-sm text-gray-500">Delmar, MD 21875</p>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="p-4">
+            <div class="space-y-2">
+                <a href="#" onclick="showSection('dashboard')" class="nav-item active flex items-center space-x-3 p-3 rounded-lg bg-blue-50 text-blue-600">
+                    <i data-lucide="home" class="w-5 h-5"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" onclick="showSection('customers')" class="nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-600">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                    <span>Customers</span>
+                </a>
+                <a href="#" onclick="showSection('projects')" class="nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-600">
+                    <i data-lucide="briefcase" class="w-5 h-5"></i>
+                    <span>Projects</span>
+                </a>
+                <a href="#" onclick="showSection('estimates')" class="nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-600">
+                    <i data-lucide="calculator" class="w-5 h-5"></i>
+                    <span>Estimates</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="ml-64">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 id="pageTitle" class="text-2xl font-bold text-gray-900">Dashboard</h2>
+                        <p class="text-gray-600">Welcome to your T&J Field Services management system</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button onclick="quickEstimate()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center space-x-2">
+                            <i data-lucide="calculator" class="w-4 h-4"></i>
+                            <span>Quick Estimate</span>
+                        </button>
+                        <button onclick="newProject()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>New Project</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <main class="p-6">
+            <!-- Dashboard -->
+            <div id="dashboard-content">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Total Projects</p>
+                                <p id="totalProjects" class="text-3xl font-bold text-gray-900">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="briefcase" class="w-6 h-6 text-blue-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg shadow-sm border card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Customers</p>
+                                <p id="totalCustomers" class="text-3xl font-bold text-gray-900">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="users" class="w-6 h-6 text-green-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg shadow-sm border card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Revenue</p>
+                                <p id="totalRevenue" class="text-3xl font-bold text-gray-900">$0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="dollar-sign" class="w-6 h-6 text-yellow-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg shadow-sm border card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Estimates</p>
+                                <p id="totalEstimates" class="text-3xl font-bold text-gray-900">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="calculator" class="w-6 h-6 text-purple-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <button onclick="addCustomer()" class="flex items-center space-x-3 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-400 hover:bg-green-50">
+                            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="user-plus" class="w-5 h-5 text-green-600"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="font-medium text-gray-900">Add Customer</p>
+                                <p class="text-sm text-gray-600">New customer record</p>
+                            </div>
+                        </button>
+                        
+                        <button onclick="newProject()" class="flex items-center space-x-3 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50">
+                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="plus-circle" class="w-5 h-5 text-blue-600"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="font-medium text-gray-900">New Project</p>
+                                <p class="text-sm text-gray-600">Start new project</p>
+                            </div>
+                        </button>
+                        
+                        <button onclick="deckEstimate()" class="flex items-center space-x-3 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-orange-400 hover:bg-orange-50">
+                            <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="calculator" class="w-5 h-5 text-orange-600"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="font-medium text-gray-900">Deck Estimate</p>
+                                <p class="text-sm text-gray-600">Quick deck pricing</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customers Section -->
+            <div id="customers-content" class="hidden">
+                <div class="bg-white rounded-lg shadow-sm border p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900">Customer Management</h3>
+                        <button onclick="addCustomer()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2">
+                            <i data-lucide="user-plus" class="w-4 h-4"></i>
+                            <span>Add Customer</span>
+                        </button>
+                    </div>
+                    <div id="customersList" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- Projects Section -->
+            <div id="projects-content" class="hidden">
+                <div class="bg-white rounded-lg shadow-sm border p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900">Project Management</h3>
+                        <button onclick="newProject()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>New Project</span>
+                        </button>
+                    </div>
+                    <div id="projectsList" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- Estimates Section -->
+            <div id="estimates-content" class="hidden">
+                <div class="bg-white rounded-lg shadow-sm border p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6">Estimate Calculator</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-green-400 hover:bg-green-50 cursor-pointer" onclick="deckEstimate()">
+                            <i data-lucide="home" class="w-12 h-12 mx-auto mb-3 text-green-600"></i>
+                            <h4 class="font-medium text-gray-900 mb-2">Deck Building</h4>
+                            <p class="text-sm text-gray-600">Calculate deck construction costs</p>
+                        </div>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 hover:bg-blue-50 cursor-pointer" onclick="kitchenEstimate()">
+                            <i data-lucide="chef-hat" class="w-12 h-12 mx-auto mb-3 text-blue-600"></i>
+                            <h4 class="font-medium text-gray-900 mb-2">Kitchen Remodel</h4>
+                            <p class="text-sm text-gray-600">Estimate kitchen renovation costs</p>
+                        </div>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-400 hover:bg-purple-50 cursor-pointer" onclick="handymanEstimate()">
+                            <i data-lucide="wrench" class="w-12 h-12 mx-auto mb-3 text-purple-600"></i>
+                            <h4 class="font-medium text-gray-900 mb-2">Handyman Services</h4>
+                            <p class="text-sm text-gray-600">Price handyman work by the hour</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Data Storage
+        const data = {
+            customers: JSON.parse(localStorage.getItem('tj_customers') || '[]'),
+            projects: JSON.parse(localStorage.getItem('tj_projects') || '[]'),
+            estimates: JSON.parse(localStorage.getItem('tj_estimates') || '[]')
+        };
+
+        // Save data
+        function save(key, value) {
+            data[key] = value;
+            localStorage.setItem('tj_' + key, JSON.stringify(value));
+            updateStats();
+        }
+
+        // Format currency
+        function currency(amount) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount || 0);
+        }
+
+        // Update dashboard stats
+        function updateStats() {
+            document.getElementById('totalProjects').textContent = data.projects.length;
+            document.getElementById('totalCustomers').textContent = data.customers.length;
+            document.getElementById('totalEstimates').textContent = data.estimates.length;
+            
+            const revenue = data.projects.reduce((sum, p) => sum + (p.value || 0), 0);
+            document.getElementById('totalRevenue').textContent = currency(revenue);
+        }
+
+        // Navigation
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('[id$="-content"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(section + '-content').classList.remove('hidden');
+            
+            // Update nav
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('active', 'bg-blue-50', 'text-blue-600');
+                el.classList.add('text-gray-700');
+            });
+            event.target.closest('.nav-item').classList.add('active', 'bg-blue-50', 'text-blue-600');
+            
+            // Update title
+            const titles = { dashboard: 'Dashboard', customers: 'Customers', projects: 'Projects', estimates: 'Estimates' };
+            document.getElementById('pageTitle').textContent = titles[section];
+            
+            // Load section data
+            if (section === 'customers') loadCustomers();
+            if (section === 'projects') loadProjects();
+        }
+
+        // Customer functions
+        function addCustomer() {
+            const name = prompt('Customer Name:');
+            if (!name) return;
+            
+            const phone = prompt('Phone Number:');
+            const email = prompt('Email (optional):') || '';
+            const address = prompt('Address (optional):') || '';
+            
+            const customer = {
+                id: Date.now(),
+                name, phone, email, address,
+                created: new Date().toISOString()
+            };
+            
+            data.customers.push(customer);
+            save('customers', data.customers);
+            alert('Customer added successfully!');
+            if (document.getElementById('customers-content').classList.contains('hidden') === false) {
+                loadCustomers();
+            }
+        }
+
+        function loadCustomers() {
+            const container = document.getElementById('customersList');
+            if (data.customers.length === 0) {
+                container.innerHTML = '<div class="text-center py-12 text-gray-500"><p>No customers yet. Add your first customer to get started!</p></div>';
+                return;
+            }
+            
+            container.innerHTML = data.customers.map(customer => `
+                <div class="flex items-center justify-between p-4 border rounded-lg">
+                    <div>
+                        <h4 class="font-medium text-gray-900">${customer.name}</h4>
+                        <p class="text-sm text-gray-600">${customer.phone}</p>
+                        ${customer.email ? `<p class="text-sm text-gray-600">${customer.email}</p>` : ''}
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-gray-500">Added ${new Date(customer.created).toLocaleDateString()}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Project functions
+        function newProject() {
+            const name = prompt('Project Name:');
+            if (!name) return;
+            
+            const customer = prompt('Customer Name:');
+            const value = parseFloat(prompt('Project Value:') || '0');
+            const type = prompt('Project Type (Deck/Kitchen/Handyman):') || 'General';
+            
+            const project = {
+                id: Date.now(),
+                name, customer, value, type,
+                status: 'Active',
+                created: new Date().toISOString()
+            };
+            
+            data.projects.push(project);
+            save('projects', data.projects);
+            alert('Project created successfully!');
+            if (document.getElementById('projects-content').classList.contains('hidden') === false) {
+                loadProjects();
+            }
+        }
+
+        function loadProjects() {
+            const container = document.getElementById('projectsList');
+            if (data.projects.length === 0) {
+                container.innerHTML = '<div class="text-center py-12 text-gray-500"><p>No projects yet. Create your first project to get started!</p></div>';
+                return;
+            }
+            
+            container.innerHTML = data.projects.map(project => `
+                <div class="flex items-center justify-between p-4 border rounded-lg">
+                    <div>
+                        <h4 class="font-medium text-gray-900">${project.name}</h4>
+                        <p class="text-sm text-gray-600">${project.customer} • ${project.type}</p>
+                        <span class="inline-block px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">${project.status}</span>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-medium text-gray-900">${currency(project.value)}</p>
+                        <p class="text-sm text-gray-500">${new Date(project.created).toLocaleDateString()}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Estimate functions
+        function quickEstimate() { deckEstimate(); }
+
+        function deckEstimate() {
+            const length = parseFloat(prompt('Deck Length (feet):') || '0');
+            const width = parseFloat(prompt('Deck Width (feet):') || '0');
+            
+            if (length <= 0 || width <= 0) {
+                alert('Please enter valid dimensions');
+                return;
+            }
+            
+            const sqft = length * width;
+            const materials = sqft * 15;
+            const labor = sqft * 12;
+            const total = materials + labor + (materials + labor) * 0.06;
+            
+            const estimate = {
+                id: Date.now(),
+                type: 'Deck',
+                details: `${length}' x ${width}' (${sqft} sq ft)`,
+                materials, labor, total,
+                created: new Date().toISOString()
+            };
+            
+            data.estimates.push(estimate);
+            save('estimates', data.estimates);
+            
+            alert(`Deck Estimate:\n${estimate.details}\nMaterials: ${currency(materials)}\nLabor: ${currency(labor)}\nTotal: ${currency(total)}`);
+        }
+
+        function kitchenEstimate() {
+            const size = prompt('Kitchen Size (Small/Medium/Large):')?.toLowerCase();
+            const costs = { small: 15000, medium: 25000, large: 40000 };
+            const base = costs[size];
+            
+            if (!base) {
+                alert('Please enter Small, Medium, or Large');
+                return;
+            }
+            
+            const total = base * 1.06;
+            alert(`Kitchen Remodel (${size}):\nBase: ${currency(base)}\nTotal: ${currency(total)}`);
+        }
+
+        function handymanEstimate() {
+            const hours = parseFloat(prompt('Hours:') || '0');
+            if (hours <= 0) return;
+            
+            const rate = 75;
+            const total = hours * rate * 1.06;
+            alert(`Handyman: ${hours} hrs @ $${rate}/hr\nTotal: ${currency(total)}`);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+            updateStats();
+        });
+    </script>
+</body>
+</html>DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1823,5 +2247,1297 @@ const APISettingsActions = {
             return false;
         }
     }
+};// T&J Field Services - UI Functions
+// Connect the business functions to the HTML interfaces
+
+// ===== DASHBOARD FUNCTIONS =====
+function loadDashboard() {
+    const stats = {
+        activeProjects: TJSystem.tjData.get('projects').filter(p => p.status === 'in-progress').length,
+        monthlyRevenue: TJSystem.ReportManager.getMonthlyRevenue(new Date().getMonth(), new Date().getFullYear()),
+        pendingEstimates: TJSystem.tjData.get('estimates').filter(e => e.status === 'pending').length,
+        weekJobs: TJSystem.ScheduleManager.getTodaysJobs().length
+    };
+
+    // Update dashboard stats
+    document.getElementById('active-projects').textContent = stats.activeProjects;
+    document.getElementById('monthly-revenue').textContent = TJSystem.TJUtils.formatCurrency(stats.monthlyRevenue);
+    document.getElementById('pending-estimates').textContent = stats.pendingEstimates;
+    document.getElementById('week-jobs').textContent = stats.weekJobs;
+
+    loadRecentProjects();
+}
+
+function loadRecentProjects() {
+    const projects = TJSystem.tjData.get('projects').slice(-3);
+    const container = document.getElementById('recent-projects');
+    
+    container.innerHTML = projects.map(project => {
+        const customer = TJSystem.tjData.get('customers').find(c => c.id === project.customerId);
+        const statusClass = {
+            'in-progress': 'bg-yellow-100 text-yellow-800',
+            'scheduled': 'bg-blue-100 text-blue-800',
+            'completed': 'bg-green-100 text-green-800'
+        }[project.status];
+
+        return `
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                <div>
+                    <p class="font-medium">${project.name}</p>
+                    <p class="text-sm text-gray-600">${customer?.name || 'Unknown Customer'}</p>
+                </div>
+                <span class="px-2 py-1 ${statusClass} text-xs rounded">${project.status}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+// ===== CUSTOMER FUNCTIONS =====
+function loadCustomers() {
+    const customers = TJSystem.tjData.get('customers');
+    const tbody = document.getElementById('customers-table-body');
+    
+    tbody.innerHTML = customers.map(customer => `
+        <tr>
+            <td class="px-6 py-4">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                        <span class="text-blue-600 font-bold">${customer.name.split(' ').map(n => n[0]).join('')}</span>
+                    </div>
+                    <div>
+                        <div class="font-medium text-gray-900">${customer.name}</div>
+                        <div class="text-sm text-gray-500">${customer.address}</div>
+                    </div>
+                </div>
+            </td>
+            <td class="px-6 py-4">
+                <div class="text-sm text-gray-900">${customer.phone}</div>
+                <div class="text-sm text-gray-500">${customer.email}</div>
+            </td>
+            <td class="px-6 py-4">
+                <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">${customer.projects.length} Active</span>
+            </td>
+            <td class="px-6 py-4 text-sm font-medium text-green-600">${TJSystem.TJUtils.formatCurrency(customer.totalValue)}</td>
+            <td class="px-6 py-4 text-sm font-medium">
+                <button onclick="viewCustomer(${customer.id})" class="text-blue-600 hover:text-blue-900 mr-3">View</button>
+                <button onclick="editCustomer(${customer.id})" class="text-gray-600 hover:text-gray-900 mr-3">Edit</button>
+                <button onclick="callCustomer('${customer.phone}')" class="text-green-600 hover:text-green-900">Call</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function addCustomer() {
+    const name = prompt('Customer Name:');
+    const email = prompt('Email:');
+    const phone = prompt('Phone:');
+    const address = prompt('Address:');
+    
+    if (name && email && phone && address) {
+        TJSystem.CustomerManager.add({ name, email, phone, address });
+        loadCustomers();
+        alert('Customer added successfully!');
+    }
+}
+
+function callCustomer(phone) {
+    window.open(`tel:${phone}`);
+}
+
+// ===== PROJECT FUNCTIONS =====
+function loadProjects() {
+    const projects = TJSystem.tjData.get('projects');
+    const container = document.getElementById('projects-container');
+    
+    container.innerHTML = projects.map(project => {
+        const customer = TJSystem.tjData.get('customers').find(c => c.id === project.customerId);
+        const statusClass = {
+            'in-progress': 'bg-yellow-100 text-yellow-800',
+            'scheduled': 'bg-blue-100 text-blue-800',
+            'completed': 'bg-green-100 text-green-800',
+            'on-hold': 'bg-red-100 text-red-800'
+        }[project.status];
+
+        return `
+            <div class="bg-white p-6 rounded-lg shadow border">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold">${project.name}</h3>
+                        <p class="text-gray-600">${customer?.name || 'Unknown Customer'}</p>
+                    </div>
+                    <span class="px-2 py-1 ${statusClass} text-xs rounded">${project.status}</span>
+                </div>
+                <div class="space-y-2 text-sm mb-4">
+                    <div class="flex justify-between">
+                        <span>Budget:</span>
+                        <span class="font-medium">${TJSystem.TJUtils.formatCurrency(project.budget)}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Progress:</span>
+                        <span class="font-medium">${project.progress}%</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Due Date:</span>
+                        <span class="font-medium">${TJSystem.TJUtils.formatDate(project.endDate)}</span>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="viewProject(${project.id})" class="flex-1 px-3 py-2 bg-blue-50 text-blue-600 rounded text-sm">View Details</button>
+                    <button onclick="editProject(${project.id})" class="px-3 py-2 bg-gray-50 text-gray-600 rounded text-sm">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function addProject() {
+    const customers = TJSystem.tjData.get('customers');
+    if (customers.length === 0) {
+        alert('Please add customers first!');
+        return;
+    }
+
+    const name = prompt('Project Name:');
+    const customerName = prompt('Customer Name:');
+    const customer = customers.find(c => c.name.toLowerCase().includes(customerName.toLowerCase()));
+    
+    if (!customer) {
+        alert('Customer not found!');
+        return;
+    }
+
+    const budget = parseFloat(prompt('Budget:'));
+    const startDate = prompt('Start Date (YYYY-MM-DD):');
+    
+    if (name && budget && startDate) {
+        TJSystem.ProjectManager.add({
+            name,
+            customerId: customer.id,
+            type: 'general',
+            budget,
+            startDate,
+            endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+            crew: []
+        });
+        loadProjects();
+        alert('Project added successfully!');
+    }
+}
+
+// ===== SCHEDULE FUNCTIONS =====
+function loadSchedule() {
+    const todaysJobs = TJSystem.ScheduleManager.getTodaysJobs();
+    const container = document.getElementById('todays-jobs');
+    
+    container.innerHTML = todaysJobs.map(job => {
+        const project = TJSystem.tjData.get('projects').find(p => p.id === job.projectId);
+        const customer = TJSystem.tjData.get('customers').find(c => c.id === job.customerId);
+        const statusClass = {
+            'scheduled': 'bg-yellow-100 text-yellow-800',
+            'in-progress': 'bg-blue-100 text-blue-800',
+            'completed': 'bg-green-100 text-green-800'
+        }[job.status];
+
+        return `
+            <div class="p-6 flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500">TIME</p>
+                        <p class="font-bold text-blue-600">${new Date(job.startTime).toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit'})}</p>
+                    </div>
+                    <div>
+                        <p class="font-semibold">${job.title}</p>
+                        <p class="text-sm text-gray-600">${customer?.name || 'Unknown Customer'}</p>
+                        <p class="text-xs text-gray-500">Crew: ${job.crew.join(', ')}</p>
+                    </div>
+                </div>
+                <span class="px-2 py-1 ${statusClass} text-xs rounded">${job.status}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+function scheduleJob() {
+    const projects = TJSystem.tjData.get('projects');
+    if (projects.length === 0) {
+        alert('Please create projects first!');
+        return;
+    }
+
+    const title = prompt('Job Title:');
+    const projectName = prompt('Project Name:');
+    const project = projects.find(p => p.name.toLowerCase().includes(projectName.toLowerCase()));
+    
+    if (!project) {
+        alert('Project not found!');
+        return;
+    }
+
+    const startTime = prompt('Start Time (YYYY-MM-DD HH:MM):');
+    const crew = prompt('Crew Members (comma separated):').split(',').map(s => s.trim());
+    
+    if (title && startTime) {
+        TJSystem.ScheduleManager.addAppointment({
+            title,
+            projectId: project.id,
+            customerId: project.customerId,
+            startTime: new Date(startTime).toISOString(),
+            endTime: new Date(new Date(startTime).getTime() + 4 * 60 * 60 * 1000).toISOString(), // 4 hours later
+            crew,
+            location: '',
+            description: title
+        });
+        loadSchedule();
+        alert('Job scheduled successfully!');
+    }
+}
+
+// ===== INITIALIZATION =====
+document.addEventListener('DOMContentLoaded', function() {
+    // Load sample data if empty
+    if (TJSystem.tjData.get('customers').length === 0) {
+        loadSampleData();
+    }
+
+    // Determine which page we're on and load appropriate data
+    const pageTitle = document.title;
+    
+    if (pageTitle.includes('Dashboard')) {
+        loadDashboard();
+    } else if (pageTitle.includes('Customers')) {
+        loadCustomers();
+    } else if (pageTitle.includes('Projects')) {
+        loadProjects();
+    } else if (pageTitle.includes('Schedule')) {
+        loadSchedule();
+    }
+});
+
+function loadSampleData() {
+    // Add sample customers
+    const customers = [
+        { name: 'John Johnson', email: 'john@email.com', phone: '(555) 123-4567', address: '123 Oak Street, Delmar MD' },
+        { name: 'Sarah Williams', email: 'sarah@email.com', phone: '(555) 987-6543', address: '456 Pine Avenue, Delmar MD' },
+        { name: 'Mike Davis', email: 'mike@business.com', phone: '(555) 456-7890', address: '789 Business Blvd, Salisbury MD' }
+    ];
+
+    customers.forEach(customerData => {
+        TJSystem.CustomerManager.add(customerData);
+    });
+
+    console.log('Sample data loaded successfully!');
+}
+
+// Export functions for global use
+window.TJUIFunctions = {
+    loadDashboard,
+    loadCustomers,
+    addCustomer,
+    loadProjects,
+    addProject,
+    loadSchedule,
+    scheduleJob,
+    callCustomer
+};// T&J Field Services - Customer Communication Functions
+
+class CustomerCommunication {
+    static sendEstimate(estimateId) {
+        const estimate = TJSystem.tjData.get('estimates').find(e => e.id === estimateId);
+        const customer = TJSystem.tjData.get('customers').find(c => c.id === estimate.customerId);
+        
+        const emailBody = this.getEstimateEmailBody(estimate, customer);
+        const subject = `Estimate ${estimate.number} - ${estimate.description}`;
+        
+        // Open email client
+        window.open(`mailto:${customer.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`);
+        
+        // Update estimate status
+        this.updateEstimateStatus(estimateId, 'sent');
+        alert('Estimate sent to customer!');
+    }
+
+    static getEstimateEmailBody(estimate, customer) {
+        return `Dear ${customer.name},
+
+Please find your estimate for ${estimate.description}.
+
+Estimate Details:
+- Number: ${estimate.number}
+- Total Amount: ${TJSystem.TJUtils.formatCurrency(estimate.total)}
+- Valid Until: ${TJSystem.TJUtils.formatDate(estimate.validUntil)}
+
+We look forward to working with you on this project.
+
+Best regards,
+T&J Field Services
+Delmar, Maryland
+(555) 123-4567
+info@tjfieldservices.com`;
+    }
+
+    static followUpOverdue(invoiceId) {
+        const invoice = TJSystem.tjData.get('invoices').find(i => i.id === invoiceId);
+        const customer = TJSystem.tjData.get('customers').find(c => c.id === invoice.customerId);
+        
+        const emailBody = this.getOverdueEmailBody(invoice, customer);
+        const subject = `Payment Reminder - Invoice ${invoice.number}`;
+        
+        window.open(`mailto:${customer.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`);
+    }
+
+    static getOverdueEmailBody(invoice, customer) {
+        return `Dear ${customer.name},
+
+This is a friendly reminder that Invoice ${invoice.number} is now overdue.
+
+Invoice Details:
+- Amount: ${TJSystem.TJUtils.formatCurrency(invoice.total)}
+- Due Date: ${TJSystem.TJUtils.formatDate(invoice.dueDate)}
+
+Please contact us at your earliest convenience to arrange payment.
+
+Thank you,
+T&J Field Services
+(555) 123-4567`;
+    }
+
+    static scheduleFollowUp(customerId, days = 7) {
+        const followUpDate = new Date();
+        followUpDate.setDate(followUpDate.getDate() + days);
+        
+        const customer = TJSystem.tjData.get('customers').find(c => c.id === customerId);
+        
+        // In a real system, this would create a calendar reminder
+        alert(`Follow-up scheduled for ${customer.name} on ${followUpDate.toDateString()}`);
+    }
+
+    static updateEstimateStatus(estimateId, status) {
+        const estimates = TJSystem.tjData.get('estimates');
+        const index = estimates.findIndex(e => e.id === estimateId);
+        if (index !== -1) {
+            estimates[index].status = status;
+            TJSystem.tjData.save('estimates', estimates);
+        }
+    }
+
+    static callCustomer(phone) {
+        // Open phone dialer on mobile devices
+        window.open(`tel:${phone}`);
+    }
+
+    static textCustomer(phone, message = '') {
+        // Open SMS app
+        window.open(`sms:${phone}${message ? `?body=${encodeURIComponent(message)}` : ''}`);
+    }
+}
+
+// Export for global use
+window.CustomerCommunication = CustomerCommunication;// T&J Field Services - Remaining UI Functions
+
+// ===== ESTIMATE UI FUNCTIONS =====
+function loadEstimates() {
+    const estimates = TJSystem.tjData.get('estimates');
+    const container = document.getElementById('estimates-container') || document.getElementById('estimates-table-body');
+    
+    if (!container) return;
+
+    if (container.tagName === 'TBODY') {
+        // Table format
+        container.innerHTML = estimates.map(estimate => {
+            const customer = TJSystem.tjData.get('customers').find(c => c.id === estimate.customerId);
+            const statusClass = {
+                'pending': 'bg-yellow-100 text-yellow-800',
+                'sent': 'bg-blue-100 text-blue-800',
+                'accepted': 'bg-green-100 text-green-800',
+                'declined': 'bg-red-100 text-red-800'
+            }[estimate.status];
+
+            return `
+                <tr>
+                    <td class="px-6 py-4 font-medium">${estimate.number}</td>
+                    <td class="px-6 py-4">${customer?.name || 'Unknown'}</td>
+                    <td class="px-6 py-4">${estimate.description}</td>
+                    <td class="px-6 py-4">${TJSystem.TJUtils.formatCurrency(estimate.total)}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 ${statusClass} text-xs rounded">${estimate.status}</span>
+                    </td>
+                    <td class="px-6 py-4 text-sm">
+                        <button onclick="viewEstimate(${estimate.id})" class="text-blue-600 hover:text-blue-900 mr-2">View</button>
+                        <button onclick="PrintManager.printEstimate(${estimate.id})" class="text-green-600 hover:text-green-900 mr-2">Print</button>
+                        <button onclick="CustomerCommunication.sendEstimate(${estimate.id})" class="text-purple-600 hover:text-purple-900">Send</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    } else {
+        // Card format
+        container.innerHTML = estimates.map(estimate => {
+            const customer = TJSystem.tjData.get('customers').find(c => c.id === estimate.customerId);
+            const statusClass = {
+                'pending': 'bg-yellow-100 text-yellow-800',
+                'sent': 'bg-blue-100 text-blue-800',
+                'accepted': 'bg-green-100 text-green-800',
+                'declined': 'bg-red-100 text-red-800'
+            }[estimate.status];
+
+            return `
+                <div class="bg-white p-6 rounded-lg shadow border">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold">${estimate.number}</h3>
+                            <p class="text-gray-600">${customer?.name || 'Unknown Customer'}</p>
+                        </div>
+                        <span class="px-2 py-1 ${statusClass} text-xs rounded">${estimate.status}</span>
+                    </div>
+                    <p class="text-sm text-gray-700 mb-4">${estimate.description}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-lg font-bold text-green-600">${TJSystem.TJUtils.formatCurrency(estimate.total)}</span>
+                        <div class="space-x-2">
+                            <button onclick="PrintManager.printEstimate(${estimate.id})" class="px-3 py-1 bg-blue-50 text-blue-600 rounded text-sm">Print</button>
+                            <button onclick="CustomerCommunication.sendEstimate(${estimate.id})" class="px-3 py-1 bg-green-50 text-green-600 rounded text-sm">Send</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+}
+
+// ===== INVOICE UI FUNCTIONS =====
+function loadInvoices() {
+    const invoices = TJSystem.tjData.get('invoices');
+    const container = document.getElementById('invoices-container') || document.getElementById('invoices-table-body');
+    
+    if (!container) return;
+
+    container.innerHTML = invoices.map(invoice => {
+        const customer = TJSystem.tjData.get('customers').find(c => c.id === invoice.customerId);
+        const project = TJSystem.tjData.get('projects').find(p => p.id === invoice.projectId);
+        const statusClass = {
+            'pending': 'bg-yellow-100 text-yellow-800',
+            'sent': 'bg-blue-100 text-blue-800',
+            'paid': 'bg-green-100 text-green-800',
+            'overdue': 'bg-red-100 text-red-800'
+        }[invoice.status];
+
+        const isOverdue = invoice.status !== 'paid' && new Date(invoice.dueDate) < new Date();
+
+        return `
+            <div class="bg-white p-6 rounded-lg shadow border">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold">${invoice.number}</h3>
+                        <p class="text-gray-600">${customer?.name || 'Unknown Customer'}</p>
+                        <p class="text-sm text-gray-500">${project?.name || 'General Services'}</p>
+                    </div>
+                    <span class="px-2 py-1 ${statusClass} text-xs rounded">
+                        ${isOverdue ? 'OVERDUE' : invoice.status.toUpperCase()}
+                    </span>
+                </div>
+                <div class="space-y-2 text-sm mb-4">
+                    <div class="flex justify-between">
+                        <span>Amount:</span>
+                        <span class="font-medium">${TJSystem.TJUtils.formatCurrency(invoice.total)}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Due Date:</span>
+                        <span class="font-medium">${TJSystem.TJUtils.formatDate(invoice.dueDate)}</span>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="PrintManager.printInvoice(${invoice.id})" class="flex-1 px-3 py-2 bg-blue-50 text-blue-600 rounded text-sm">Print</button>
+                    ${invoice.status !== 'paid' ? `
+                        <button onclick="markInvoicePaid(${invoice.id})" class="px-3 py-2 bg-green-50 text-green-600 rounded text-sm">Mark Paid</button>
+                        ${isOverdue ? `<button onclick="CustomerCommunication.followUpOverdue(${invoice.id})" class="px-3 py-2 bg-red-50 text-red-600 rounded text-sm">Follow Up</button>` : ''}
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function createInvoice() {
+    const projects = TJSystem.tjData.get('projects');
+    if (projects.length === 0) {
+        alert('Please create projects first!');
+        return;
+    }
+
+    const projectName = prompt('Project Name:');
+    const project = projects.find(p => p.name.toLowerCase().includes(projectName.toLowerCase()));
+    
+    if (!project) {
+        alert('Project not found!');
+        return;
+    }
+
+    const amount = parseFloat(prompt('Invoice Amount:'));
+    if (!amount) return;
+
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + 30); // 30 days from now
+
+    const invoiceData = {
+        customerId: project.customerId,
+        projectId: project.id,
+        items: [{
+            description: project.name,
+            quantity: 1,
+            price: amount
+        }],
+        dueDate: dueDate.toISOString().split('T')[0]
+    };
+
+    TJSystem.InvoiceManager.create(invoiceData);
+    loadInvoices();
+    alert('Invoice created successfully!');
+}
+
+function markInvoicePaid(invoiceId) {
+    TJSystem.InvoiceManager.markPaid(invoiceId);
+    loadInvoices();
+    alert('Invoice marked as paid!');
+}
+
+// ===== INVENTORY UI FUNCTIONS =====
+function loadInventory() {
+    const inventory = TJSystem.tjData.get('inventory');
+    const container = document.getElementById('inventory-container') || document.getElementById('inventory-table-body');
+    
+    if (!container) return;
+
+    container.innerHTML = inventory.map(item => {
+        const lowStock = item.quantity <= item.lowStockAlert;
+        const stockClass = lowStock ? 'text-red-600 font-bold' : 'text-green-600';
+
+        return `
+            <div class="bg-white p-6 rounded-lg shadow border ${lowStock ? 'border-red-200' : ''}">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold">${item.name}</h3>
+                        <p class="text-gray-600 capitalize">${item.category}</p>
+                    </div>
+                    <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded">${item.unit}</span>
+                </div>
+                <div class="space-y-2 text-sm mb-4">
+                    <div class="flex justify-between">
+                        <span>Quantity:</span>
+                        <span class="${stockClass}">${item.quantity} ${item.unit}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Price per ${item.unit}:</span>
+                        <span class="font-medium">${TJSystem.TJUtils.formatCurrency(item.price)}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Total Value:</span>
+                        <span class="font-medium">${TJSystem.TJUtils.formatCurrency(item.quantity * item.price)}</span>
+                    </div>
+                </div>
+                ${lowStock ? '<p class="text-red-600 text-sm font-medium mb-2">⚠️ Low Stock Alert!</p>' : ''}
+                <div class="flex space-x-2">
+                    <button onclick="updateInventoryQuantity(${item.id})" class="flex-1 px-3 py-2 bg-blue-50 text-blue-600 rounded text-sm">Update Qty</button>
+                    <button onclick="editInventoryItem(${item.id})" class="px-3 py-2 bg-gray-50 text-gray-600 rounded text-sm">Edit</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function addInventoryItem() {
+    const name = prompt('Item Name:');
+    const category = prompt('Category (tools, lumber, hardware, finishes):');
+    const quantity = parseFloat(prompt('Quantity:'));
+    const unit = prompt('Unit (each, box, gallon, etc.):');
+    const price = parseFloat(prompt('Price per unit:'));
+    
+    if (name && category && quantity && unit && price) {
+        TJSystem.InventoryManager.addItem({
+            name, category, quantity, unit, price,
+            supplier: '',
+            lowStockAlert: 5,
+            location: ''
+        });
+        loadInventory();
+        alert('Item added successfully!');
+    }
+}
+
+function updateInventoryQuantity(itemId) {
+    const newQuantity = parseFloat(prompt('New Quantity:'));
+    if (newQuantity !== null && !isNaN(newQuantity)) {
+        TJSystem.InventoryManager.updateQuantity(itemId, newQuantity);
+        loadInventory();
+    }
+}
+
+function editInventoryItem(itemId) {
+    const item = TJSystem.tjData.get('inventory').find(i => i.id === itemId);
+    if (!item) return;
+
+    const name = prompt('Item Name:', item.name);
+    const price = parseFloat(prompt('Price per unit:', item.price));
+    const lowStockAlert = parseFloat(prompt('Low stock alert level:', item.lowStockAlert));
+
+    if (name && price && lowStockAlert) {
+        TJSystem.InventoryManager.updateItem(itemId, { name, price, lowStockAlert });
+        loadInventory();
+        alert('Item updated successfully!');
+    }
+}
+
+// ===== REPORTS UI FUNCTIONS =====
+function loadReports() {
+    const stats = TJSystem.ReportManager.getProjectStats();
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    const monthlyRevenue = TJSystem.ReportManager.getMonthlyRevenue(currentMonth, currentYear);
+    const profitMargin = TJSystem.ReportManager.getProfitMargin();
+
+    // Update report stats
+    if (document.getElementById('total-projects')) {
+        document.getElementById('total-projects').textContent = stats.total;
+        document.getElementById('completed-projects').textContent = stats.completed;
+        document.getElementById('monthly-revenue-report').textContent = TJSystem.TJUtils.formatCurrency(monthlyRevenue);
+        document.getElementById('profit-margin').textContent = profitMargin.toFixed(1) + '%';
+    }
+
+    loadRecentActivity();
+    loadOverdueInvoices();
+}
+
+function loadRecentActivity() {
+    const projects = TJSystem.tjData.get('projects').slice(-5);
+    const container = document.getElementById('recent-activity');
+    
+    if (!container) return;
+
+    container.innerHTML = projects.map(project => {
+        const customer = TJSystem.tjData.get('customers').find(c => c.id === project.customerId);
+        return `
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                <div>
+                    <p class="font-medium">${project.name}</p>
+                    <p class="text-sm text-gray-600">${customer?.name || 'Unknown Customer'}</p>
+                </div>
+                <span class="text-sm text-gray-500">${TJSystem.TJUtils.formatDate(project.created)}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+function loadOverdueInvoices() {
+    const overdueInvoices = TJSystem.InvoiceManager.getOverdue();
+    const container = document.getElementById('overdue-invoices');
+    
+    if (!container) return;
+
+    if (overdueInvoices.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-4">No overdue invoices</p>';
+        return;
+    }
+
+    container.innerHTML = overdueInvoices.map(invoice => {
+        const customer = TJSystem.tjData.get('customers').find(c => c.id === invoice.customerId);
+        return `
+            <div class="flex justify-between items-center p-3 bg-red-50 rounded border border-red-200">
+                <div>
+                    <p class="font-medium">${invoice.number}</p>
+                    <p class="text-sm text-gray-600">${customer?.name || 'Unknown Customer'}</p>
+                </div>
+                <div class="text-right">
+                    <p class="font-bold text-red-600">${TJSystem.TJUtils.formatCurrency(invoice.total)}</p>
+                    <button onclick="CustomerCommunication.followUpOverdue(${invoice.id})" 
+                            class="text-xs text-red-600 hover:text-red-800">Follow Up</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ===== SCHEDULE UI FUNCTIONS =====
+function loadSchedule() {
+    const projects = TJSystem.tjData.get('projects');
+    const scheduleContainer = document.getElementById('schedule-container');
+    
+    if (!scheduleContainer) return;
+
+    // Get current week dates
+    const today = new Date();
+    const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
+    
+    const weekDays = [];
+    for (let i = 0; i < 7; i++) {
+        const day = new Date(startOfWeek);
+        day.setDate(startOfWeek.getDate() + i);
+        weekDays.push(day);
+    }
+
+    scheduleContainer.innerHTML = `
+        <div class="grid grid-cols-7 gap-4">
+            ${weekDays.map(day => `
+                <div class="bg-white p-4 rounded-lg shadow border">
+                    <h3 class="font-semibold text-center mb-3">
+                        ${day.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                    </h3>
+                    <div class="space-y-2">
+                        ${getProjectsForDay(projects, day)}
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function getProjectsForDay(projects, day) {
+    const dayProjects = projects.filter(project => {
+        const projectDate = new Date(project.startDate);
+        return projectDate.toDateString() === day.toDateString() && project.status !== 'completed';
+    });
+
+    if (dayProjects.length === 0) {
+        return '<p class="text-gray-400 text-sm">No projects</p>';
+    }
+
+    return dayProjects.map(project => {
+        const customer = TJSystem.tjData.get('customers').find(c => c.id === project.customerId);
+        return `
+            <div class="bg-blue-50 p-2 rounded text-sm">
+                <p class="font-medium">${project.name}</p>
+                <p class="text-gray-600">${customer?.name || 'Unknown'}</p>
+            </div>
+        `;
+    }).join('');
+}
+
+// ===== DATA CLEANUP FUNCTIONS =====
+function removeDuplicateProjects() {
+    const projects = TJSystem.tjData.get('projects');
+    const uniqueProjects = [];
+    const seen = new Set();
+
+    projects.forEach(project => {
+        const key = `${project.name}-${project.customerId}-${project.budget}`;
+        if (!seen.has(key)) {
+            seen.add(key);
+            uniqueProjects.push(project);
+        }
+    });
+
+    TJSystem.tjData.save('projects', uniqueProjects);
+    alert(`Removed ${projects.length - uniqueProjects.length} duplicate projects`);
+    if (typeof loadProjects === 'function') loadProjects();
+}
+
+function clearAllData() {
+    if (confirm('Are you sure you want to clear ALL data? This cannot be undone!')) {
+        localStorage.clear();
+        location.reload();
+    }
+}
+
+function resetToSampleData() {
+    if (confirm('Reset to sample data? This will overwrite all current data!')) {
+        localStorage.clear();
+        loadSampleData();
+        location.reload();
+    }
+}
+
+// ===== ENHANCED INITIALIZATION =====
+document.addEventListener('DOMContentLoaded', function() {
+    // Load sample data if empty
+    if (TJSystem.tjData.get('customers').length === 0) {
+        loadSampleData();
+    }
+
+    // Determine page and load appropriate data
+    const currentPage = window.location.pathname.split('/').pop().replace('.html', '');
+    
+    switch(currentPage) {
+        case 'dashboard':
+        case 'index':
+            loadDashboard();
+            break;
+        case 'customers':
+            loadCustomers();
+            break;
+        case 'projects':
+            loadProjects();
+            break;
+        case 'estimates':
+            loadEstimates();
+            break;
+        case 'schedule':
+            loadSchedule();
+            break;
+        case 'invoicing':
+            loadInvoices();
+            break;
+        case 'inventory':
+            loadInventory();
+            break;
+        case 'reports':
+            loadReports();
+            break;
+    }
+});
+
+// ===== UTILITY FUNCTIONS =====
+function viewEstimate(estimateId) {
+    const estimate = TJSystem.tjData.get('estimates').find(e => e.id === estimateId);
+    const customer = TJSystem.tjData.get('customers').find(c => c.id === estimate.customerId);
+    
+    alert(`Estimate: ${estimate.number}\nCustomer: ${customer.name}\nTotal: ${TJSystem.TJUtils.formatCurrency(estimate.total)}\nStatus: ${estimate.status}`);
+}
+
+function exportData() {
+    const data = {
+        customers: TJSystem.tjData.get('customers'),
+        projects: TJSystem.tjData.get('projects'),
+        estimates: TJSystem.tjData.get('estimates'),
+        invoices: TJSystem.tjData.get('invoices'),
+        inventory: TJSystem.tjData.get('inventory')
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'tj-field-services-backup.json';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// Export functions for global use
+window.loadEstimates = loadEstimates;
+window.loadInvoices = loadInvoices;
+window.loadInventory = loadInventory;
+window.loadReports = loadReports;
+window.loadSchedule = loadSchedule;
+window.createInvoice = createInvoice;
+window.markInvoicePaid = markInvoicePaid;
+window.addInventoryItem = addInventoryItem;
+window.updateInventoryQuantity = updateInventoryQuantity;
+window.editInventoryItem = editInventoryItem;
+window.removeDuplicateProjects = removeDuplicateProjects;
+window.clearAllData = clearAllData;
+window.resetToSampleData = resetToSampleData;
+window.viewEstimate = viewEstimate;
+window.exportData = exportData;// T&J Field Services - Project Creation Modal & Functions
+
+// ===== ENHANCED PROJECT MANAGER =====
+TJSystem.ProjectManager.createWithModal = function() {
+    // Create modal HTML
+    const modalHTML = `
+        <div id="project-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
+                <h2 class="text-xl font-bold mb-4">Create New Project</h2>
+                <form id="project-form">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Project Name</label>
+                        <input type="text" id="project-name" class="w-full p-2 border rounded" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Customer</label>
+                        <select id="project-customer" class="w-full p-2 border rounded" required>
+                            <option value="">Select Customer</option>
+                            ${TJSystem.tjData.get('customers').map(c => 
+                                `<option value="${c.id}">${c.name}</option>`
+                            ).join('')}
+                        </select>
+                        <button type="button" onclick="TJSystem.CustomerManager.createWithModal()" 
+                                class="text-sm text-blue-600 mt-1">+ Add New Customer</button>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Project Type</label>
+                        <select id="project-type" class="w-full p-2 border rounded" required>
+                            <option value="">Select Type</option>
+                            <option value="deck">Deck Building</option>
+                            <option value="kitchen">Kitchen Remodel</option>
+                            <option value="bathroom">Bathroom Remodel</option>
+                            <option value="handyman">Handyman Services</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Budget</label>
+                        <input type="number" id="project-budget" class="w-full p-2 border rounded" step="100" min="0">
+                        <button type="button" onclick="openQuickEstimate()" 
+                                class="text-sm text-green-600 mt-1">📊 Quick Estimate</button>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Start Date</label>
+                        <input type="date" id="project-start-date" class="w-full p-2 border rounded">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Description</label>
+                        <textarea id="project-description" class="w-full p-2 border rounded" rows="3"></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-2">
+                        <button type="button" onclick="closeProjectModal()" class="px-4 py-2 bg-gray-300 rounded">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Create Project</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+
+    // Add modal to page
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Handle form submission
+    document.getElementById('project-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const projectData = {
+            name: document.getElementById('project-name').value,
+            customerId: parseInt(document.getElementById('project-customer').value),
+            type: document.getElementById('project-type').value,
+            budget: parseFloat(document.getElementById('project-budget').value) || 0,
+            startDate: document.getElementById('project-start-date').value,
+            description: document.getElementById('project-description').value
+        };
+
+        const newProject = TJSystem.ProjectManager.create(projectData);
+        closeProjectModal();
+        
+        if (typeof loadProjects === 'function') {
+            loadProjects();
+        }
+        
+        alert(`Project "${newProject.name}" created successfully!`);
+    });
 };
+
+// ===== CUSTOMER CREATION MODAL =====
+TJSystem.CustomerManager.createWithModal = function() {
+    const modalHTML = `
+        <div id="customer-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
+                <h2 class="text-xl font-bold mb-4">Add New Customer</h2>
+                <form id="customer-form">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Name</label>
+                        <input type="text" id="customer-name" class="w-full p-2 border rounded" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Phone</label>
+                        <input type="tel" id="customer-phone" class="w-full p-2 border rounded" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Email</label>
+                        <input type="email" id="customer-email" class="w-full p-2 border rounded">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Address</label>
+                        <textarea id="customer-address" class="w-full p-2 border rounded" rows="3"></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-2">
+                        <button type="button" onclick="closeCustomerModal()" class="px-4 py-2 bg-gray-300 rounded">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Add Customer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    document.getElementById('customer-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const customerData = {
+            name: document.getElementById('customer-name').value,
+            phone: document.getElementById('customer-phone').value,
+            email: document.getElementById('customer-email').value,
+            address: document.getElementById('customer-address').value
+        };
+
+        const newCustomer = TJSystem.CustomerManager.create(customerData);
+        closeCustomerModal();
+        
+        // Refresh customer dropdown in project modal
+        const customerSelect = document.getElementById('project-customer');
+        if (customerSelect) {
+            const option = document.createElement('option');
+            option.value = newCustomer.id;
+            option.textContent = newCustomer.name;
+            option.selected = true;
+            customerSelect.appendChild(option);
+        }
+        
+        if (typeof loadCustomers === 'function') {
+            loadCustomers();
+        }
+        
+        alert(`Customer "${newCustomer.name}" added successfully!`);
+    });
+};
+
+// ===== MODAL CONTROL FUNCTIONS =====
+function closeProjectModal() {
+    const modal = document.getElementById('project-modal');
+    if (modal) modal.remove();
+}
+
+function closeCustomerModal() {
+    const modal = document.getElementById('customer-modal');
+    if (modal) modal.remove();
+}
+
+function closeEstimateModal() {
+    const modal = document.getElementById('estimate-modal');
+    if (modal) modal.remove();
+}
+
+// ===== QUICK ACCESS FUNCTIONS =====
+function createNewProject() {
+    TJSystem.ProjectManager.createWithModal();
+}
+
+function addNewCustomer() {
+    TJSystem.CustomerManager.createWithModal();
+}
+
+function openQuickEstimate() {
+    createQuickEstimate();
+}
+
+// Export functions for global use
+window.createNewProject = createNewProject;
+window.addNewCustomer = addNewCustomer;
+window.openQuickEstimate = openQuickEstimate;
+window.closeProjectModal = closeProjectModal;
+window.closeCustomerModal = closeCustomerModal;
+window.closeEstimateModal = closeEstimateModal;// T&J Field Services - Estimate Display & Integration Functions
+
+let currentEstimateResult = null;
+
+function displayEstimateResult(calculation) {
+    const resultDiv = document.getElementById('estimate-result');
+    const breakdownDiv = document.getElementById('estimate-breakdown');
+    
+    let breakdownHTML = `
+        <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+                <span>Base Cost:</span>
+                <span>${TJSystem.TJUtils.formatCurrency(calculation.baseCost || calculation.labor || (calculation.total - calculation.profitMargin - calculation.tax))}</span>
+            </div>
+    `;
+    
+    if (calculation.extras && calculation.extras > 0) {
+        breakdownHTML += `
+            <div class="flex justify-between">
+                <span>Extras:</span>
+                <span>${TJSystem.TJUtils.formatCurrency(calculation.extras)}</span>
+            </div>
+        `;
+    }
+    
+    if (calculation.features && calculation.features > 0) {
+        breakdownHTML += `
+            <div class="flex justify-between">
+                <span>Features:</span>
+                <span>${TJSystem.TJUtils.formatCurrency(calculation.features)}</span>
+            </div>
+        `;
+    }
+    
+    if (calculation.materials && calculation.materials > 0) {
+        breakdownHTML += `
+            <div class="flex justify-between">
+                <span>Materials:</span>
+                <span>${TJSystem.TJUtils.formatCurrency(calculation.materials)}</span>
+            </div>
+        `;
+    }
+    
+    breakdownHTML += `
+            <hr class="my-2">
+            <div class="flex justify-between">
+                <span>Subtotal:</span>
+                <span>${TJSystem.TJUtils.formatCurrency(calculation.total)}</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Profit (20%):</span>
+                <span>${TJSystem.TJUtils.formatCurrency(calculation.profitMargin)}</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Tax (6%):</span>
+                <span>${TJSystem.TJUtils.formatCurrency(calculation.tax)}</span>
+            </div>
+            <hr class="my-2">
+            <div class="flex justify-between font-bold text-lg">
+                <span>Total:</span>
+                <span class="text-green-600">${TJSystem.TJUtils.formatCurrency(calculation.finalTotal)}</span>
+            </div>
+        </div>
+    `;
+    
+    if (calculation.area) {
+        breakdownHTML = `
+            <div class="mb-3 text-sm text-gray-600">
+                Area: ${calculation.area} sq ft @ ${TJSystem.TJUtils.formatCurrency(calculation.baseRate)}/sq ft
+            </div>
+        ` + breakdownHTML;
+    }
+    
+    if (calculation.hours) {
+        breakdownHTML = `
+            <div class="mb-3 text-sm text-gray-600">
+                ${calculation.hours} hours @ ${TJSystem.TJUtils.formatCurrency(calculation.hourlyRate)}/hour
+            </div>
+        ` + breakdownHTML;
+    }
+    
+    breakdownDiv.innerHTML = breakdownHTML;
+    resultDiv.classList.remove('hidden');
+}
+
+function useEstimateInProject() {
+    if (!currentEstimateResult) {
+        alert('No estimate calculated!');
+        return;
+    }
+    
+    // If we're in project creation modal, fill the budget field
+    const budgetField = document.getElementById('project-budget');
+    if (budgetField) {
+        budgetField.value = Math.round(currentEstimateResult.finalTotal);
+        closeEstimateModal();
+        alert('Estimate added to project budget!');
+    } else {
+        // Create a new project with this estimate
+        const projectName = prompt('Project Name:', `${document.getElementById('estimate-type').value.charAt(0).toUpperCase() + document.getElementById('estimate-type').value.slice(1)} Project`);
+        if (!projectName) return;
+        
+        const customers = TJSystem.tjData.get('customers');
+        if (customers.length === 0) {
+            alert('Please add customers first!');
+            return;
+        }
+        
+        const customerName = prompt('Customer Name:');
+        const customer = customers.find(c => 
+            c.name.toLowerCase().includes(customerName.toLowerCase())
+        );
+        
+        if (!customer) {
+            alert('Customer not found!');
+            return;
+        }
+        
+        const projectData = {
+            name: projectName,
+            customerId: customer.id,
+            type: document.getElementById('estimate-type').value,
+            budget: Math.round(currentEstimateResult.finalTotal),
+            description: `Estimated at ${TJSystem.TJUtils.formatCurrency(currentEstimateResult.finalTotal)}`,
+            startDate: new Date().toISOString().split('T')[0]
+        };
+        
+        const newProject = TJSystem.ProjectManager.create(projectData);
+        closeEstimateModal();
+        
+        if (typeof loadProjects === 'function') {
+            loadProjects();
+        }
+        
+        alert(`Project "${newProject.name}" created with estimate!`);
+    }
+}
+
+// ===== QUICK BUTTONS FOR COMMON ACTIONS =====
+function quickDeckEstimate() {
+    createQuickEstimate();
+    setTimeout(() => {
+        document.getElementById('estimate-type').value = 'deck';
+        showEstimateFields();
+        // Set some default values
+        document.getElementById('deck-length').value = '12';
+        document.getElementById('deck-width').value = '16';
+        document.getElementById('deck-type').value = 'basic';
+    }, 100);
+}
+
+function quickKitchenEstimate() {
+    createQuickEstimate();
+    setTimeout(() => {
+        document.getElementById('estimate-type').value = 'kitchen';
+        showEstimateFields();
+        // Set some default values
+        document.getElementById('kitchen-length').value = '10';
+        document.getElementById('kitchen-width').value = '12';
+        document.getElementById('kitchen-type').value = 'midRange';
+    }, 100);
+}
+
+function quickHandymanEstimate() {
+    createQuickEstimate();
+    setTimeout(() => {
+        document.getElementById('estimate-type').value = 'handyman';
+        showEstimateFields();
+        // Set some default values
+        document.getElementById('handyman-hours').value = '4';
+        document.getElementById('handyman-type').value = 'basic';
+    }, 100);
+}
+
+// ===== SIMPLE ADD FUNCTIONS =====
+function addCustomer() {
+    const name = prompt('Customer Name:');
+    const phone = prompt('Phone Number:');
+    const email = prompt('Email (optional):');
+    const address = prompt('Address (optional):');
+    
+    if (name && phone) {
+        const customer = TJSystem.CustomerManager.create({
+            name: name,
+            phone: phone,
+            email: email || '',
+            address: address || ''
+        });
+        
+        if (typeof loadCustomers === 'function') {
+            loadCustomers();
+        }
+        
+        alert(`Customer "${customer.name}" added successfully!`);
+    }
+}
+
+function addInventoryItem() {
+    const name = prompt('Item Name:');
+    const category = prompt('Category (tools, lumber, hardware, finishes):');
+    const quantity = parseFloat(prompt('Quantity:'));
+    const unit = prompt('Unit (each, box, gallon, etc.):');
+    const price = parseFloat(prompt('Price per unit:'));
+    
+    if (name && category && quantity && unit && price) {
+        TJSystem.InventoryManager.addItem({
+            name, category, quantity, unit, price,
+            supplier: '',
+            lowStockAlert: 5,
+            location: ''
+        });
+        
+        if (typeof loadInventory === 'function') {
+            loadInventory();
+        }
+        
+        alert('Item added successfully!');
+    }
+}
+
+// ===== EXPORT FUNCTIONS =====
+window.displayEstimateResult = displayEstimateResult;
+window.useEstimateInProject = useEstimateInProject;
+window.quickDeckEstimate = quickDeckEstimate;
+window.quickKitchenEstimate = quickKitchenEstimate;
+window.quickHandymanEstimate = quickHandymanEstimate;
+window.addCustomer = addCustomer;
+window.addInventoryItem = addInventoryItem;
+window.currentEstimateResult = currentEstimateResult;
 };
