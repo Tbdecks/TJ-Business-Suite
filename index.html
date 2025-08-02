@@ -4442,5 +4442,637 @@ const SecurityAudit = {
             alertThreshold: document.getElementById('alertThreshold').value
         };
     }
+};// Integration overview component for T&J Field Services
+const IntegrationOverview = {
+    render() {
+        return `
+            <div class="space-y-6">
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-white border rounded-lg p-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-bold text-green-600" id="activeIntegrations">0</div>
+                                <div class="text-sm text-gray-600">Active</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white border rounded-lg p-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                <i data-lucide="grid-3x3" class="w-5 h-5 text-blue-600"></i>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-bold text-blue-600" id="availableIntegrations">0</div>
+                                <div class="text-sm text-gray-600">Available</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white border rounded-lg p-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                                <i data-lucide="zap" class="w-5 h-5 text-purple-600"></i>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-bold text-purple-600" id="automations">0</div>
+                                <div class="text-sm text-gray-600">Automations</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white border rounded-lg p-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mr-3">
+                                <i data-lucide="activity" class="w-5 h-5 text-orange-600"></i>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-bold text-orange-600" id="apiCalls">0</div>
+                                <div class="text-sm text-gray-600">API Calls Today</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Active Integrations -->
+                <div class="bg-white border rounded-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-medium">Active Integrations</h3>
+                        <button onclick="IntegrationOverview.manageAll()" class="btn-secondary text-sm">
+                            Manage All
+                        </button>
+                    </div>
+                    <div id="activeIntegrationsList" class="space-y-3">
+                        <!-- Active integrations will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Popular Integrations -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h3 class="text-lg font-medium mb-4">Popular Integrations</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="popularIntegrations">
+                        <!-- Popular integrations will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Recent Activity -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h3 class="text-lg font-medium mb-4">Recent Integration Activity</h3>
+                    <div id="recentActivity" class="space-y-3">
+                        <!-- Recent activity will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    load() {
+        this.loadStats();
+        this.loadActiveIntegrations();
+        this.loadPopularIntegrations();
+        this.loadRecentActivity();
+    },
+    
+    loadStats() {
+        // Simulate loading stats
+        setTimeout(() => {
+            document.getElementById('activeIntegrations').textContent = '7';
+            document.getElementById('availableIntegrations').textContent = '25';
+            document.getElementById('automations').textContent = '12';
+            document.getElementById('apiCalls').textContent = '1,247';
+        }, 500);
+    },
+    
+    loadActiveIntegrations() {
+        const activeIntegrations = [
+            {
+                name: 'QuickBooks Online',
+                category: 'Accounting',
+                status: 'connected',
+                lastSync: '2 minutes ago',
+                icon: 'calculator',
+                color: 'green'
+            },
+            {
+                name: 'Gmail',
+                category: 'Communication',
+                status: 'connected',
+                lastSync: '5 minutes ago',
+                icon: 'mail',
+                color: 'blue'
+            },
+            {
+                name: 'Google Drive',
+                category: 'Storage',
+                status: 'connected',
+                lastSync: '1 hour ago',
+                icon: 'cloud',
+                color: 'purple'
+            },
+            {
+                name: 'Mailchimp',
+                category: 'Marketing',
+                status: 'warning',
+                lastSync: 'Authentication needed',
+                icon: 'megaphone',
+                color: 'yellow'
+            }
+        ];
+        
+        document.getElementById('activeIntegrationsList').innerHTML = activeIntegrations.map(integration => `
+            <div class="flex items-center justify-between p-3 border rounded-lg">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-${integration.color}-100 rounded-lg flex items-center justify-center mr-3">
+                        <i data-lucide="${integration.icon}" class="w-5 h-5 text-${integration.color}-600"></i>
+                    </div>
+                    <div>
+                        <div class="font-medium">${integration.name}</div>
+                        <div class="text-sm text-gray-500">${integration.category}</div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="text-right">
+                        <div class="flex items-center">
+                            <span class="w-2 h-2 rounded-full ${integration.status === 'connected' ? 'bg-green-500' : 'bg-yellow-500'} mr-2"></span>
+                            <span class="text-sm ${integration.status === 'connected' ? 'text-green-600' : 'text-yellow-600'}">
+                                ${integration.status === 'connected' ? 'Connected' : 'Needs Attention'}
+                            </span>
+                        </div>
+                        <div class="text-xs text-gray-400">${integration.lastSync}</div>
+                    </div>
+                    <button onclick="IntegrationOverview.configureIntegration('${integration.name}')" 
+                            class="btn-secondary text-sm">
+                        Configure
+                    </button>
+                </div>
+            </div>
+        `).join('');
+        
+        lucide.createIcons();
+    },
+    
+    loadPopularIntegrations() {
+        const popularIntegrations = [
+            {
+                name: 'Stripe',
+                description: 'Accept payments online',
+                category: 'Payments',
+                icon: 'credit-card',
+                color: 'indigo',
+                installed: false
+            },
+            {
+                name: 'Slack',
+                description: 'Team communication',
+                category: 'Communication',
+                icon: 'message-square',
+                color: 'purple',
+                installed: false
+            },
+            {
+                name: 'Zapier',
+                description: 'Automate workflows',
+                category: 'Automation',
+                icon: 'zap',
+                color: 'orange',
+                installed: false
+            },
+            {
+                name: 'Dropbox',
+                description: 'Cloud file storage',
+                category: 'Storage',
+                icon: 'cloud',
+                color: 'blue',
+                installed: false
+            },
+            {
+                name: 'Twilio',
+                description: 'SMS and voice calls',
+                category: 'Communication',
+                icon: 'phone',
+                color: 'red',
+                installed: false
+            },
+            {
+                name: 'Square',
+                description: 'Point of sale system',
+                category: 'Payments',
+                icon: 'square',
+                color: 'gray',
+                installed: false
+            }
+        ];
+        
+        document.getElementById('popularIntegrations').innerHTML = popularIntegrations.map(integration => `
+            <div class="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                <div class="flex items-start justify-between mb-3">
+                    <div class="w-12 h-12 bg-${integration.color}-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="${integration.icon}" class="w-6 h-6 text-${integration.color}-600"></i>
+                    </div>
+                    <span class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">
+                        ${integration.category}
+                    </span>
+                </div>
+                <h4 class="font-medium mb-1">${integration.name}</h4>
+                <p class="text-sm text-gray-600 mb-3">${integration.description}</p>
+                <button onclick="IntegrationOverview.installIntegration('${integration.name}')" 
+                        class="w-full btn-primary text-sm">
+                    ${integration.installed ? 'Configure' : 'Install'}
+                </button>
+            </div>
+        `).join('');
+        
+        lucide.createIcons();
+    },
+    
+    loadRecentActivity() {
+        const recentActivity = [
+            {
+                type: 'sync',
+                integration: 'QuickBooks Online',
+                action: 'Synced 3 new invoices',
+                timestamp: '2 minutes ago',
+                icon: 'refresh-cw',
+                color: 'blue'
+            },
+            {
+                type: 'connect',
+                integration: 'Google Drive',
+                action: 'Successfully connected',
+                timestamp: '1 hour ago',
+                icon: 'link',
+                color: 'green'
+            },
+            {
+                type: 'error',
+                integration: 'Mailchimp',
+                action: 'Authentication failed',
+                timestamp: '2 hours ago',
+                icon: 'alert-triangle',
+                color: 'red'
+            },
+            {
+                type: 'automation',
+                integration: 'Zapier',
+                action: 'New automation triggered',
+                timestamp: '3 hours ago',
+                icon: 'zap',
+                color: 'purple'
+            }
+        ];
+        
+        document.getElementById('recentActivity').innerHTML = recentActivity.map(activity => `
+            <div class="flex items-center p-3 border rounded-lg">
+                <div class="w-8 h-8 bg-${activity.color}-100 rounded-lg flex items-center justify-center mr-3">
+                    <i data-lucide="${activity.icon}" class="w-4 h-4 text-${activity.color}-600"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="font-medium text-sm">${activity.integration}</div>
+                    <div class="text-sm text-gray-600">${activity.action}</div>
+                </div>
+                <div class="text-xs text-gray-400">${activity.timestamp}</div>
+            </div>
+        `).join('');
+        
+        lucide.createIcons();
+    },
+    
+    configureIntegration(name) {
+        UI.showAlert(`Opening ${name} configuration...`, 'info');
+    },
+    
+    installIntegration(name) {
+        UI.showAlert(`Installing ${name} integration...`, 'info');
+    },
+    
+    manageAll() {
+        UI.showAlert('Opening integration management panel...', 'info');
+    }
+};id: tj-accounting-integrations
+name: T&J Accounting Integrations
+type: code.js
+content: |-
+// Accounting integrations component for T&J Field Services
+const AccountingIntegrations = {
+    render() {
+        return `
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-medium">Accounting Integrations</h3>
+                    <button onclick="AccountingIntegrations.syncAll()" class="btn-primary">
+                        <i data-lucide="refresh-cw" class="inline w-4 h-4 mr-2"></i>
+                        Sync All
+                    </button>
+                </div>
+                
+                <!-- Connected Accounting Services -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div id="connectedAccounting" class="space-y-4">
+                        <!-- Connected services will be loaded here -->
+                    </div>
+                    <div id="availableAccounting" class="space-y-4">
+                        <!-- Available services will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Sync Settings -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">Sync Settings</h4>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Auto Sync Frequency</label>
+                                <select id="autoSyncFrequency" class="form-select">
+                                    <option value="realtime">Real-time</option>
+                                    <option value="hourly">Every hour</option>
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="manual">Manual only</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Sync Direction</label>
+                                <select id="syncDirection" class="form-select">
+                                    <option value="bidirectional">Two-way sync</option>
+                                    <option value="to_accounting">T&J → Accounting</option>
+                                    <option value="from_accounting">Accounting → T&J</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <h5 class="font-medium">What to Sync</h5>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="syncCustomers" class="form-checkbox" checked>
+                                    <span class="ml-2 text-sm">Customers</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="syncInvoices" class="form-checkbox" checked>
+                                    <span class="ml-2 text-sm">Invoices</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="syncPayments" class="form-checkbox" checked>
+                                    <span class="ml-2 text-sm">Payments</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="syncExpenses" class="form-checkbox">
+                                    <span class="ml-2 text-sm">Expenses</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="syncItems" class="form-checkbox" checked>
+                                    <span class="ml-2 text-sm">Items/Services</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="syncTaxes" class="form-checkbox" checked>
+                                    <span class="ml-2 text-sm">Tax Rates</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="syncReports" class="form-checkbox">
+                                    <span class="ml-2 text-sm">Reports</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="syncBankData" class="form-checkbox">
+                                    <span class="ml-2 text-sm">Bank Data</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button onclick="AccountingIntegrations.saveSettings()" class="btn-primary">
+                            Save Settings
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Sync History -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">Recent Sync Activity</h4>
+                    <div id="syncHistory" class="space-y-3">
+                        <!-- Sync history will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    load() {
+        this.loadConnectedServices();
+        this.loadAvailableServices();
+        this.loadSyncHistory();
+        this.loadSettings();
+    },
+    
+    loadConnectedServices() {
+        const connectedServices = [
+            {
+                name: 'QuickBooks Online',
+                status: 'connected',
+                lastSync: '2 minutes ago',
+                syncedItems: '247 customers, 156 invoices',
+                icon: 'calculator',
+                color: 'green'
+            }
+        ];
+        
+        const connectedHtml = connectedServices.length > 0 ? `
+            <h4 class="font-medium text-green-600 mb-3">
+                <i data-lucide="check-circle" class="inline w-4 h-4 mr-2"></i>
+                Connected Services
+            </h4>
+            ${connectedServices.map(service => `
+                <div class="border border-green-200 bg-green-50 rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                                <i data-lucide="${service.icon}" class="w-5 h-5 text-green-600"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-medium">${service.name}</h5>
+                                <p class="text-sm text-green-600">Connected</p>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="AccountingIntegrations.syncNow('${service.name}')" class="btn-secondary text-sm">
+                                <i data-lucide="refresh-cw" class="inline w-3 h-3 mr-1"></i>
+                                Sync Now
+                            </button>
+                            <button onclick="AccountingIntegrations.configure('${service.name}')" class="btn-secondary text-sm">
+                                Configure
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-600">
+                        <p>Last sync: ${service.lastSync}</p>
+                        <p>${service.syncedItems}</p>
+                    </div>
+                </div>
+            `).join('')}
+        ` : `
+            <div class="text-
+// Accounting sync settings component for T&J Field Services
+const AccountingSyncSettings = {
+    render() {
+        return `
+            <div class="bg-white border rounded-lg p-6">
+                <h4 class="text-lg font-medium mb-4">Sync Settings</h4>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Auto Sync Frequency</label>
+                            <select id="autoSyncFrequency" class="form-select">
+                                <option value="realtime">Real-time</option>
+                                <option value="hourly">Every hour</option>
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="manual">Manual only</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Sync Direction</label>
+                            <select id="syncDirection" class="form-select">
+                                <option value="bidirectional">Two-way sync</option>
+                                <option value="to_accounting">T&J → Accounting</option>
+                                <option value="from_accounting">Accounting → T&J</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <h5 class="font-medium">What to Sync</h5>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="syncCustomers" class="form-checkbox" checked>
+                                <span class="ml-2 text-sm">Customers</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="syncInvoices" class="form-checkbox" checked>
+                                <span class="ml-2 text-sm">Invoices</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="syncPayments" class="form-checkbox" checked>
+                                <span class="ml-2 text-sm">Payments</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="syncExpenses" class="form-checkbox">
+                                <span class="ml-2 text-sm">Expenses</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="syncItems" class="form-checkbox" checked>
+                                <span class="ml-2 text-sm">Items/Services</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="syncTaxes" class="form-checkbox" checked>
+                                <span class="ml-2 text-sm">Tax Rates</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="syncReports" class="form-checkbox">
+                                <span class="ml-2 text-sm">Reports</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="syncBankData" class="form-checkbox">
+                                <span class="ml-2 text-sm">Bank Data</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <h5 class="font-medium mb-3">Advanced Settings</h5>
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="conflictResolution" class="form-checkbox">
+                                <span class="ml-2 text-sm">Automatic conflict resolution (T&J data takes priority)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="syncNotifications" class="form-checkbox" checked>
+                                <span class="ml-2 text-sm">Send notifications on sync completion</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="syncErrors" class="form-checkbox" checked>
+                                <span class="ml-2 text-sm">Alert on sync errors</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-2 pt-4">
+                        <button onclick="AccountingSyncSettings.saveSettings()" class="btn-primary">
+                            Save Settings
+                        </button>
+                        <button onclick="AccountingSyncSettings.resetDefaults()" class="btn-secondary">
+                            Reset to Defaults
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    load() {
+        // Load saved settings
+        document.getElementById('autoSyncFrequency').value = Settings.getSetting('autoSyncFrequency', 'daily');
+        document.getElementById('syncDirection').value = Settings.getSetting('syncDirection', 'bidirectional');
+        
+        // Load sync options
+        document.getElementById('syncCustomers').checked = Settings.getSetting('syncCustomers', true);
+        document.getElementById('syncInvoices').checked = Settings.getSetting('syncInvoices', true);
+        document.getElementById('syncPayments').checked = Settings.getSetting('syncPayments', true);
+        document.getElementById('syncExpenses').checked = Settings.getSetting('syncExpenses', false);
+        document.getElementById('syncItems').checked = Settings.getSetting('syncItems', true);
+        document.getElementById('syncTaxes').checked = Settings.getSetting('syncTaxes', true);
+        document.getElementById('syncReports').checked = Settings.getSetting('syncReports', false);
+        document.getElementById('syncBankData').checked = Settings.getSetting('syncBankData', false);
+        
+        // Load advanced settings
+        document.getElementById('conflictResolution').checked = Settings.getSetting('conflictResolution', false);
+        document.getElementById('syncNotifications').checked = Settings.getSetting('syncNotifications', true);
+        document.getElementById('syncErrors').checked = Settings.getSetting('syncErrors', true);
+    },
+    
+    saveSettings() {
+        const settings = {
+            autoSyncFrequency: document.getElementById('autoSyncFrequency').value,
+            syncDirection: document.getElementById('syncDirection').value,
+            syncCustomers: document.getElementById('syncCustomers').checked,
+            syncInvoices: document.getElementById('syncInvoices').checked,
+            syncPayments: document.getElementById('syncPayments').checked,
+            syncExpenses: document.getElementById('syncExpenses').checked,
+            syncItems: document.getElementById('syncItems').checked,
+            syncTaxes: document.getElementById('syncTaxes').checked,
+            syncReports: document.getElementById('syncReports').checked,
+            syncBankData: document.getElementById('syncBankData').checked,
+            conflictResolution: document.getElementById('conflictResolution').checked,
+            syncNotifications: document.getElementById('syncNotifications').checked,
+            syncErrors: document.getElementById('syncErrors').checked
+        };
+        
+        Object.keys(settings).forEach(key => {
+            Settings.updateSetting(key, settings[key]);
+        });
+        
+        UI.showAlert('Sync settings saved successfully!', 'success');
+    },
+    
+    resetDefaults() {
+        if (confirm('Are you sure you want to reset all sync settings to defaults?')) {
+            // Reset to default values
+            document.getElementById('autoSyncFrequency').value = 'daily';
+            document.getElementById('syncDirection').value = 'bidirectional';
+            
+            document.getElementById('syncCustomers').checked = true;
+            document.getElementById('syncInvoices').checked = true;
+            document.getElementById('syncPayments').checked = true;
+            document.getElementById('syncExpenses').checked = false;
+            document.getElementById('syncItems').checked = true;
+            document.getElementById('syncTaxes').checked = true;
+            document.getElementById('syncReports').checked = false;
+            document.getElementById('syncBankData').checked = false;
+            
+            document.getElementById('conflictResolution').checked = false;
+            document.getElementById('syncNotifications').checked = true;
+            document.getElementById('syncErrors').checked = true;
+            
+            UI.showAlert('Settings reset to defaults', 'success');
+        }
+    }
 };
 };
