@@ -1223,5 +1223,301 @@ const CalendarUtils = {
             this.isEventInDateRange(event, startDate, endDate)
         ).sort((a, b) => new Date(a.start) - new Date(b.start));
     }
+};// Event actions component for T&J Field Services
+const EventActions = {
+    viewEvent(id) {
+        const event = Data.events.find(e => e.id === id);
+        if (event) {
+            const customer = event.customerId ? Data.customers.find(c => c.id === event.customerId) : null;
+            const project = event.projectId ? Data.projects.find(p => p.id === event.projectId) : null;
+            
+            const startDate = new Date(event.start);
+            const endDate = new Date(event.end);
+            
+            UI.showModal(`Event Details - ${event.title}`, `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><strong>Type:</strong> ${event.type || 'Not specified'}</div>
+                        <div><strong>Priority:</strong> ${event.priority || 'Medium'}</div>
+                    </div>
+                    
+                    ${event.description ? `
+                        <div><strong>Description:</strong><br>${event.description}</div>
+                    ` : ''}
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><strong>Start:</strong> ${this.formatDateTime(startDate, event.allDay)}</div>
+                        <div><strong>End:</strong> ${this.formatDateTime(endDate, event.allDay)}</div>
+                    </div>
+                    
+                    ${event.location ? `
+                        <div><strong>Location:</strong><br>${event.location}</div>
+                    ` : ''}
+                    
+                    ${customer ? `
+                        <div class="border-t pt-4">
+                            <h4 class="font-semibold mb-2">Customer Information</h4>
+                            <div><strong>Name:</strong> ${customer.name}</div>
+                            <div><strong>Phone:</strong> <a href="tel:${customer.primaryPhone}" class="text-blue-600">${customer.primaryPhone}</a></div>
+                            ${customer.email ? `<div><strong>Email:</strong> <a href="mailto:${customer.email}" class="text-blue-600">${customer.email}</a></div>` : ''}
+                        </div>
+                    ` : ''}
+                    
+                    ${project ? `
+                        <div class="border-t pt-4">
+                            <h4 class="font-semibold mb-2">Related Project</h4>
+                            <div><strong>Project:</strong> ${project.name}</div>
+                            <div><strong>Status:</strong> ${project.status}</div>
+                            <div><strong>Value:</strong> ${Data.formatCurrency(project.value || 0)}</div>
+                        </div>
+                    ` : ''}
+                    
+                    ${this.renderReminders(event)}
+                    
+                    <div class="text-sm text-gray-500 border-t pt-4">
+                        Created: ${Data.formatDate(event.dateCreated)}
+                    </div>
+                </div>
+            `, [
+                { text: 'Edit Event', type: 'primary', onclick: `EventActions.editEvent('${event.id}'); this.closest('.fixed').remove();` },
+                { text: 'Delete Event', type: 'danger', onclick: `EventActions.deleteEvent('${event.id}'); this.closest('.fixed').remove();` },
+                { text: 'Close', type: 'secondary', onclick: 'this.closest(".fixed").remove()' }
+            ]);
+        }
+    },
+    
+    editEvent(id) {
+        const event = Data.events.find(e => e.id === id);
+        if (event) {
+            UI.showModal('Edit Event', EventForm.renderFull(), [
+                { text: 'Update Event', type: 'primary', onclick: 'EventForm.saveFullEvent()' },
+                { text: 'Cancel', type: 'secondary', onclick: 'this.closest(".fixed").remove()' }
+            ]);
+            
+            // Load event data into form
+            setTimeout(() => {
+                EventForm.loadEventData(event);
+            }, 100);
+        }
+    },
+    
+    deleteEvent(id) {
+        const event = Data.events.find(e => e.id === id);
+        if (event && confirm(`Are you sure you want to delete "${event.title}"?`)) {
+            if (Calendar.deleteEvent(id)) {
+                UI.showAlert('Event deleted successfully!');
+            }
+        }
+    },
+    
+    markComplete(id) {
+        const event = Data.events.find(e => e.id === id);
+        if (event) {
+            event.completed = true;
+            event.completedDate = new Date().toISOString();
+            Data.save('events', Data.events);
+            
+            CalendarView.load();
+            CalendarSidebar.loadUpcoming();
+            UI.showAlert('Event marked as completed!');
+        }
+    },
+    
+    reschedule(id) {
+        const event = Data.events.find(e => e.id === id);
+        if (event) {
+            UI.showModal(`Reschedule - ${event.title}`, `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">New Date</label>
+                            <input type="date" id="rescheduleDate" class="form-input" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">New Time</label>
+                            <input type="time" id="rescheduleTime" class="form-input" required>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Reason for Reschedule</label>
+                        <textarea id="rescheduleReason" rows="3" class="form-textarea" 
+                                  placeholder="Optional reason for rescheduling..."></textarea>
+                    </div>
+                </div>
+            `, [
+                { text: 'Reschedule', type: 'primary', onclick: `EventActions.saveReschedule('${id}')` },
+                { text: 'Cancel', type: 'secondary', onclick: 'this.closest(".fixed").remove()' }
+            ]);
+            
+            // Set current values
+            const currentDate = new Date(event.start);
+            document.getElementById('rescheduleDate').value = currentDate.toISOString().split('T')[0];
+            document.getElementById('rescheduleTime').value = currentDate.toTimeString().slice(0, 5);
+        }
+    },
+    
+    saveReschedule(id) {
+        const newDate = document.getElementById('rescheduleDate').value;
+        const newTime = document.getElementById('rescheduleTime').value;
+        const reason = document.getElementById('rescheduleReason').value;
+        
+        if (!newDate || !newTime) {
+            UI.showAlert('Please select a new date and time', 'error');
+            return;
+        }
+        
+        const event = Data.events.find(e => e.id === id);
+        if (event) {
+            const oldStart = new Date(event.start);
+            const duration = new Date(event.end) - oldStart;
+            
+            event.start = `${newDate}T${newTime}`;
+            event.end = new Date(new Date(event.start).getTime() + duration).toISOString();
+            
+            if (reason) {
+                event.rescheduleHistory = event.rescheduleHistory || [];
+                event.rescheduleHistory.push({
+                    oldDate: oldStart.toISOString(),
+                    newDate: event.start,
+                    reason: reason,
+                    date: new Date().toISOString()
+                });
+            }
+            
+            Data.save('events', Data.events);
+            
+            CalendarView.load();
+            CalendarSidebar.loadUpcoming();
+            UI.showAlert('Event rescheduled successfully!');
+            
+            document.querySelector('.fixed').remove();
+        }
+    },
+    
+    duplicate(id) {
+        const event = Data.events.find(e => e.id === id);
+        if (event) {
+            const duplicatedEvent = {
+                ...event,
+                id: Date.now().toString(),
+                title: `${event.title} (Copy)`,
+                dateCreated: new Date().toISOString()
+            };
+            
+            delete duplicatedEvent.completed;
+            delete duplicatedEvent.completedDate;
+            
+            Calendar.addEvent(duplicatedEvent);
+            UI.showAlert('Event duplicated successfully!');
+        }
+    },
+    
+    createRecurring(id) {
+        const event = Data.events.find(e => e.id === id);
+        if (event) {
+            UI.showModal(`Create Recurring Event - ${event.title}`, `
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Repeat</label>
+                        <select id="recurringType" class="form-select">
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Number of Occurrences</label>
+                        <input type="number" id="recurringCount" min="1" max="52" value="4" class="form-input">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">End Date (Optional)</label>
+                        <input type="date" id="recurringEndDate" class="form-input">
+                    </div>
+                </div>
+            `, [
+                { text: 'Create Series', type: 'primary', onclick: `EventActions.saveRecurring('${id}')` },
+                { text: 'Cancel', type: 'secondary', onclick: 'this.closest(".fixed").remove()' }
+            ]);
+        }
+    },
+    
+    saveRecurring(id) {
+        const event = Data.events.find(e => e.id === id);
+        const type = document.getElementById('recurringType').value;
+        const count = parseInt(document.getElementById('recurringCount').value);
+        const endDate = document.getElementById('recurringEndDate').value;
+        
+        if (event && count > 0) {
+            const startDate = new Date(event.start);
+            const duration = new Date(event.end) - startDate;
+            
+            for (let i = 1; i <= count; i++) {
+                let nextDate = new Date(startDate);
+                
+                switch(type) {
+                    case 'daily':
+                        nextDate.setDate(nextDate.getDate() + i);
+                        break;
+                    case 'weekly':
+                        nextDate.setDate(nextDate.getDate() + (i * 7));
+                        break;
+                    case 'monthly':
+                        nextDate.setMonth(nextDate.getMonth() + i);
+                        break;
+                }
+                
+                if (endDate && nextDate > new Date(endDate)) break;
+                
+                const recurringEvent = {
+                    ...event,
+                    id: `${event.id}_${i}`,
+                    start: nextDate.toISOString(),
+                    end: new Date(nextDate.getTime() + duration).toISOString(),
+                    title: `${event.title} (${i + 1})`,
+                    dateCreated: new Date().toISOString(),
+                    parentEventId: event.id
+                };
+                
+                Calendar.addEvent(recurringEvent);
+            }
+            
+            UI.showAlert(`Created ${count} recurring events!`);
+            document.querySelector('.fixed').remove();
+        }
+    },
+    
+    formatDateTime(date, allDay) {
+        if (allDay) {
+            return date.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        } else {
+            return date.toLocaleDateString('en-US', { 
+                weekday: 'short', 
+                month: 'short', 
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            });
+        }
+    },
+    
+    renderReminders(event) {
+        if (!event.emailReminder && !event.smsReminder) return '';
+        
+        return `
+            <div class="border-t pt-4">
+                <h4 class="font-semibold mb-2">Reminders</h4>
+                ${event.emailReminder ? `<div>Email: ${event.emailReminder} minutes before</div>` : ''}
+                ${event.smsReminder ? `<div>SMS: ${event.smsReminder} minutes before</div>` : ''}
+            </div>
+        `;
+    }
 };
 };
