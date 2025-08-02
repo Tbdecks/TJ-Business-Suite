@@ -11539,7 +11539,235 @@ window.clearAllData = clearAllData;
 window.resetToSampleData = resetToSampleData;
 window.viewEstimate = viewEstimate;
 window.exportData = exportData;
+// T&J Field Services - Estimate Display & Integration Functions
 
+let currentEstimateResult = null;
+
+function displayEstimateResult(calculation) {
+    const resultDiv = document.getElementById('estimate-result');
+    const breakdownDiv = document.getElementById('estimate-breakdown');
+    
+    let breakdownHTML = `
+        <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+                <span>Base Cost:</span>
+                <span>${TJSystem.TJUtils.formatCurrency(calculation.baseCost || calculation.labor || (calculation.total - calculation.profitMargin - calculation.tax))}</span>
+            </div>
+    `;
+    
+    if (calculation.extras && calculation.extras > 0) {
+        breakdownHTML += `
+            <div class="flex justify-between">
+                <span>Extras:</span>
+                <span>${TJSystem.TJUtils.formatCurrency(calculation.extras)}</span>
+            </div>
+        `;
+    }
+    
+    if (calculation.features && calculation.features > 0) {
+        breakdownHTML += `
+            <div class="flex justify-between">
+                <span>Features:</span>
+                <span>${TJSystem.TJUtils.formatCurrency(calculation.features)}</span>
+            </div>
+        `;
+    }
+    
+    if (calculation.materials && calculation.materials > 0) {
+        breakdownHTML += `
+            <div class="flex justify-between">
+                <span>Materials:</span>
+                <span>${TJSystem.TJUtils.formatCurrency(calculation.materials)}</span>
+            </div>
+        `;
+    }
+    
+    breakdownHTML += `
+            <hr class="my-2">
+            <div class="flex justify-between">
+                <span>Subtotal:</span>
+                <span>${TJSystem.TJUtils.formatCurrency(calculation.total)}</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Profit (20%):</span>
+                <span>${TJSystem.TJUtils.formatCurrency(calculation.profitMargin)}</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Tax (6%):</span>
+                <span>${TJSystem.TJUtils.formatCurrency(calculation.tax)}</span>
+            </div>
+            <hr class="my-2">
+            <div class="flex justify-between font-bold text-lg">
+                <span>Total:</span>
+                <span class="text-green-600">${TJSystem.TJUtils.formatCurrency(calculation.finalTotal)}</span>
+            </div>
+        </div>
+    `;
+    
+    if (calculation.area) {
+        breakdownHTML = `
+            <div class="mb-3 text-sm text-gray-600">
+                Area: ${calculation.area} sq ft @ ${TJSystem.TJUtils.formatCurrency(calculation.baseRate)}/sq ft
+            </div>
+        ` + breakdownHTML;
+    }
+    
+    if (calculation.hours) {
+        breakdownHTML = `
+            <div class="mb-3 text-sm text-gray-600">
+                ${calculation.hours} hours @ ${TJSystem.TJUtils.formatCurrency(calculation.hourlyRate)}/hour
+            </div>
+        ` + breakdownHTML;
+    }
+    
+    breakdownDiv.innerHTML = breakdownHTML;
+    resultDiv.classList.remove('hidden');
+}
+
+function useEstimateInProject() {
+    if (!currentEstimateResult) {
+        alert('No estimate calculated!');
+        return;
+    }
+    
+    // If we're in project creation modal, fill the budget field
+    const budgetField = document.getElementById('project-budget');
+    if (budgetField) {
+        budgetField.value = Math.round(currentEstimateResult.finalTotal);
+        closeEstimateModal();
+        alert('Estimate added to project budget!');
+    } else {
+        // Create a new project with this estimate
+        const projectName = prompt('Project Name:', `${document.getElementById('estimate-type').value.charAt(0).toUpperCase() + document.getElementById('estimate-type').value.slice(1)} Project`);
+        if (!projectName) return;
+        
+        const customers = TJSystem.tjData.get('customers');
+        if (customers.length === 0) {
+            alert('Please add customers first!');
+            return;
+        }
+        
+        const customerName = prompt('Customer Name:');
+        const customer = customers.find(c => 
+            c.name.toLowerCase().includes(customerName.toLowerCase())
+        );
+        
+        if (!customer) {
+            alert('Customer not found!');
+            return;
+        }
+        
+        const projectData = {
+            name: projectName,
+            customerId: customer.id,
+            type: document.getElementById('estimate-type').value,
+            budget: Math.round(currentEstimateResult.finalTotal),
+            description: `Estimated at ${TJSystem.TJUtils.formatCurrency(currentEstimateResult.finalTotal)}`,
+            startDate: new Date().toISOString().split('T')[0]
+        };
+        
+        const newProject = TJSystem.ProjectManager.create(projectData);
+        closeEstimateModal();
+        
+        if (typeof loadProjects === 'function') {
+            loadProjects();
+        }
+        
+        alert(`Project "${newProject.name}" created with estimate!`);
+    }
+}
+
+// ===== QUICK BUTTONS FOR COMMON ACTIONS =====
+function quickDeckEstimate() {
+    createQuickEstimate();
+    setTimeout(() => {
+        document.getElementById('estimate-type').value = 'deck';
+        showEstimateFields();
+        // Set some default values
+        document.getElementById('deck-length').value = '12';
+        document.getElementById('deck-width').value = '16';
+        document.getElementById('deck-type').value = 'basic';
+    }, 100);
+}
+
+function quickKitchenEstimate() {
+    createQuickEstimate();
+    setTimeout(() => {
+        document.getElementById('estimate-type').value = 'kitchen';
+        showEstimateFields();
+        // Set some default values
+        document.getElementById('kitchen-length').value = '10';
+        document.getElementById('kitchen-width').value = '12';
+        document.getElementById('kitchen-type').value = 'midRange';
+    }, 100);
+}
+
+function quickHandymanEstimate() {
+    createQuickEstimate();
+    setTimeout(() => {
+        document.getElementById('estimate-type').value = 'handyman';
+        showEstimateFields();
+        // Set some default values
+        document.getElementById('handyman-hours').value = '4';
+        document.getElementById('handyman-type').value = 'basic';
+    }, 100);
+}
+
+// ===== SIMPLE ADD FUNCTIONS =====
+function addCustomer() {
+    const name = prompt('Customer Name:');
+    const phone = prompt('Phone Number:');
+    const email = prompt('Email (optional):');
+    const address = prompt('Address (optional):');
+    
+    if (name && phone) {
+        const customer = TJSystem.CustomerManager.create({
+            name: name,
+            phone: phone,
+            email: email || '',
+            address: address || ''
+        });
+        
+        if (typeof loadCustomers === 'function') {
+            loadCustomers();
+        }
+        
+        alert(`Customer "${customer.name}" added successfully!`);
+    }
+}
+
+function addInventoryItem() {
+    const name = prompt('Item Name:');
+    const category = prompt('Category (tools, lumber, hardware, finishes):');
+    const quantity = parseFloat(prompt('Quantity:'));
+    const unit = prompt('Unit (each, box, gallon, etc.):');
+    const price = parseFloat(prompt('Price per unit:'));
+    
+    if (name && category && quantity && unit && price) {
+        TJSystem.InventoryManager.addItem({
+            name, category, quantity, unit, price,
+            supplier: '',
+            lowStockAlert: 5,
+            location: ''
+        });
+        
+        if (typeof loadInventory === 'function') {
+            loadInventory();
+        }
+        
+        alert('Item added successfully!');
+    }
+}
+
+// ===== EXPORT FUNCTIONS =====
+window.displayEstimateResult = displayEstimateResult;
+window.useEstimateInProject = useEstimateInProject;
+window.quickDeckEstimate = quickDeckEstimate;
+window.quickKitchenEstimate = quickKitchenEstimate;
+window.quickHandymanEstimate = quickHandymanEstimate;
+window.addCustomer = addCustomer;
+window.addInventoryItem = addInventoryItem;
+window.currentEstimateResult = currentEstimateResult;
 
 
 };
