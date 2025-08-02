@@ -9935,6 +9935,149 @@ content: |-
         </div>
     </div>
 </body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T&J Reports</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 p-6">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">Reports</h1>
+                <p class="text-gray-600">Business analytics and insights</p>
+            </div>
+            <div class="flex space-x-2">
+                <select class="px-3 py-2 border border-gray-300 rounded-md text-sm">
+                    <option>This Month</option>
+                    <option>Last Month</option>
+                    <option>This Year</option>
+                </select>
+                <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    <i class="fas fa-download mr-2"></i>Export
+                </button>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow border">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Monthly Revenue</p>
+                        <p class="text-2xl font-bold text-green-600">$45,200</p>
+                        <p class="text-xs text-green-600">↑ 12% from last month</p>
+                    </div>
+                    <i class="fas fa-dollar-sign text-2xl text-green-500"></i>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow border">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Projects Completed</p>
+                        <p class="text-2xl font-bold text-blue-600">8</p>
+                        <p class="text-xs text-blue-600">↑ 3 from last month</p>
+                    </div>
+                    <i class="fas fa-check-circle text-2xl text-blue-500"></i>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow border">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Customer Satisfaction</p>
+                        <p class="text-2xl font-bold text-yellow-600">4.8</p>
+                        <p class="text-xs text-yellow-600">out of 5 stars</p>
+                    </div>
+                    <i class="fas fa-star text-2xl text-yellow-500"></i>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow border">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Profit Margin</p>
+                        <p class="text-2xl font-bold text-purple-600">32%</p>
+                        <p class="text-xs text-purple-600">↑ 2% improvement</p>
+                    </div>
+                    <i class="fas fa-chart-line text-2xl text-purple-500"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Categories -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Financial Reports -->
+            <div class="bg-white p-6 rounded-lg shadow border">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-chart-bar text-2xl text-green-600 mr-3"></i>
+                    <h3 class="text-lg font-semibold">Financial Reports</h3>
+                </div>
+                <div class="space-y-3">
+                    <button class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded-lg">
+                        <p class="font-medium">Revenue Summary</p>
+                        <p class="text-sm text-gray-600">Monthly income breakdown</p>
+                    </button>
+                    <button class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded-lg">
+                        <p class="font-medium">Expense Report</p>
+                        <p class="text-sm text-gray-600">Cost analysis and trends</p>
+                    </button>
+                    <button class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded-lg">
+                        <p class="font-medium">Profit & Loss</p>
+                        <p class="text-sm text-gray-600">P&L statement</p>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Project Reports -->
+            <div class="bg-white p-6 rounded-lg shadow border">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-project-diagram text-2xl text-blue-600 mr-3"></i>
+                    <h3 class="text-lg font-semibold">Project Reports</h3>
+                </div>
+                <div class="space-y-3">
+                    <button class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded-lg">
+                        <p class="font-medium">Project Performance</p>
+                        <p class="text-sm text-gray-600">Timeline and budget analysis</p>
+                    </button>
+                    <button class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded-lg">
+                        <p class="font-medium">Completion Rates</p>
+                        <p class="text-sm text-gray-600">On-time delivery metrics</p>
+                    </button>
+                    <button class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded-lg">
+                        <p class="font-medium">Material Usage</p>
+                        <p class="text-sm text-gray-600">Inventory consumption</p>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Customer Reports -->
+            <div class="bg-white p-6 rounded-lg shadow border">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-users text-2xl text-purple-600 mr-3"></i>
+                    <h3 class="text-lg font-semibold">Customer Reports</h3>
+                </div>
+                <div class="space-y-3">
+                    <button class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded-lg">
+                        <p class="font-medium">Customer List</p>
+                        <p class="text-sm text-gray-600">Complete customer database</p>
+                    </button>
+                    <button class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded-lg">
+                        <p class="font-medium">Satisfaction Survey</p>
+                        <p class="text-sm text-gray-600">Feedback and ratings</p>
+                    </button>
+                    <button class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded-lg">
+                        <p class="font-medium">Repeat Business</p>
+                        <p class="text-sm text-gray-600">Customer retention analysis</p>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
 </html>
 
 
