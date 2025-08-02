@@ -830,5 +830,398 @@ const ProjectsFilter = {
             </div>
         `;
     }
+};// Projects export component for T&J Field Services
+const ProjectsExport = {
+    export() {
+        const data = Data.projects.map(project => ({
+            name: project.name,
+            customer: project.customerName,
+            type: project.type,
+            status: project.status,
+            priority: project.priority,
+            value: project.value || 0,
+            startDate: project.startDate || '',
+            endDate: project.endDate || '',
+            duration: project.duration || '',
+            address: project.address || '',
+            dateCreated: project.dateCreated
+        }));
+        
+        const csv = [
+            'Project Name,Customer,Type,Status,Priority,Value,Start Date,End Date,Duration,Address,Date Created',
+            ...data.map(row => `"${row.name}","${row.customer}","${row.type}","${row.status}","${row.priority}","${row.value}","${row.startDate}","${row.endDate}","${row.duration}","${row.address}","${row.dateCreated}"`)
+        ].join('\n');
+        
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'projects.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        UI.showAlert('Projects exported successfully!');
+    },
+    
+    exportByStatus(status) {
+        const filteredProjects = Data.projects.filter(p => p.status === status);
+        
+        if (filteredProjects.length === 0) {
+            UI.showAlert(`No ${status} projects to export`, 'info');
+            return;
+        }
+        
+        const data = filteredProjects.map(project => ({
+            name: project.name,
+            customer: project.customerName,
+            type: project.type,
+            value: project.value || 0,
+            startDate: project.startDate || '',
+            endDate: project.endDate || '',
+            dateCreated: project.dateCreated
+        }));
+        
+        const csv = [
+            'Project Name,Customer,Type,Value,Start Date,End Date,Date Created',
+            ...data.map(row => `"${row.name}","${row.customer}","${row.type}","${row.value}","${row.startDate}","${row.endDate}","${row.dateCreated}"`)
+        ].join('\n');
+        
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${status}_projects.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        UI.showAlert(`${status} projects exported successfully!`);
+    },
+    
+    exportProjectSummary() {
+        const summary = {
+            totalProjects: Data.projects.length,
+            activeProjects: Data.projects.filter(p => p.status === 'in-progress').length,
+            completedProjects: Data.projects.filter(p => p.status === 'completed').length,
+            pendingProjects: Data.projects.filter(p => p.status === 'pending').length,
+            totalValue: Data.projects.reduce((sum, p) => sum + (p.value || 0), 0),
+            averageValue: Data.projects.length > 0 ? 
+                (Data.projects.reduce((sum, p) => sum + (p.value || 0), 0) / Data.projects.length) : 0
+        };
+        
+        const summaryText = [
+            'T&J FIELD SERVICES - PROJECT SUMMARY',
+            '=====================================',
+            '',
+            `Total Projects: ${summary.totalProjects}`,
+            `Active Projects: ${summary.activeProjects}`,
+            `Completed Projects: ${summary.completedProjects}`,
+            `Pending Projects: ${summary.pendingProjects}`,
+            '',
+            `Total Project Value: ${Data.formatCurrency(summary.totalValue)}`,
+            `Average Project Value: ${Data.formatCurrency(summary.averageValue)}`,
+            '',
+            `Report Generated: ${new Date().toLocaleDateString()}`,
+            '',
+            'PROJECT BREAKDOWN BY TYPE:',
+            '-------------------------'
+        ];
+        
+        // Add project type breakdown
+        const typeBreakdown = {};
+        Data.projects.forEach(project => {
+            typeBreakdown[project.type] = (typeBreakdown[project.type] || 0) + 1;
+        });
+        
+        Object.entries(typeBreakdown).forEach(([type, count]) => {
+            summaryText.push(`${type}: ${count} projects`);
+        });
+        
+        const blob = new Blob([summaryText.join('\n')], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'project_summary.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        UI.showAlert('Project summary exported!');
+    }
+};// Calendar sidebar component for T&J Field Services
+const CalendarSidebar = {
+    render() {
+        return `
+            <!-- Quick Add Event -->
+            <div class="bg-white rounded-lg shadow-md p-4">
+                <h4 class="font-semibold mb-3">Quick Add Event</h4>
+                ${EventForm.renderQuick()}
+            </div>
+            
+            <!-- Today's Schedule -->
+            <div class="bg-white rounded-lg shadow-md p-4">
+                <h4 class="font-semibold mb-3">Today's Schedule</h4>
+                <div id="todaySchedule">
+                    <div class="text-center text-gray-500 py-4">
+                        <i data-lucide="calendar-x" class="w-8 h-8 mx-auto mb-2 text-gray-300"></i>
+                        <p class="text-sm">No events today</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Upcoming Events -->
+            <div class="bg-white rounded-lg shadow-md p-4">
+                <h4 class="font-semibold mb-3">Upcoming Events</h4>
+                <div id="upcomingEvents">
+                    <div class="text-center text-gray-500 py-4">
+                        <i data-lucide="clock" class="w-8 h-8 mx-auto mb-2 text-gray-300"></i>
+                        <p class="text-sm">Loading...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Project Deadlines -->
+            <div class="bg-white rounded-lg shadow-md p-4">
+                <h4 class="font-semibold mb-3">Project Deadlines</h4>
+                <div id="projectDeadlines">
+                    <div class="text-center text-gray-500 py-4">
+                        <i data-lucide="alert-circle" class="w-8 h-8 mx-auto mb-2 text-gray-300"></i>
+                        <p class="text-sm">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    loadUpcoming() {
+        const container = document.getElementById('upcomingEvents');
+        if (!container) return;
+        
+        Data.events = Data.events || [];
+        
+        const today = new Date();
+        const upcoming = Data.events
+            .filter(event => new Date(event.start) > today)
+            .sort((a, b) => new Date(a.start) - new Date(b.start))
+            .slice(0, 5);
+        
+        if (upcoming.length === 0) {
+            container.innerHTML = `
+                <div class="text-center text-gray-500 py-4">
+                    <i data-lucide="calendar-x" class="w-8 h-8 mx-auto mb-2 text-gray-300"></i>
+                    <p class="text-sm">No upcoming events</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = upcoming.map(event => this.renderEventItem(event)).join('');
+        
+        // Load today's schedule
+        this.loadTodaySchedule();
+        
+        // Load project deadlines
+        this.loadProjectDeadlines();
+    },
+    
+    loadTodaySchedule() {
+        const container = document.getElementById('todaySchedule');
+        if (!container) return;
+        
+        const today = new Date().toDateString();
+        const todayEvents = Data.events.filter(event => 
+            new Date(event.start).toDateString() === today
+        ).sort((a, b) => new Date(a.start) - new Date(b.start));
+        
+        if (todayEvents.length === 0) {
+            container.innerHTML = `
+                <div class="text-center text-gray-500 py-4">
+                    <i data-lucide="calendar-x" class="w-8 h-8 mx-auto mb-2 text-gray-300"></i>
+                    <p class="text-sm">No events today</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = todayEvents.map(event => this.renderEventItem(event, true)).join('');
+    },
+    
+    loadDayEvents(dateStr) {
+        const container = document.getElementById('todaySchedule');
+        if (!container) return;
+        
+        const selectedDate = new Date(dateStr).toDateString();
+        const dayEvents = Data.events.filter(event => 
+            new Date(event.start).toDateString() === selectedDate
+        ).sort((a, b) => new Date(a.start) - new Date(b.start));
+        
+        // Update header
+        const header = container.parentElement.querySelector('h4');
+        if (header) {
+            const dateObj = new Date(dateStr);
+            header.textContent = `${dateObj.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                month: 'short', 
+                day: 'numeric' 
+            })} Schedule`;
+        }
+        
+        if (dayEvents.length === 0) {
+            container.innerHTML = `
+                <div class="text-center text-gray-500 py-4">
+                    <i data-lucide="calendar-x" class="w-8 h-8 mx-auto mb-2 text-gray-300"></i>
+                    <p class="text-sm">No events this day</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = dayEvents.map(event => this.renderEventItem(event, true)).join('');
+    },
+    
+    loadProjectDeadlines() {
+        const container = document.getElementById('projectDeadlines');
+        if (!container) return;
+        
+        const today = new Date();
+        const upcoming = Data.projects
+            .filter(project => project.endDate && new Date(project.endDate) > today)
+            .sort((a, b) => new Date(a.endDate) - new Date(b.endDate))
+            .slice(0, 5);
+        
+        if (upcoming.length === 0) {
+            container.innerHTML = `
+                <div class="text-center text-gray-500 py-4">
+                    <i data-lucide="check-circle" class="w-8 h-8 mx-auto mb-2 text-gray-300"></i>
+                    <p class="text-sm">No upcoming deadlines</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = upcoming.map(project => this.renderDeadlineItem(project)).join('');
+    },
+    
+    renderEventItem(event, showTime = false) {
+        const eventDate = new Date(event.start);
+        const colors = {
+            'appointment': 'blue',
+            'project': 'green',
+            'estimate': 'orange',
+            'personal': 'purple'
+        };
+        
+        const color = colors[event.type] || 'gray';
+        
+        return `
+            <div class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer"
+                 onclick="EventActions.viewEvent('${event.id}')">
+                <div class="w-3 h-3 bg-${color}-400 rounded-full flex-shrink-0"></div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-sm font-medium truncate">${event.title}</div>
+                    <div class="text-xs text-gray-500">
+                        ${showTime ? eventDate.toLocaleTimeString('en-US', { 
+                            hour: 'numeric', 
+                            minute: '2-digit' 
+                        }) : eventDate.toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric' 
+                        })}
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    renderDeadlineItem(project) {
+        const endDate = new Date(project.endDate);
+        const today = new Date();
+        const daysUntil = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+        
+        let urgencyColor = 'gray';
+        if (daysUntil <= 3) urgencyColor = 'red';
+        else if (daysUntil <= 7) urgencyColor = 'orange';
+        else if (daysUntil <= 14) urgencyColor = 'yellow';
+        
+        return `
+            <div class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer"
+                 onclick="ProjectActions.viewDetails('${project.id}')">
+                <div class="w-3 h-3 bg-${urgencyColor}-400 rounded-full flex-shrink-0"></div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-sm font-medium truncate">${project.name}</div>
+                    <div class="text-xs text-gray-500">
+                        Due ${endDate.toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric' 
+                        })} (${daysUntil} days)
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+};// Calendar utility functions for T&J Field Services
+const CalendarUtils = {
+    formatICSDate(date, allDay = false) {
+        if (allDay) {
+            return date.toISOString().split('T')[0].replace(/-/g, '');
+        } else {
+            return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        }
+    },
+    
+    getPriorityNumber(priority) {
+        const priorities = {
+            'low': '9',
+            'medium': '5', 
+            'high': '3',
+            'urgent': '1'
+        };
+        return priorities[priority] || '5';
+    },
+    
+    generateICSContent() {
+        let icsContent = [
+            'BEGIN:VCALENDAR',
+            'VERSION:2.0',
+            'PRODID:-//T&J Field Services//Calendar//EN',
+            'CALSCALE:GREGORIAN',
+            'METHOD:PUBLISH'
+        ];
+        
+        Data.events.forEach(event => {
+            icsContent.push(...this.createICSEvent(event));
+        });
+        
+        icsContent.push('END:VCALENDAR');
+        return icsContent.join('\r\n');
+    },
+    
+    createICSEvent(event) {
+        const startDate = new Date(event.start);
+        const endDate = new Date(event.end);
+        
+        return [
+            'BEGIN:VEVENT',
+            `UID:${event.id}@tjfieldservices.com`,
+            `DTSTART:${this.formatICSDate(startDate, event.allDay)}`,
+            `DTEND:${this.formatICSDate(endDate, event.allDay)}`,
+            `SUMMARY:${event.title}`,
+            ...(event.description ? [`DESCRIPTION:${event.description.replace(/\n/g, '\\n')}`] : []),
+            ...(event.location ? [`LOCATION:${event.location}`] : []),
+            `CATEGORIES:${event.type.toUpperCase()}`,
+            `PRIORITY:${this.getPriorityNumber(event.priority)}`,
+            `CREATED:${this.formatICSDate(new Date(event.dateCreated))}`,
+            'END:VEVENT'
+        ];
+    },
+    
+    isEventInDateRange(event, startDate, endDate) {
+        const eventDate = new Date(event.start);
+        return eventDate >= startDate && eventDate <= endDate;
+    },
+    
+    getEventsForDateRange(startDate, endDate) {
+        return Data.events.filter(event => 
+            this.isEventInDateRange(event, startDate, endDate)
+        ).sort((a, b) => new Date(a.start) - new Date(b.start));
+    }
 };
 };
