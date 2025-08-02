@@ -1,4 +1,4 @@
-id: tj-business-suite-complete
+  id: tj-business-suite-complete
 name: T&J Field Services - Complete Business Management System
 type: html
 content: |-
@@ -517,4 +517,356 @@ content: |-
 
               const estimate = {
                   id: Date.now(),
-                  date: new Date().to
+                  date: new Date().to          <!-- Estimates Section -->
+          <section id="estimates" class="section">
+              <h2 class="text-3xl font-bold mb-6 text-gray-800">Project Estimates</h2>
+              
+              <!-- Quick Templates -->
+              <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                  <h3 class="text-xl font-semibold mb-4">Quick Estimate Templates</h3>
+                  <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                      <button onclick="loadTemplate('deck')" class="bg-blue-100 hover:bg-blue-200 p-4 rounded-lg transition-colors">
+                          <i data-lucide="home" class="w-6 h-6 mx-auto mb-2 text-blue-600"></i>
+                          <p class="text-sm font-medium">Standard Deck (12x16)</p>
+                      </button>
+                      <button onclick="loadTemplate('kitchen')" class="bg-green-100 hover:bg-green-200 p-4 rounded-lg transition-colors">
+                          <i data-lucide="chef-hat" class="w-6 h-6 mx-auto mb-2 text-green-600"></i>
+                          <p class="text-sm font-medium">Kitchen Remodel</p>
+                      </button>
+                      <button onclick="loadTemplate('bathroom')" class="bg-purple-100 hover:bg-purple-200 p-4 rounded-lg transition-colors">
+                          <i data-lucide="droplets" class="w-6 h-6 mx-auto mb-2 text-purple-600"></i>
+                          <p class="text-sm font-medium">Bathroom Renovation</p>
+                      </button>
+                      <button onclick="loadTemplate('handyman')" class="bg-orange-100 hover:bg-orange-200 p-4 rounded-lg transition-colors">
+                          <i data-lucide="wrench" class="w-6 h-6 mx-auto mb-2 text-orange-600"></i>
+                          <p class="text-sm font-medium">Handyman Day Rate</p>
+                      </button>
+                      <button onclick="loadTemplate('repair')" class="bg-red-100 hover:bg-red-200 p-4 rounded-lg transition-colors">
+                          <i data-lucide="settings" class="w-6 h-6 mx-auto mb-2 text-red-600"></i>
+                          <p class="text-sm font-medium">General Repairs</p>
+                      </button>
+                  </div>
+              </div>
+
+              <!-- Estimate Form -->
+              <div class="bg-white rounded-lg shadow-md p-6">
+                  <h3 class="text-xl font-semibold mb-6">Create New Estimate</h3>
+                  
+                  <form id="estimateForm" class="space-y-6">
+                      <!-- Basic Info -->
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                              <label class="block text-sm font-medium text-gray-700 mb-2">Customer Name</label>
+                              <input type="text" id="customerName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                          </div>
+                          
+                          <div>
+                              <label class="block text-sm font-medium text-gray-700 mb-2">Project Type</label>
+                              <select id="projectType" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                  <option value="">Select Type</option>
+                                  <option value="deck">Deck Building</option>
+                                  <option value="remodel">Home Remodeling</option>
+                                  <option value="renovation">Renovation</option>
+                                  <option value="handyman">Handyman Services</option>
+                                  <option value="repair">Repairs</option>
+                              </select>
+                          </div>
+                      </div>
+
+                      <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-2">Project Address</label>
+                          <input type="text" id="projectAddress" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      </div>
+
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                              <label class="block text-sm font-medium text-gray-700 mb-2">Square Footage</label>
+                              <input type="number" id="squareFootage" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                          </div>
+                      </div>
+
+                      <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-2">Project Description</label>
+                          <textarea id="projectDescription" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                      </div>
+
+                      <!-- Cost Breakdown -->
+                      <div class="border-t pt-6">
+                          <h4 class="text-lg font-semibold mb-4">Cost Breakdown</h4>
+                          
+                          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                              <div>
+                                  <label class="block text-sm font-medium text-gray-700 mb-2">Materials Cost ($)</label>
+                                  <input type="number" id="materialsCost" step="0.01" oninput="calculateTotal()" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                              </div>
+                              
+                              <div>
+                                  <label class="block text-sm font-medium text-gray-700 mb-2">Labor Hours</label>
+                                  <input type="number" id="laborHours" step="0.5" oninput="calculateTotal()" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                              </div>
+                              
+                              <div>
+                                  <label class="block text-sm font-medium text-gray-700 mb-2">Labor Rate ($/hour)</label>
+                                  <input type="number" id="laborRate" step="0.01" value="75" oninput="calculateTotal()" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                              </div>
+                              
+                              <div>
+                                  <label class="block text-sm font-medium text-gray-700 mb-2">Equipment/Tools ($)</label>
+                                  <input type="number" id="equipmentCost" step="0.01" oninput="calculateTotal()" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                              </div>
+                              
+                              <div>
+                                  <label class="block text-sm font-medium text-gray-700 mb-2">Permits/Fees ($)</label>
+                                  <input type="number" id="permitsCost" step="0.01" oninput="calculateTotal()" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                              </div>
+                              
+                              <div>
+                                  <label class="block text-sm font-medium text-gray-700 mb-2">Profit Margin (%)</label>
+                                  <input type="number" id="profitMargin" step="1" value="20" oninput="calculateTotal()" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                              </div>
+                          </div>
+                      </div>
+
+                      <!-- Estimate Summary -->
+                      <div class="bg-gray-50 p-6 rounded-lg">
+                          <h4 class="text-lg font-semibold mb-4">Estimate Summary</h4>
+                          <div class="space-y-2">
+                              <div class="flex justify-between">
+                                  <span>Materials:</span>
+                                  <span id="summaryMaterials">$0.00</span>
+                              </div>
+                              <div class="flex justify-between">
+                                  <span>Labor:</span>
+                                  <span id="summaryLabor">$0.00</span>
+                              </div>
+                              <div class="flex justify-between">
+                                  <span>Equipment:</span>
+                                  <span id="summaryEquipment">$0.00</span>
+                              </div>
+                              <div class="flex justify-between">
+                                  <span>Permits:</span>
+                                  <span id="summaryPermits">$0.00</span>
+                              </div>
+                              <div class="flex justify-between border-t pt-2">
+                                  <span>Subtotal:</span>
+                                  <span id="summarySubtotal">$0.00</span>
+                              </div>
+                              <div class="flex justify-between">
+                                  <span>Profit:</span>
+                                  <span id="summaryProfit">$0.00</span>
+                              </div>
+                              <div class="flex justify-between border-t pt-2 text-xl font-bold">
+                                  <span>TOTAL ESTIMATE:</span>
+                                  <span id="summaryTotal">$0.00</span>
+                              </div>
+                          </div>
+                      </div>
+
+                      <!-- Action Buttons -->
+                      <div class="flex space-x-4">
+                          <button type="button" onclick="saveEstimate()" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                              <i data-lucide="save" class="inline w-4 h-4 mr-2"></i>Save Estimate
+                          </button>
+                          <button type="button" onclick="generatePDF()" class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors">
+                              <i data-lucide="download" class="inline w-4 h-4 mr-2"></i>Generate PDF
+                          </button>
+                          <button type="button" onclick="clearForm()" class="bg-gray-600 text-white px-6 py-2 rounded-md hover:bg-gray-700 transition-colors">
+                              <i data-lucide="x" class="inline w-4 h-4 mr-2"></i>Clear Form
+                          </button>
+                      </div>
+                  </form>
+              </div>
+
+              <!-- Recent Estimates -->
+              <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                  <h3 class="text-xl font-semibold mb-4">Recent Estimates</h3>
+                  <div class="overflow-x-auto">
+                      <table class="min-w-full table-auto">
+                          <thead class="bg-gray-50">
+                              <tr>
+                                  <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Date</th>
+                                  <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Customer</th>
+                                  <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Project Type</th>
+                                  <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Total</th>
+                                  <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Status</th>
+                                  <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Actions</th>
+                              </tr>
+                          </thead>
+                          <tbody id="estimatesTable">
+                              <tr>
+                                  <td colspan="6" class="px-4 py-8 text-center text-gray-500">No estimates yet. Create your first estimate above!</td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          </section>          // Save estimate
+          let estimates = JSON.parse(localStorage.getItem('estimates')) || [];
+
+          function saveEstimate() {
+              const customerName = document.getElementById('customerName').value;
+              const projectType = document.getElementById('projectType').value;
+              const total = document.getElementById('summaryTotal').textContent;
+
+              if (!customerName || !projectType) {
+                  alert('Please fill in customer name and project type');
+                  return;
+              }
+
+              const estimate = {
+                  id: Date.now(),
+                  date: new Date().toLocaleDateString(),
+                  customerName: customerName,
+                  projectType: projectType,
+                  projectAddress: document.getElementById('projectAddress').value,
+                  squareFootage: document.getElementById('squareFootage').value,
+                  projectDescription: document.getElementById('projectDescription').value,
+                  materialsCost: document.getElementById('materialsCost').value,
+                  laborHours: document.getElementById('laborHours').value,
+                  laborRate: document.getElementById('laborRate').value,
+                  equipmentCost: document.getElementById('equipmentCost').value,
+                  permitsCost: document.getElementById('permitsCost').value,
+                  profitMargin: document.getElementById('profitMargin').value,
+                  total: total,
+                  status: 'Draft'
+              };
+
+              estimates.push(estimate);
+              localStorage.setItem('estimates', JSON.stringify(estimates));
+              
+              alert('Estimate saved successfully!');
+              updateEstimatesTable();
+              updateDashboardStats();
+          }
+
+          // Update estimates table
+          function updateEstimatesTable() {
+              const tableBody = document.getElementById('estimatesTable');
+              
+              if (estimates.length === 0) {
+                  tableBody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">No estimates yet. Create your first estimate above!</td></tr>';
+                  return;
+              }
+
+              tableBody.innerHTML = estimates.slice(-10).reverse().map(estimate => `
+                  <tr class="border-b hover:bg-gray-50">
+                      <td class="px-4 py-2">${estimate.date}</td>
+                      <td class="px-4 py-2">${estimate.customerName}</td>
+                      <td class="px-4 py-2 capitalize">${estimate.projectType}</td>
+                      <td class="px-4 py-2 font-semibold">${estimate.total}</td>
+                      <td class="px-4 py-2">
+                          <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">${estimate.status}</span>
+                      </td>
+                      <td class="px-4 py-2">
+                          <button onclick="viewEstimate(${estimate.id})" class="text-blue-600 hover:text-blue-800 mr-2">View</button>
+                          <button onclick="deleteEstimate(${estimate.id})" class="text-red-600 hover:text-red-800">Delete</button>
+                      </td>
+                  </tr>
+              `).join('');
+          }
+
+          // View estimate
+          function viewEstimate(id) {
+              const estimate = estimates.find(e => e.id === id);
+              if (estimate) {
+                  alert(`Estimate Details:\n\nCustomer: ${estimate.customerName}\nProject: ${estimate.projectType}\nTotal: ${estimate.total}\nDate: ${estimate.date}`);
+              }
+          }
+
+          // Delete estimate
+          function deleteEstimate(id) {
+              if (confirm('Are you sure you want to delete this estimate?')) {
+                  estimates = estimates.filter(e => e.id !== id);
+                  localStorage.setItem('estimates', JSON.stringify(estimates));
+                  updateEstimatesTable();
+                  updateDashboardStats();
+              }
+          }
+
+          // Generate PDF
+          function generatePDF() {
+              const customerName = document.getElementById('customerName').value;
+              const projectType = document.getElementById('projectType').value;
+              
+              if (!customerName || !projectType) {
+                  alert('Please fill in customer name and project type before generating PDF');
+                  return;
+              }
+
+              const { jsPDF } = window.jspdf;
+              const doc = new jsPDF();
+
+              // Header
+              doc.setFontSize(20);
+              doc.text('T&J Field Services', 20, 20);
+              doc.setFontSize(12);
+              doc.text('Delmar, MD 21875 - Licensed & Insured', 20, 30);
+              
+              // Title
+              doc.setFontSize(16);
+              doc.text('PROJECT ESTIMATE', 20, 50);
+              
+              // Customer Info
+              doc.setFontSize(12);
+              doc.text(`Customer: ${customerName}`, 20, 70);
+              doc.text(`Project Type: ${projectType}`, 20, 80);
+              doc.text(`Address: ${document.getElementById('projectAddress').value}`, 20, 90);
+              doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 100);
+              
+              // Cost Breakdown
+              doc.text('COST BREAKDOWN:', 20, 120);
+              doc.text(`Materials: ${document.getElementById('summaryMaterials').textContent}`, 30, 135);
+              doc.text(`Labor: ${document.getElementById('summaryLabor').textContent}`, 30, 145);
+              doc.text(`Equipment: ${document.getElementById('summaryEquipment').textContent}`, 30, 155);
+              doc.text(`Permits: ${document.getElementById('summaryPermits').textContent}`, 30, 165);
+              doc.text(`Profit: ${document.getElementById('summaryProfit').textContent}`, 30, 175);
+              
+              // Total
+              doc.setFontSize(14);
+              doc.text(`TOTAL ESTIMATE: ${document.getElementById('summaryTotal').textContent}`, 20, 195);
+              
+              // Footer
+              doc.setFontSize(10);
+              doc.text('This estimate is valid for 30 days. Terms and conditions apply.', 20, 250);
+              
+              doc.save(`${customerName}_Estimate_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`);
+          }
+
+          // Clear form
+          function clearForm() {
+              document.getElementById('estimateForm').reset();
+              document.getElementById('laborRate').value = 75;
+              document.getElementById('profitMargin').value = 20;
+              calculateTotal();
+          }
+
+          // Update dashboard stats
+          function updateDashboardStats() {
+              const totalEstimates = estimates.length;
+              const totalValue = estimates.reduce((sum, est) => {
+                  const value = parseFloat(est.total.replace('$', '').replace(',', '')) || 0;
+                  return sum + value;
+              }, 0);
+              const avgValue = totalEstimates > 0 ? totalValue / totalEstimates : 0;
+
+              document.getElementById('totalEstimates').textContent = totalEstimates;
+              document.getElementById('activeCustomers').textContent = new Set(estimates.map(e => e.customerName)).size;
+              document.getElementById('activeProjects').textContent = estimates.filter(e => e.status !== 'Completed').length;
+              document.getElementById('monthlyRevenue').textContent = `$${totalValue.toLocaleString()}`;
+              
+              // Update reports
+              document.getElementById('reportTotalValue').textContent = `$${totalValue.toLocaleString()}`;
+              document.getElementById('reportAvgValue').textContent = `$${avgValue.toLocaleString()}`;
+              document.getElementById('reportConversionRate').textContent = '75%'; // Placeholder
+              document.getElementById('reportInventoryValue').textContent = '$25,000'; // Placeholder
+          }
+
+          // Initialize on page load
+          document.addEventListener('DOMContentLoaded', function() {
+              updateEstimatesTable();
+              updateDashboardStats();
+              calculateTotal();
+          });
+      </script>
+  </body>
+  </html>
