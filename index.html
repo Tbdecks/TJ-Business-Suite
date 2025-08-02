@@ -5074,5 +5074,1194 @@ const AccountingSyncSettings = {
             UI.showAlert('Settings reset to defaults', 'success');
         }
     }
+};// Communication integrations component for T&J Field Services
+const CommunicationIntegrations = {
+    render() {
+        return `
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-medium">Communication Integrations</h3>
+                    <button onclick="CommunicationIntegrations.testAll()" class="btn-primary">
+                        <i data-lucide="send" class="inline w-4 h-4 mr-2"></i>
+                        Test All
+                    </button>
+                </div>
+                
+                <!-- Email Services -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">
+                        <i data-lucide="mail" class="inline w-5 h-5 mr-2"></i>
+                        Email Services
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${this.renderEmailServices()}
+                    </div>
+                </div>
+                
+                <!-- SMS Services -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">
+                        <i data-lucide="message-square" class="inline w-5 h-5 mr-2"></i>
+                        SMS Services
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${this.renderSMSServices()}
+                    </div>
+                </div>
+                
+                <!-- Chat & Messaging -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">
+                        <i data-lucide="message-circle" class="inline w-5 h-5 mr-2"></i>
+                        Chat & Messaging
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${this.renderChatServices()}
+                    </div>
+                </div>
+                
+                <!-- Communication Settings -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">Communication Settings</h4>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Default Email Template</label>
+                                <select id="defaultEmailTemplate" class="form-select">
+                                    <option value="professional">Professional</option>
+                                    <option value="friendly">Friendly</option>
+                                    <option value="minimal">Minimal</option>
+                                    <option value="custom">Custom</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">SMS Character Limit Warning</label>
+                                <select id="smsCharLimit" class="form-select">
+                                    <option value="160">160 characters</option>
+                                    <option value="320">320 characters</option>
+                                    <option value="480">480 characters</option>
+                                    <option value="none">No limit</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="autoResponders" class="form-checkbox" checked>
+                                <span class="ml-3">Enable automatic response messages</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="readReceipts" class="form-checkbox">
+                                <span class="ml-3">Request read receipts for emails</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="unsubscribeLinks" class="form-checkbox" checked>
+                                <span class="ml-3">Include unsubscribe links in marketing emails</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="deliveryReports" class="form-checkbox" checked>
+                                <span class="ml-3">Enable delivery reports for SMS</span>
+                            </label>
+                        </div>
+                        
+                        <button onclick="CommunicationIntegrations.saveSettings()" class="btn-primary">
+                            Save Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    renderEmailServices() {
+        const emailServices = [
+            {
+                name: 'Gmail',
+                status: 'connected',
+                description: 'Google email service',
+                icon: 'mail',
+                color: 'red',
+                features: ['Send emails', 'Read receipts', 'Templates']
+            },
+            {
+                name: 'Outlook',
+                status: 'available',
+                description: 'Microsoft email service',
+                icon: 'mail',
+                color: 'blue',
+                features: ['Send emails', 'Calendar sync', 'Contacts']
+            },
+            {
+                name: 'SendGrid',
+                status: 'available',
+                description: 'Email delivery service',
+                icon: 'send',
+                color: 'blue',
+                features: ['Bulk emails', 'Analytics', 'Templates']
+            },
+            {
+                name: 'Mailgun',
+                status: 'available',
+                description: 'Email API service',
+                icon: 'zap',
+                color: 'orange',
+                features: ['API emails', 'Validation', 'Analytics']
+            }
+        ];
+        
+        return emailServices.map(service => this.renderServiceCard(service, 'email')).join('');
+    },
+    
+    renderSMSServices() {
+        const smsServices = [
+            {
+                name: 'Twilio',
+                status: 'available',
+                description: 'SMS and voice service',
+                icon: 'phone',
+                color: 'red',
+                features: ['SMS', 'Voice calls', 'WhatsApp']
+            },
+            {
+                name: 'TextMagic',
+                status: 'available',
+                description: 'Business SMS service',
+                icon: 'message-square',
+                color: 'green',
+                features: ['Bulk SMS', 'Two-way SMS', 'Templates']
+            },
+            {
+                name: 'Vonage',
+                status: 'available',
+                description: 'Communication APIs',
+                icon: 'phone-call',
+                color: 'purple',
+                features: ['SMS', 'Voice', 'Video']
+            },
+            {
+                name: 'AWS SNS',
+                status: 'available',
+                description: 'Amazon notification service',
+                icon: 'cloud',
+                color: 'orange',
+                features: ['SMS', 'Push notifications', 'Email']
+            }
+        ];
+        
+        return smsServices.map(service => this.renderServiceCard(service, 'sms')).join('');
+    },
+    
+    renderChatServices() {
+        const chatServices = [
+            {
+                name: 'Slack',
+                status: 'available',
+                description: 'Team communication',
+                icon: 'message-circle',
+                color: 'purple',
+                features: ['Team chat', 'File sharing', 'Integrations']
+            },
+            {
+                name: 'Microsoft Teams',
+                status: 'available',
+                description: 'Business communication',
+                icon: 'users',
+                color: 'blue',
+                features: ['Video calls', 'Chat', 'File sharing']
+            },
+            {
+                name: 'Discord',
+                status: 'available',
+                description: 'Community platform',
+                icon: 'message-square',
+                color: 'indigo',
+                features: ['Voice chat', 'Text chat', 'Communities']
+            },
+            {
+                name: 'WhatsApp Business',
+                status: 'available',
+                description: 'Business messaging',
+                icon: 'phone',
+                color: 'green',
+                features: ['Customer chat', 'Broadcast', 'Automation']
+            }
+        ];
+        
+        return chatServices.map(service => this.renderServiceCard(service, 'chat')).join('');
+    },
+    
+    renderServiceCard(service, type) {
+        const isConnected = service.status === 'connected';
+        return `
+            <div class="border rounded-lg p-4 ${isConnected ? 'border-green-200 bg-green-50' : 'border-gray-200'}">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-${service.color}-100 rounded-lg flex items-center justify-center mr-3">
+                            <i data-lucide="${service.icon}" class="w-5 h-5 text-${service.color}-600"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-medium">${service.name}</h5>
+                            <p class="text-sm text-gray-600">${service.description}</p>
+                        </div>
+                    </div>
+                    <span class="w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-400'}"></span>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="flex flex-wrap gap-1">
+                        ${service.features.map(feature => `
+                            <span class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">${feature}</span>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div class="flex space-x-2">
+                    ${isConnected ? `
+                        <button onclick="CommunicationIntegrations.configure('${service.name}', '${type}')" 
+                                class="btn-secondary text-sm flex-1">
+                            Configure
+                        </button>
+                        <button onclick="CommunicationIntegrations.test('${service.name}', '${type}')" 
+                                class="btn-secondary text-sm">
+                            Test
+                        </button>
+                    ` : `
+                        <button onclick="CommunicationIntegrations.connect('${service.name}', '${type}')" 
+                                class="btn-primary text-sm flex-1">
+                            Connect
+                        </button>
+                        <button onclick="CommunicationIntegrations.learnMore('${service.name}', '${type}')" 
+                                class="btn-secondary text-sm">
+                            Info
+                        </button>
+                    `}
+                </div>
+            </div>
+        `;
+    },
+    
+    load() {
+        // Load communication settings
+        document.getElementById('defaultEmailTemplate').value = Settings.getSetting('defaultEmailTemplate', 'professional');
+        document.getElementById('smsCharLimit').value = Settings.getSetting('smsCharLimit', '160');
+        document.getElementById('autoResponders').checked = Settings.getSetting('autoResponders', true);
+        document.getElementById('readReceipts').checked = Settings.getSetting('readReceipts', false);
+        document.getElementById('unsubscribeLinks').checked = Settings.getSetting('unsubscribeLinks', true);
+        document.getElementById('deliveryReports').checked = Settings.getSetting('deliveryReports', true);
+        
+        lucide.createIcons();
+    },
+    
+    connect(serviceName, type) {
+        UI.showAlert(`Connecting to ${serviceName}...`, 'info');
+        setTimeout(() => {
+            UI.showAlert(`${serviceName} connected successfully!`, 'success');
+            this.load();
+        }, 2000);
+    },
+    
+    configure(serviceName, type) {
+        UI.showAlert(`Opening ${serviceName} configuration...`, 'info');
+    },
+    
+    test(serviceName, type) {
+        UI.showAlert(`Testing ${serviceName} connection...`, 'info');
+        setTimeout(() => {
+            UI.showAlert(`${serviceName} test successful!`, 'success');
+        }, 1500);
+    },
+    
+    testAll() {
+        UI.showAlert('Testing all communication services...', 'info');
+        setTimeout(() => {
+            UI.showAlert('All communication tests completed!', 'success');
+        }, 3000);
+    },
+    
+    learnMore(serviceName, type) {
+        UI.showAlert(`Opening ${serviceName} information...`, 'info');
+    },
+    
+    saveSettings() {
+        const settings = {
+            defaultEmailTemplate: document.getElementById('defaultEmailTemplate').value,
+            smsCharLimit: document.getElementById('smsCharLimit').value,
+            autoResponders: document.getElementById('autoResponders').checked,
+            readReceipts: document.getElementById('readReceipts').checked,
+            unsubscribeLinks: document.getElementById('unsubscribeLinks').checked,
+            deliveryReports: document.getElementById('deliveryReports').checked
+        };
+        
+        Object.keys(settings).forEach(key => {
+            Settings.updateSetting(key, settings[key]);
+        });
+        
+        UI.showAlert('Communication settings saved successfully!', 'success');
+    }
+};// Marketing integrations component for T&J Field Services
+const MarketingIntegrations = {
+    render() {
+        return `
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-medium">Marketing Integrations</h3>
+                    <button onclick="MarketingIntegrations.syncAllCampaigns()" class="btn-primary">
+                        <i data-lucide="refresh-cw" class="inline w-4 h-4 mr-2"></i>
+                        Sync Campaigns
+                    </button>
+                </div>
+                
+                <!-- Email Marketing -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">
+                        <i data-lucide="mail" class="inline w-5 h-5 mr-2"></i>
+                        Email Marketing
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${this.renderEmailMarketing()}
+                    </div>
+                </div>
+                
+                <!-- Social Media -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">
+                        <i data-lucide="share-2" class="inline w-5 h-5 mr-2"></i>
+                        Social Media
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${this.renderSocialMedia()}
+                    </div>
+                </div>
+                
+                <!-- Review Management -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">
+                        <i data-lucide="star" class="inline w-5 h-5 mr-2"></i>
+                        Review Management
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${this.renderReviewPlatforms()}
+                    </div>
+                </div>
+                
+                <!-- Marketing Automation -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">Marketing Automation Settings</h4>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Lead Follow-up Delay</label>
+                                <select id="leadFollowupDelay" class="form-select">
+                                    <option value="immediate">Immediate</option>
+                                    <option value="1hour">1 hour</option>
+                                    <option value="24hours">24 hours</option>
+                                    <option value="3days">3 days</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Campaign Sync Frequency</label>
+                                <select id="campaignSyncFreq" class="form-select">
+                                    <option value="realtime">Real-time</option>
+                                    <option value="hourly">Every hour</option>
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="autoLeadCapture" class="form-checkbox" checked>
+                                <span class="ml-3">Automatically capture leads from marketing campaigns</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="autoSegmentation" class="form-checkbox">
+                                <span class="ml-3">Enable automatic customer segmentation</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="reviewRequests" class="form-checkbox" checked>
+                                <span class="ml-3">Send automatic review requests after job completion</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="socialPosting" class="form-checkbox">
+                                <span class="ml-3">Auto-post completed projects to social media</span>
+                            </label>
+                        </div>
+                        
+                        <button onclick="MarketingIntegrations.saveSettings()" class="btn-primary">
+                            Save Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    renderEmailMarketing() {
+        const emailServices = [
+            {
+                name: 'Mailchimp',
+                status: 'connected',
+                description: 'Email marketing platform',
+                icon: 'mail',
+                color: 'yellow',
+                metrics: { subscribers: '1,247', campaigns: '23', open_rate: '24.5%' }
+            },
+            {
+                name: 'Constant Contact',
+                status: 'available',
+                description: 'Email & digital marketing',
+                icon: 'send',
+                color: 'blue',
+                metrics: null
+            },
+            {
+                name: 'ConvertKit',
+                status: 'available',
+                description: 'Creator marketing platform',
+                icon: 'zap',
+                color: 'pink',
+                metrics: null
+            },
+            {
+                name: 'ActiveCampaign',
+                status: 'available',
+                description: 'Customer experience automation',
+                icon: 'activity',
+                color: 'blue',
+                metrics: null
+            }
+        ];
+        
+        return emailServices.map(service => this.renderMarketingCard(service, 'email')).join('');
+    },
+    
+    renderSocialMedia() {
+        const socialServices = [
+            {
+                name: 'Facebook Business',
+                status: 'available',
+                description: 'Facebook & Instagram marketing',
+                icon: 'facebook',
+                color: 'blue',
+                metrics: null
+            },
+            {
+                name: 'Google My Business',
+                status: 'available',
+                description: 'Local business presence',
+                icon: 'map-pin',
+                color: 'red',
+                metrics: null
+            },
+            {
+                name: 'LinkedIn Business',
+                status: 'available',
+                description: 'Professional networking',
+                icon: 'linkedin',
+                color: 'blue',
+                metrics: null
+            },
+            {
+                name: 'Hootsuite',
+                status: 'available',
+                description: 'Social media management',
+                icon: 'share-2',
+                color: 'orange',
+                metrics: null
+            }
+        ];
+        
+        return socialServices.map(service => this.renderMarketingCard(service, 'social')).join('');
+    },
+    
+    renderReviewPlatforms() {
+        const reviewServices = [
+            {
+                name: 'Google Reviews',
+                status: 'available',
+                description: 'Google business reviews',
+                icon: 'star',
+                color: 'yellow',
+                metrics: null
+            },
+            {
+                name: 'Yelp Business',
+                status: 'available',
+                description: 'Yelp review management',
+                icon: 'message-square',
+                color: 'red',
+                metrics: null
+            },
+            {
+                name: 'Angie\'s List',
+                status: 'available',
+                description: 'Home services reviews',
+                icon: 'home',
+                color: 'green',
+                metrics: null
+            },
+            {
+                name: 'Better Business Bureau',
+                status: 'available',
+                description: 'BBB accreditation',
+                icon: 'shield',
+                color: 'blue',
+                metrics: null
+            }
+        ];
+        
+        return reviewServices.map(service => this.renderMarketingCard(service, 'review')).join('');
+    },
+    
+    renderMarketingCard(service, type) {
+        const isConnected = service.status === 'connected';
+        return `
+            <div class="border rounded-lg p-4 ${isConnected ? 'border-green-200 bg-green-50' : 'border-gray-200'}">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-${service.color}-100 rounded-lg flex items-center justify-center mr-3">
+                            <i data-lucide="${service.icon}" class="w-5 h-5 text-${service.color}-600"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-medium">${service.name}</h5>
+                            <p class="text-sm text-gray-600">${service.description}</p>
+                        </div>
+                    </div>
+                    <span class="w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-400'}"></span>
+                </div>
+                
+                ${service.metrics ? `
+                    <div class="mb-3 p-2 bg-white rounded border">
+                        <div class="grid grid-cols-3 gap-2 text-xs">
+                            <div class="text-center">
+                                <div class="font-medium text-gray-900">${service.metrics.subscribers}</div>
+                                <div class="text-gray-500">Subscribers</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="font-medium text-gray-900">${service.metrics.campaigns}</div>
+                                <div class="text-gray-500">Campaigns</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="font-medium text-gray-900">${service.metrics.open_rate}</div>
+                                <div class="text-gray-500">Open Rate</div>
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
+                
+                <div class="flex space-x-2">
+                    ${isConnected ? `
+                        <button onclick="MarketingIntegrations.viewCampaigns('${service.name}')" 
+                                class="btn-secondary text-sm flex-1">
+                            View Campaigns
+                        </button>
+                        <button onclick="MarketingIntegrations.configure('${service.name}', '${type}')" 
+                                class="btn-secondary text-sm">
+                            Settings
+                        </button>
+                    ` : `
+                        <button onclick="MarketingIntegrations.connect('${service.name}', '${type}')" 
+                                class="btn-primary text-sm flex-1">
+                            Connect
+                        </button>
+                        <button onclick="MarketingIntegrations.learnMore('${service.name}', '${type}')" 
+                                class="btn-secondary text-sm">
+                            Info
+                        </button>
+                    `}
+                </div>
+            </div>
+        `;
+    },
+    
+    load() {
+        // Load marketing settings
+        document.getElementById('leadFollowupDelay').value = Settings.getSetting('leadFollowupDelay', '24hours');
+        document.getElementById('campaignSyncFreq').value = Settings.getSetting('campaignSyncFreq', 'daily');
+        document.getElementById('autoLeadCapture').checked = Settings.getSetting('autoLeadCapture', true);
+        document.getElementById('autoSegmentation').checked = Settings.getSetting('autoSegmentation', false);
+        document.getElementById('reviewRequests').checked = Settings.getSetting('reviewRequests', true);
+        document.getElementById('socialPosting').checked = Settings.getSetting('socialPosting', false);
+        
+        lucide.createIcons();
+    },
+    
+    connect(serviceName, type) {
+        UI.showAlert(`Connecting to ${serviceName}...`, 'info');
+        setTimeout(() => {
+            UI.showAlert(`${serviceName} connected successfully!`, 'success');
+            this.load();
+        }, 2000);
+    },
+    
+    configure(serviceName, type) {
+        const configModal = `
+            <div class="space-y-4">
+                <h4 class="text-lg font-medium">${serviceName} Settings</h4>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Sync Frequency</label>
+                        <select class="form-select">
+                            <option value="realtime">Real-time</option>
+                            <option value="hourly">Every hour</option>
+                            <option value="daily">Daily</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="form-checkbox" checked>
+                            <span class="ml-3 text-sm">Sync customer lists</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="form-checkbox">
+                            <span class="ml-3 text-sm">Auto-tag customers by service type</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="form-checkbox" checked>
+                            <span class="ml-3 text-sm">Send campaign performance reports</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="flex space-x-2 pt-4">
+                    <button onclick="UI.closeModal()" class="btn-secondary">Cancel</button>
+                    <button onclick="MarketingIntegrations.saveServiceSettings('${serviceName}')" class="btn-primary">
+                        Save Settings
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        UI.showModal(`${serviceName} Configuration`, configModal);
+    },
+    
+    viewCampaigns(serviceName) {
+        const campaignsModal = `
+            <div class="space-y-4">
+                <h4 class="text-lg font-medium">${serviceName} Campaigns</h4>
+                <div class="space-y-3 max-h-64 overflow-y-auto">
+                    <div class="border rounded p-3">
+                        <div class="flex items-center justify-between mb-2">
+                            <h5 class="font-medium">Spring Deck Special</h5>
+                            <span class="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">Active</span>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <p>Sent: 1,247 | Opens: 306 (24.5%) | Clicks: 42 (3.4%)</p>
+                        </div>
+                    </div>
+                    <div class="border rounded p-3">
+                        <div class="flex items-center justify-between mb-2">
+                            <h5 class="font-medium">Winter Maintenance Tips</h5>
+                            <span class="text-xs px-2 py-1 bg-gray-100 text-gray-800 rounded-full">Completed</span>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <p>Sent: 1,180 | Opens: 354 (30.0%) | Clicks: 67 (5.7%)</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex space-x-2 pt-4">
+                    <button onclick="UI.closeModal()" class="btn-secondary">Close</button>
+                    <button onclick="MarketingIntegrations.createCampaign('${serviceName}')" class="btn-primary">
+                        Create Campaign
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        UI.showModal(`${serviceName} Campaigns`, campaignsModal);
+    },
+    
+    createCampaign(serviceName) {
+        UI.closeModal();
+        UI.showAlert(`Opening ${serviceName} campaign creator...`, 'info');
+    },
+    
+    syncAllCampaigns() {
+        UI.showAlert('Syncing all marketing campaigns...', 'info');
+        setTimeout(() => {
+            UI.showAlert('All campaigns synced successfully!', 'success');
+        }, 2000);
+    },
+    
+    learnMore(serviceName, type) {
+        UI.showAlert(`Opening ${serviceName} information...`, 'info');
+    },
+    
+    saveServiceSettings(serviceName) {
+        UI.closeModal();
+        UI.showAlert(`${serviceName} settings saved successfully!`, 'success');
+    },
+    
+    saveSettings() {
+        const settings = {
+            leadFollowupDelay: document.getElementById('leadFollowupDelay').value,
+            campaignSyncFreq: document.getElementById('campaignSyncFreq').value,
+            autoLeadCapture: document.getElementById('autoLeadCapture').checked,
+            autoSegmentation: document.getElementById('autoSegmentation').checked,
+            reviewRequests: document.getElementById('reviewRequests').checked,
+            socialPosting: document.getElementById('socialPosting').checked
+        };
+        
+        Object.keys(settings).forEach(key => {
+            Settings.updateSetting(key, settings[key]);
+        });
+        
+        UI.showAlert('Marketing settings saved successfully!', 'success');
+    }
+};id: tj-storage-integrations
+name: T&J Storage Integrations
+type: code.js
+content: |-
+// Storage integrations component for T&J Field Services
+const StorageIntegrations = {
+    render() {
+        return `
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-medium">Storage Integrations</h3>
+                    <button onclick="StorageIntegrations.syncAllFiles()" class="btn-primary">
+                        <i data-lucide="refresh-cw" class="inline w-4 h-4 mr-2"></i>
+                        Sync All Files
+                    </button>
+                </div>
+                
+                <!-- Cloud Storage -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">
+                        <i data-lucide="cloud" class="inline w-5 h-5 mr-2"></i>
+                        Cloud Storage
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${this.renderCloudStorage()}
+                    </div>
+                </div>
+                
+                <!-- Document Management -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">
+                        <i data-lucide="file-text" class="inline w-5 h-5 mr-2"></i>
+                        Document Management
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${this.renderDocumentSystems()}
+                    </div>
+                </div>
+                
+                <!-- Photo & Media Storage -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">
+                        <i data-lucide="image" class="inline w-5 h-5 mr-2"></i>
+                        Photo & Media Storage
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${this.renderMediaStorage()}
+                    </div>
+                </div>
+                
+                <!-- Storage Settings -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">Storage Settings</h4>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Default Storage Location</label>
+                                <select id="defaultStorage" class="form-select">
+                                    <option value="local">Local Storage</option>
+                                    <option value="google_drive">Google Drive</option>
+                                    <option value="dropbox">Dropbox</option>
+                                    <option value="onedrive">OneDrive</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Auto-Backup Frequency</label>
+                                <select id="backupFrequency" class="form-select">
+                                    <option value="realtime">Real-time</option>
+                                    <option value="hourly">Every hour</option>
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Photo Quality</label>
+                                <select id="photoQuality" class="form-select">
+                                    <option value="original">Original Quality</option>
+                                    <option value="high">High Quality</option>
+                                    <option value="medium">Medium Quality</option>
+                                    <option value="compressed">Compressed</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">File Retention</label>
+                                <select id="fileRetention" class="form-select">
+                                    <option value="forever">Keep Forever</option>
+                                    <option value="5years">5 Years</option>
+                                    <option value="3years">3 Years</option>
+                                    <option value="1year">1 Year</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="autoSync" class="form-checkbox" checked>
+                                <span class="ml-3">Enable automatic file synchronization</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="duplicateDetection" class="form-checkbox" checked>
+                                <span class="ml-3">Detect and prevent duplicate files</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="versionControl" class="form-checkbox">
+                                <span class="ml-3">Enable file version control</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="encryptFiles" class="form-checkbox" checked>
+                                <span class="ml-3">Encrypt files during storage and transfer</span>
+                            </label>
+                        </div>
+                        
+                        <button onclick="StorageIntegrations.saveSettings()" class="btn-primary">
+                            Save Settings
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Storage Usage -->
+                <div class="bg-white border rounded-lg p-6">
+                    <h4 class="text-lg font-medium mb-4">Storage Usage</h4>
+                    <div id="storageUsage">
+                        <!-- Storage usage will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    renderCloudStorage() {
+        const cloudServices = [
+            {
+                name: 'Google Drive',
+                status: 'connected',
+                description: 'Google cloud storage',
+                icon: 'cloud',
+                color: 'blue',
+                usage: { used: '15.2 GB', total: '100 GB', percentage: 15 }
+            },
+            {
+                name: 'Dropbox',
+                status: 'available',
+                description: 'File sync and sharing',
+                icon: 'cloud',
+                color: 'blue',
+                usage: null
+            },
+            {
+                name: 'OneDrive',
+                status: 'available',
+                description: 'Microsoft cloud storage',
+                icon: 'cloud',
+                color: 'blue',
+                usage: null
+            },
+            {
+                name: 'Amazon S3',
+                status: 'available',
+                description: 'Scalable cloud storage',
+                icon: 'server',
+                color: 'orange',
+                usage: null
+            }
+        ];
+        
+        return cloudServices.map(service => this.renderStorageCard(service, 'cloud')).join('');
+    },
+    
+    renderDocumentSystems() {
+        const docServices = [
+            {
+                name: 'SharePoint',
+                status: 'available',
+                description: 'Microsoft document management',
+                icon: 'file-text',
+                color: 'blue',
+                usage: null
+            },
+            {
+                name: 'Box',
+                status: 'available',
+                description: 'Enterprise content management',
+                icon: 'archive',
+                color: 'blue',
+                usage: null
+            },
+            {
+                name: 'DocuSign',
+                status: 'available',
+                description: 'Digital signature platform',
+                icon: 'edit-3',
+                color: 'yellow',
+                usage: null
+            },
+            {
+                name: 'Adobe Document Cloud',
+                status: 'available',
+                description: 'PDF and document services',
+                icon: 'file',
+                color: 'red',
+                usage: null
+            }
+        ];
+        
+        return docServices.map(service => this.renderStorageCard(service, 'document')).join('');
+    },
+    
+    renderMediaStorage() {
+        const mediaServices = [
+            {
+                name: 'Google Photos',
+                status: 'available',
+                description: 'Photo storage and organization',
+                icon: 'image',
+                color: 'green',
+                usage: null
+            },
+            {
+                name: 'Flickr',
+                status: 'available',
+                description: 'Photo sharing platform',
+                icon: 'camera',
+                color: 'pink',
+                usage: null
+            },
+            {
+                name: 'Cloudinary',
+                status: 'available',
+                description: 'Image and video management',
+                icon: 'image',
+                color: 'blue',
+                usage: null
+            },
+            {
+                name: 'Vimeo',
+                status: 'available',
+                description: 'Video hosting platform',
+                icon: 'video',
+                color: 'blue',
+                usage: null
+            }
+        ];
+        
+        return mediaServices.map(service => this.renderStorageCard(service, 'media')).join('');
+    },
+    
+    renderStorageCard(service, type) {
+        const isConnected = service.status === 'connected';
+        return `
+            <div class="border rounded-lg p-4 ${isConnected ? 'border-green-200 bg-green-50' : 'border-gray-200'}">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-${service.color}-100 rounded-lg flex items-center justify-center mr-3">
+                            <i data-lucide="${service.icon}" class="w-5 h-5 text-${service.color}-600"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-medium">${service.name}</h5>
+                            <p class="text-sm text-gray-600">${service.description}</p>
+                        </div>
+                    </div>
+                    <span class="w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-400'}"></span>
+                </div>
+                
+                ${service.usage ? `
+                    <div class="mb-3">
+                        <div class="flex items-center justify-between text-sm mb-1">
+                            <span>Storage Used</span>
+                            <span>${service.usage.used} / ${service.usage.total}</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full" style="width: ${service.usage.percentage}%"></div>
+                        </div>
+                    </div>
+                ` : ''}
+                
+                <div class="flex space-x-2">
+                    ${isConnected ? `
+                        <button onclick="StorageIntegrations.manageFiles('${service.name}')" 
+                                class="btn-secondary text-sm flex-1">
+                            Manage Files
+                        </button>
+                        <button onclick="StorageIntegrations.configure('${service.name}', '${type}')" 
+                                class="btn-secondary text-sm">
+                            Settings
+                        </button>
+                    ` : `
+                        <button onclick="StorageIntegrations.connect('${service.name}', '${type}')" 
+                                class="btn-primary text-sm flex-1">
+                            Connect
+                        </button>
+                        <button onclick="StorageIntegrations.learnMore('${service.name}', '${type}')" 
+                                class="btn-secondary text-sm">
+                            Info
+                        </button>
+                    `}
+                </div>
+            </div>
+        `;
+    },
+    
+    load() {
+        // Load storage settings
+        document.getElementById('defaultStorage').value = Settings.getSetting('defaultStorage', 'google_drive');
+        document.getElementById('backupFrequency').value = Settings.getSetting('backupFrequency', 'daily');
+        document.getElementById('photoQuality').value = Settings.getSetting('photoQuality', 'high');
+        document.getElementById('fileRetention').value = Settings.getSetting('fileRetention', 'forever');
+        document.getElementById('autoSync').checke
+// Media services component for T&J Field Services
+const MediaServices = {
+    load() {
+        const mediaServices = [
+            {
+                name: 'Google Photos',
+                status: 'available',
+                description: 'Photo storage and organization',
+                icon: 'image',
+                color: 'green'
+            },
+            {
+                name: 'Flickr',
+                status: 'available',
+                description: 'Photo sharing platform',
+                icon: 'camera',
+                color: 'pink'
+            },
+            {
+                name: 'Cloudinary',
+                status: 'available',
+                description: 'Image and video management',
+                icon: 'image',
+                color: 'blue'
+            },
+            {
+                name: 'Vimeo',
+                status: 'available',
+                description: 'Video hosting platform',
+                icon: 'video',
+                color: 'blue'
+            }
+        ];
+        
+        document.getElementById('mediaServices').innerHTML = 
+            mediaServices.map(service => this.renderMediaCard(service)).join('');
+        
+        lucide.createIcons();
+    },
+    
+    renderMediaCard(service) {
+        const isConnected = service.status === 'connected';
+        return `
+            <div class="border rounded-lg p-4 ${isConnected ? 'border-green-200 bg-green-50' : 'border-gray-200'}">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-${service.color}-100 rounded-lg flex items-center justify-center mr-3">
+                            <i data-lucide="${service.icon}" class="w-5 h-5 text-${service.color}-600"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-medium">${service.name}</h5>
+                            <p class="text-sm text-gray-600">${service.description}</p>
+                        </div>
+                    </div>
+                    <span class="w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-400'}"></span>
+                </div>
+                
+                <div class="flex space-x-2">
+                    ${isConnected ? `
+                        <button onclick="MediaServices.manageMedia('${service.name}')" 
+                                class="btn-secondary text-sm flex-1">
+                            Manage Media
+                        </button>
+                        <button onclick="MediaServices.configure('${service.name}')" 
+                                class="btn-secondary text-sm">
+                            Settings
+                        </button>
+                    ` : `
+                        <button onclick="MediaServices.connect('${service.name}')" 
+                                class="btn-primary text-sm flex-1">
+                            Connect
+                        </button>
+                        <button onclick="MediaServices.learnMore('${service.name}')" 
+                                class="btn-secondary text-sm">
+                            Info
+                        </button>
+                    `}
+                </div>
+            </div>
+        `;
+    },
+    
+    connect(serviceName) {
+        UI.showAlert(`Connecting to ${serviceName}...`, 'info');
+        setTimeout(() => {
+            UI.showAlert(`${serviceName} connected successfully!`, 'success');
+            this.load();
+        }, 2000);
+    },
+    
+    configure(serviceName) {
+        const configModal = `
+            <div class="space-y-4">
+                <h4 class="text-lg font-medium">${serviceName} Configuration</h4>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Upload Quality</label>
+                        <select class="form-select">
+                            <option value="original">Original Quality</option>
+                            <option value="high">High Quality</option>
+                            <option value="medium">Medium Quality</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Auto-Upload</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox" checked>
+                                <span class="ml-2 text-sm">Before photos</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox" checked>
+                                <span class="ml-2 text-sm">After photos</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox">
+                                <span class="ml-2 text-sm">Progress videos</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex space-x-2 pt-4">
+                    <button onclick="UI.closeModal()" class="btn-secondary">Cancel</button>
+                    <button onclick="MediaServices.saveConfig('${serviceName}')" class="btn-primary">
+                        Save Configuration
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        UI.showModal(`${serviceName} Settings`, configModal);
+    },
+    
+    manageMedia(serviceName) {
+        UI.showAlert(`Opening ${serviceName} media manager...`, 'info');
+    },
+    
+    learnMore(serviceName) {
+        UI.showAlert(`Opening ${serviceName} information...`, 'info');
+    },
+    
+    saveConfig(serviceName) {
+        UI.closeModal();
+        UI.showAlert(`${serviceName} configuration saved!`, 'success');
+    }
 };
 };
