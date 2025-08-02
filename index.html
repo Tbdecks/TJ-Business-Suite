@@ -9414,6 +9414,413 @@ content: |-
                             <span>100%</span>
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div
+                            <div<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T&J Estimates</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 p-6">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">Estimates</h1>
+                <p class="text-gray-600">Create and manage project estimates</p>
+            </div>
+            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <i class="fas fa-plus mr-2"></i>New Estimate
+            </button>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow border">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Total Estimates</p>
+                        <p class="text-2xl font-bold">18</p>
+                    </div>
+                    <i class="fas fa-calculator text-2xl text-blue-500"></i>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow border">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Pending</p>
+                        <p class="text-2xl font-bold text-yellow-600">8</p>
+                    </div>
+                    <i class="fas fa-clock text-2xl text-yellow-500"></i>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow border">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Accepted</p>
+                        <p class="text-2xl font-bold text-green-600">7</p>
+                    </div>
+                    <i class="fas fa-check-circle text-2xl text-green-500"></i>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow border">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Total Value</p>
+                        <p class="text-2xl font-bold text-blue-600">$185K</p>
+                    </div>
+                    <i class="fas fa-dollar-sign text-2xl text-blue-500"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estimates List -->
+        <div class="bg-white rounded-lg shadow border overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold">Recent Estimates</h3>
+            </div>
+            <div class="divide-y divide-gray-200">
+                <!-- Estimate 1 -->
+                <div class="p-6 hover:bg-gray-50">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-4 mb-2">
+                                <h3 class="text-lg font-semibold">EST-2024-001</h3>
+                                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded">Pending</span>
+                            </div>
+                            <p class="text-gray-600 mb-2">Deck Installation & Staining</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                <div>
+                                    <p class="text-gray-500">Customer</p>
+                                    <p class="font-medium">Mike Davis</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Amount</p>
+                                    <p class="font-medium text-green-600">$22,500</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Created</p>
+                                    <p class="font-medium">Mar 20, 2024</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Valid Until</p>
+                                    <p class="font-medium">Apr 20, 2024</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2 ml-4">
+                            <button class="px-3 py-2 bg-blue-50 text-blue-600 rounded text-sm hover:bg-blue-100">
+                                <i class="fas fa-eye mr-1"></i>View
+                            </button>
+                            <button class="px-3 py-2 bg-green-50 text-green-600 rounded text-sm hover:bg-green-100">
+                                <i class="fas fa-paper-plane mr-1"></i>Send
+                            </button>
+                            <button class="px-3 py-2 bg-gray-50 text-gray-600 rounded text-sm hover:bg-gray-100">
+                                <i class="fas fa-edit mr-1"></i>Edit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estimate 2 -->
+                <div class="p-6 hover:bg-gray-50">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-4 mb-2">
+                                <h3 class="text-lg font-semibold">EST-2024-002</h3>
+                                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">Accepted</span>
+                            </div>
+                            <p class="text-gray-600 mb-2">Kitchen Cabinet Replacement</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                <div>
+                                    <p class="text-gray-500">Customer</p>
+                                    <p class="font-medium">Sarah Williams</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Amount</p>
+                                    <p class="font-medium text-green-600">$18,750</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Created</p>
+                                    <p class="font-medium">Mar 15, 2024</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Accepted</p>
+                                    <p class="font-medium">Mar 18, 2024</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2 ml-4">
+                            <button class="px-3 py-2 bg-blue-50 text-blue-600 rounded text-sm hover:bg-blue-100">
+                                <i class="fas fa-eye mr-1"></i>View
+                            </button>
+                            <button class="px-3 py-2 bg-purple-50 text-purple-600 rounded text-sm hover:bg-purple-100">
+                                <i class="fas fa-project-diagram mr-1"></i>Create Project
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estimate 3 -->
+                <div class="p-6 hover:bg-gray-50">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-4 mb-2">
+                                <h3 class="text-lg font-semibold">EST-2024-003</h3>
+                                <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded">Declined</span>
+                            </div>
+                            <p class="text-gray-600 mb-2">Bathroom Renovation</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                <div>
+                                    <p class="text-gray-500">Customer</p>
+                                    <p class="font-medium">Robert Brown</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Amount</p>
+                                    <p class="font-medium text-green-600">$28,900</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Created</p>
+                                    <p class="font-medium">Mar 10, 2024</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Declined</p>
+                                    <p class="font-medium">Mar 25, 2024</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2 ml-4">
+                            <button class="px-3 py-2 bg-blue-50 text-blue-600 rounded text-sm hover:bg-blue-100">
+                                <i class="fas fa-eye mr-1"></i>View
+                            </button>
+                            <button class="px-3 py-2 bg-yellow-50 text-yellow-600 rounded text-sm hover:bg-yellow-100">
+                                <i class="fas fa-copy mr-1"></i>Duplicate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>T&J Customers</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 p-6">
+<div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">Customers</h1>
+            <p class="text-gray-600">Manage your customer database</p>
+        </div>
+        <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <i class="fas fa-plus mr-2"></i>Add Customer
+        </button>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="bg-white p-4 rounded-lg shadow border mb-6">
+        <div class="flex space-x-4">
+            <div class="flex-1">
+                <input type="text" placeholder="Search customers..." class="w-full p-2 border border-gray-300 rounded-md">
+            </div>
+            <button class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md">
+                <i class="fas fa-search"></i>
+            </button>
+            <button class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md">
+                <i class="fas fa-filter"></i> Filter
+            </button>
+        </div>
+    </div>
+
+    <!-- Customer Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Customer 1 -->
+        <div class="bg-white p-6 rounded-lg shadow border">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <span class="text-blue-600 font-bold">JJ</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold">John Johnson</h3>
+                        <p class="text-sm text-gray-600">Residential Customer</p>
+                    </div>
+                </div>
+                <button class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-2 text-sm mb-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-phone text-gray-400"></i>
+                    <span>(555) 123-4567</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-envelope text-gray-400"></i>
+                    <span>john@email.com</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-map-marker-alt text-gray-400"></i>
+                    <span>123 Oak Street, Delmar MD</span>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center mb-4">
+                <div class="text-center">
+                    <p class="text-2xl font-bold text-blue-600">2</p>
+                    <p class="text-xs text-gray-600">Active Projects</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-2xl font-bold text-green-600">$42K</p>
+                    <p class="text-xs text-gray-600">Total Value</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-2xl font-bold text-purple-600">5</p>
+                    <p class="text-xs text-gray-600">All Projects</p>
+                </div>
+            </div>
+
+            <div class="flex space-x-2">
+                <button class="flex-1 px-3 py-2 bg-blue-50 text-blue-600 rounded text-sm">View Profile</button>
+                <button class="px-3 py-2 bg-gray-50 text-gray-600 rounded text-sm">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="px-3 py-2 bg-gray-50 text-gray-600 rounded text-sm">
+                    <i class="fas fa-phone"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Customer 2 -->
+        <div class="bg-white p-6 rounded-lg shadow border">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                        <span class="text-green-600 font-bold">SW</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold">Sarah Williams</h3>
+                        <p class="text-sm text-gray-600">Residential Customer</p>
+                    </div>
+                </div>
+                <button class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-2 text-sm mb-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-phone text-gray-400"></i>
+                    <span>(555) 987-6543</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-envelope text-gray-400"></i>
+                    <span>sarah@email.com</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-map-marker-alt text-gray-400"></i>
+                    <span>456 Pine Ave, Delmar MD</span>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center mb-4">
+                <div class="text-center">
+                    <p class="text-2xl font-bold text-blue-600">1</p>
+                    <p class="text-xs text-gray-600">Active Projects</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-2xl font-bold text-green-600">$18K</p>
+                    <p class="text-xs text-gray-600">Total Value</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-2xl font-bold text-purple-600">1</p>
+                    <p class="text-xs text-gray-600">All Projects</p>
+                </div>
+            </div>
+
+            <div class="flex space-x-2">
+                <button class="flex-1 px-3 py-2 bg-blue-50 text-blue-600 rounded text-sm">View Profile</button>
+                <button class="px-3 py-2 bg-gray-50 text-gray-600 rounded text-sm">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="px-3 py-2 bg-gray-50 text-gray-600 rounded text-sm">
+                    <i class="fas fa-phone"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Customer 3 -->
+        <div class="bg-white p-6 rounded-lg shadow border">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                        <span class="text-yellow-600 font-bold">MD</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold">Mike Davis</h3>
+                        <p class="text-sm text-gray-600">Commercial Client</p>
+                    </div>
+                </div>
+                <button class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-2 text-sm mb-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-phone text-gray-400"></i>
+                    <span>(555) 456-7890</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-envelope text-gray-400"></i>
+                    <span>mike@business.com</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-map-marker-alt text-gray-400"></i>
+                    <span>789 Business Blvd, Salisbury MD</span>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center mb-4">
+                <div class="text-center">
+                    <p class="text-2xl font-bold text-blue-600">0</p>
+                    <p class="text-xs text-gray-600">Active Projects</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-2xl font-bold text-green-600">$85K</p>
+                    <p class="text-xs text-gray-600">Total Value</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-2xl font-bold text-purple-600">3</p>
+                    <p class="text-xs text-gray-600">All Projects</p>
+                </div>
+            </div>
+
+            <div class="flex space-x-2">
+                <button class="flex-1 px-3 py-2 bg-blue-50 text-blue-600 rounded text-sm">View Profile</button>
+                <button class="px-3 py-2 bg-gray-50 text-gray-600 rounded text-sm">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="px-3 py-2 bg-gray-50 text-gray-600 rounded text-sm">
+                    <i class="fas fa-phone"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
 
 };
