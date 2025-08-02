@@ -10371,7 +10371,684 @@ window.TJUIFunctions = {
     loadSchedule,
     scheduleJob,
     callCustomer
-};
+};id: tj-business-functions
+name: T&J Complete Business Functions
+type: code.javascript
+content: |-
+// T&J Field Services - Complete Business Functions
+// Real-world functions for Delmar, MD Remodeling & Deck Building
+
+// ===== PROJECT CREATION & MANAGEMENT =====
+class ProjectCreator {
+    static showCreateForm() {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        modal.innerHTML = `
+            <div class="bg-white p-8 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
+                <h2 class="text-2xl font-bold mb-6">Create New Project</h2>
+                <form id="project-form">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Project Name</label>
+                            <input type="text" id="project-name" class="w-full p-2 border rounded" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Customer</label>
+                            <select id="project-customer" class="w-full p-2 border rounded" required>
+                                <option value="">Select Customer</option>
+                                ${TJSystem.tjData.get('customers').map(c => 
+                                    `<option value="${c.id}">${c.name}</option>`
+                                ).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Project Type</label>
+                            <select id="project-type" class="w-full p-2 border rounded" required>
+                                <option value="deck">Deck Building</option>
+                                <option value="kitchen">Kitchen Remodel</option>
+                                <option value="bathroom">Bathroom Remodel</option>
+                                <option value="handyman">Handyman Services</option>
+                                <option value="renovation">General Renovation</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Budget</label>
+                            <input type="number" id="project-budget" class="w-full p-2 border rounded" step="0.01" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Start Date</label>
+                            <input type="date" id="project-start" class="w-full p-2 border rounded" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Expected End Date</label>
+                            <input type="date" id="project-end" class="w-full p-2 border rounded" required>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium mb-2">Project Description</label>
+                        <textarea id="project-description" class="w-full p-2 border rounded h-24"></textarea>
+                    </div>
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium mb-2">Crew Members</label>
+                        <input type="text" id="project-crew" class="w-full p-2 border rounded" 
+                               placeholder="Tom, Jerry, Mike (comma separated)">
+                    </div>
+                    <div class="flex justify-end space-x-4 mt-6">
+                        <button type="button" onclick="this.closest('.fixed').remove()" 
+                                class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                            Create Project</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        document.getElementById('project-form').onsubmit = (e) => {
+            e.preventDefault();
+            this.createProject();
+            modal.remove();
+        };
+    }
+
+    static createProject() {
+        const formData = {
+            name: document.getElementById('project-name').value,
+            customerId: parseInt(document.getElementById('project-customer').value),
+            type: document.getElementById('project-type').value,
+            budget: parseFloat(document.getElementById('project-budget').value),
+            startDate: document.getElementById('project-start').value,
+            endDate: document.getElementById('project-end').value,
+            description: document.getElementById('project-description').value,
+            crew: document.getElementById('project-crew').value.split(',').map(s => s.trim()).filter(s => s)
+        };
+
+        const project = TJSystem.ProjectManager.add(formData);
+        
+        // Create initial schedule entry
+        TJSystem.ScheduleManager.addAppointment({
+            projectId: project.id,
+            customerId: project.customerId,
+            title: `Start: ${project.name}`,
+            description: project.description || project.name,
+            startTime: new Date(project.startDate + 'T09:00:00').toISOString(),
+            endTime: new Date(project.startDate + 'T17:00:00').toISOString(),
+            crew: project.crew,
+            location: '',
+            type: 'work'
+        });
+
+        alert('Project created successfully!');
+        if (typeof loadProjects === 'function') loadProjects();
+    }
+}
+
+// ===== ESTIMATE CREATION & MANAGEMENT =====
+class EstimateCreator {
+    static showCreateForm() {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        modal.innerHTML = `
+            <div class="bg-white p-8 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-screen overflow-y-auto">
+                <h2 class="text-2xl font-bold mb-6">Create Estimate</h2>
+                <form id="estimate-form">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Customer</label>
+                            <select id="estimate-customer" class="w-full p-2 border rounded" required>
+                                <option value="">Select Customer</option>
+                                ${TJSystem.tjData.get('customers').map(c => 
+                                    `<option value="${c.id}">${c.name}</option>`
+                                ).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Project Type</label>
+                            <select id="estimate-type" class="w-full p-2 border rounded" required>
+                                <option value="deck">Deck Building</option>
+                                <option value="kitchen">Kitchen Remodel</option>
+                                <option value="bathroom">Bathroom Remodel</option>
+                                <option value="handyman">Handyman Services</option>
+                                <option value="renovation">General Renovation</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium mb-2">Project Description</label>
+                            <textarea id="estimate-description" class="w-full p-2 border rounded h-20" required></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Valid Until</label>
+                            <input type="date" id="estimate-valid" class="w-full p-2 border rounded" required>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-lg font-semibold mb-4">Line Items</h3>
+                    <div id="estimate-items">
+                        <div class="grid grid-cols-12 gap-2 mb-2 font-medium text-sm">
+                            <div class="col-span-5">Description</div>
+                            <div class="col-span-2">Quantity</div>
+                            <div class="col-span-2">Unit</div>
+                            <div class="col-span-2">Price</div>
+                            <div class="col-span-1">Total</div>
+                        </div>
+                        <div class="estimate-item grid grid-cols-12 gap-2 mb-2">
+                            <input type="text" class="col-span-5 p-2 border rounded item-description" placeholder="Labor, materials, etc.">
+                            <input type="number" class="col-span-2 p-2 border rounded item-quantity" step="0.01" onchange="calculateItemTotal(this)">
+                            <input type="text" class="col-span-2 p-2 border rounded item-unit" placeholder="hrs, sq ft, each">
+                            <input type="number" class="col-span-2 p-2 border rounded item-price" step="0.01" onchange="calculateItemTotal(this)">
+                            <input type="number" class="col-span-1 p-2 border rounded item-total" readonly>
+                        </div>
+                    </div>
+                    
+                    <button type="button" onclick="addEstimateItem()" class="mb-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                        Add Item
+                    </button>
+                    
+                    <div class="border-t pt-4">
+                        <div class="flex justify-end">
+                            <div class="w-64">
+                                <div class="flex justify-between mb-2">
+                                    <span>Subtotal:</span>
+                                    <span id="estimate-subtotal">$0.00</span>
+                                </div>
+                                <div class="flex justify-between mb-2">
+                                    <span>Tax (6%):</span>
+                                    <span id="estimate-tax">$0.00</span>
+                                </div>
+                                <div class="flex justify-between font-bold text-lg border-t pt-2">
+                                    <span>Total:</span>
+                                    <span id="estimate-total">$0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <label class="block text-sm font-medium mb-2">Notes</label>
+                        <textarea id="estimate-notes" class="w-full p-2 border rounded h-20" 
+                                  placeholder="Additional terms, conditions, or notes..."></textarea>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-4 mt-6">
+                        <button type="button" onclick="this.closest('.fixed').remove()" 
+                                class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                            Create Estimate</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Set default valid date (30 days from now)
+        const validDate = new Date();
+        validDate.setDate(validDate.getDate() + 30);
+        document.getElementById('estimate-valid').value = validDate.toISOString().split('T')[0];
+        
+        document.getElementById('estimate-form').onsubmit = (e) => {
+            e.preventDefault();
+            this.createEstimate();
+            modal.remove();
+        };
+    }
+
+    static createEstimate() {
+        const items = Array.from(document.querySelectorAll('.estimate-item')).map(item => ({
+            description: item.querySelector('.item-description').value,
+            quantity: parseFloat(item.querySelector('.item-quantity').value) || 0,
+            unit: item.querySelector('.item-unit').value,
+            price: parseFloat(item.querySelector('.item-price').value) || 0
+        })).filter(item => item.description && item.quantity && item.price);
+
+        const estimateData = {
+            customerId: parseInt(document.getElementById('estimate-customer').value),
+            projectType: document.getElementById('estimate-type').value,
+            description: document.getElementById('estimate-description').value,
+            validUntil: document.getElementById('estimate-valid').value,
+            items: items,
+            notes: document.getElementById('estimate-notes').value
+        };
+
+        const estimate = TJSystem.EstimateManager.create(estimateData);
+        alert('Estimate created successfully!');
+        if (typeof loadEstimates === 'function') loadEstimates();
+    }
+}
+
+// ===== PRINTING & PDF GENERATION =====
+class PrintManager {
+    static printEstimate(estimateId) {
+        const estimate = TJSystem.tjData.get('estimates').find(e => e.id === estimateId);
+        const customer = TJSystem.tjData.get('customers').find(c => c.id === estimate.customerId);
+        
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Estimate ${estimate.number}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 40px; }
+                    .header { text-align: center; margin-bottom: 30px; }
+                    .company { font-size: 24px; font-weight: bold; color: #2563eb; }
+                    .contact { margin: 10px 0; }
+                    .estimate-info { display: flex; justify-content: space-between; margin: 30px 0; }
+                    .customer-info { width: 48%; }
+                    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                    th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+                    th { background-color: #f8f9fa; }
+                    .totals { text-align: right; margin-top: 20px; }
+                    .total-row { font-weight: bold; font-size: 18px; }
+                    .notes { margin-top: 30px; padding: 20px; background-color: #f8f9fa; }
+                    @media print { .no-print { display: none; } }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="company">T&J Field Services</div>
+                    <div class="contact">Delmar, Maryland 21875</div>
+                    <div class="contact">Phone: (555) 123-4567 | Email: info@tjfieldservices.com</div>
+                </div>
+                
+                <div class="estimate-info">
+                    <div class="customer-info">
+                        <h3>Bill To:</h3>
+                        <p><strong>${customer.name}</strong><br>
+                        ${customer.address}<br>
+                        ${customer.phone}<br>
+                        ${customer.email}</p>
+                    </div>
+                    <div class="customer-info">
+                        <h3>Estimate Details:</h3>
+                        <p><strong>Estimate #:</strong> ${estimate.number}<br>
+                        <strong>Date:</strong> ${TJSystem.TJUtils.formatDate(estimate.created)}<br>
+                        <strong>Valid Until:</strong> ${TJSystem.TJUtils.formatDate(estimate.validUntil)}<br>
+                        <strong>Project:</strong> ${estimate.description}</p>
+                    </div>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Quantity</th>
+                            <th>Unit</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${estimate.items.map(item => `
+                            <tr>
+                                <td>${item.description}</td>
+                                <td>${item.quantity}</td>
+                                <td>${item.unit}</td>
+                                <td>${TJSystem.TJUtils.formatCurrency(item.price)}</td>
+                                <td>${TJSystem.TJUtils.formatCurrency(item.quantity * item.price)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                
+                <div class="totals">
+                    <p>Subtotal: ${TJSystem.TJUtils.formatCurrency(estimate.subtotal)}</p>
+                    <p>Tax (6%): ${TJSystem.TJUtils.formatCurrency(estimate.tax)}</p>
+                    <p class="total-row">Total: ${TJSystem.TJUtils.formatCurrency(estimate.total)}</p>
+                </div>
+                
+                ${estimate.notes ? `
+                    <div class="notes">
+                        <h3>Notes:</h3>
+                        <p>${estimate.notes}</p>
+                    </div>
+                ` : ''}
+                
+                <div style="margin-top: 50px; text-align: center; font-size: 12px; color: #666;">
+                    <p>Thank you for choosing T&J Field Services for your remodeling and deck building needs!</p>
+                    <p>This estimate is valid for 30 days from the date above.</p>
+                </div>
+                
+                <div class="no-print" style="margin-top: 30px; text-align: center;">
+                    <button onclick="window.print()" style="padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 5px; cursor: pointer;">Print Estimate</button>
+                    <button onclick="window.close()" style="padding: 10px 20px; background: #6b7280; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">Close</button>
+                </div>
+            </body>
+            </html>
+        `);
+        
+        printWindow.document.close();
+    }
+
+    static printInvoice(invoiceId) {
+        const invoice = TJSystem.tjData.get('invoices').find(i => i.id === invoiceId);
+        const customer = TJSystem.tjData.get('customers').find(c => c.id === invoice.customerId);
+        const project = TJSystem.tjData.get('projects').find(p => p.id === invoice.projectId);
+        
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Invoice ${invoice.number}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 40px; }
+                    .header { text-align: center; margin-bottom: 30px; }
+                    .company { font-size: 24px; font-weight: bold; color: #2563eb; }
+                    .contact { margin: 10px 0; }
+                    .invoice-info { display: flex; justify-content: space-between; margin: 30px 0; }
+                    .customer-info { width: 48%; }
+                    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                    th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+                    th { background-color: #f8f9fa; }
+                    .totals { text-align: right; margin-top: 20px; }
+                    .total-row { font-weight: bold; font-size: 18px; }
+                    .paid { color: #10b981; font-weight: bold; }
+                    .due { color: #ef4444; font-weight: bold; }
+                    @media print { .no-print { display: none; } }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="company">T&J Field Services</div>
+                    <div class="contact">Delmar, Maryland 21875</div>
+                    <div class="contact">Phone: (555) 123-4567 | Email: info@tjfieldservices.com</div>
+                </div>
+                
+                <div class="invoice-info">
+                    <div class="customer-info">
+                        <h3>Bill To:</h3>
+                        <p><strong>${customer.name}</strong><br>
+                        ${customer.address}<br>
+                        ${customer.phone}<br>
+                        ${customer.email}</p>
+                    </div>
+                    <div class="customer-info">
+                        <h3>Invoice Details:</h3>
+                        <p><strong>Invoice #:</strong> ${invoice.number}<br>
+                        <strong>Date:</strong> ${TJSystem.TJUtils.formatDate(invoice.created)}<br>
+                        <strong>Due Date:</strong> ${TJSystem.TJUtils.formatDate(invoice.dueDate)}<br>
+                        <strong>Project:</strong> ${project?.name || 'General Services'}<br>
+                        <strong>Status:</strong> <span class="${invoice.status === 'paid' ? 'paid' : 'due'}">${invoice.status.toUpperCase()}</span></p>
+                    </div>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Quantity</th>
+                            <th>Rate</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${invoice.items.map(item => `
+                            <tr>
+                                <td>${item.description}</td>
+                                <td>${item.quantity}</td>
+                                <td>${TJSystem.TJUtils.formatCurrency(item.price)}</td>
+                                <td>${TJSystem.TJUtils.formatCurrency(item.quantity * item.price)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                
+                <div class="totals">
+                    <p>Subtotal: ${TJSystem.TJUtils.formatCurrency(invoice.subtotal)}</p>
+                    <p>Tax (6%): ${TJSystem.TJUtils.formatCurrency(invoice.tax)}</p>
+                    <p class="total-row">Total: ${TJSystem.TJUtils.formatCurrency(invoice.total)}</p>
+                    ${invoice.status === 'paid' ? `<p class="paid">PAID - ${TJSystem.TJUtils.formatDate(invoice.paidDate)}</p>` : ''}
+                </div>
+                
+                <div style="margin-top: 50px; text-align: center; font-size: 12px; color: #666;">
+                    <p>Thank you for your business!</p>
+                    <p>Payment is due within 30 days of invoice date.</p>
+                </div>
+                
+                <div class="no-print" style="margin-top: 30px; text-align: center;">
+                    <button onclick="window.print()" style="padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 5px; cursor: pointer;">Print Invoice</button>
+                    <button onclick="window.close()" style="padding: 10px 20px; background: #6b7280; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">Close</button>
+                </div>
+            </body>
+            </html>
+        `);
+        
+        printWindow.document.close();
+    }
+
+    static exportCustomerList() {
+        const customers = TJSystem.tjData.get('customers');
+        let csv = 'Name,Email,Phone,Address,Projects,Total Value\n';
+        
+        customers.forEach(customer => {
+            csv += `"${customer.name}","${customer.email}","${customer.phone}","${customer.address}",${customer.projects.length},"${TJSystem.TJUtils.formatCurrency(customer.totalValue)}"\n`;
+        });
+        
+        this.downloadCSV(csv, 'customers.csv');
+    }
+
+    static downloadCSV(csvContent, filename) {
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
+// ===== CUSTOMER COMMUNICATION =====
+class CustomerCommunication {
+    static sendEstimate(estimateId) {
+        const estimate = TJSystem.tjData.get('estimates').find(e => e.id === estimateId);
+        const customer = TJSystem.tjData.get('customers').find(c => c.id === estimate.customerId);
+        
+        // In real implementation, this would integrate with email service
+        const emailBody = `Dear ${customer.name},
+
+Please find attached your estimate for ${estimate.description}.
+
+Estimate Number: ${estimate.number}
+Total Amount: ${TJSystem.TJUtils.formatCurrency(estimate.total)}
+Valid Until: ${TJSystem.TJUtils.formatDate(estimate.validUntil)}
+
+We look forward to working with you on this project.
+
+Best regards,
+T&J Field Services
+Delmar, Maryland
+(555) 123-4567`;
+
+        // For now, open email client
+        window.open(`mailto:${customer.email}?subject=Estimate ${estimate.number} - ${estimate.description}&body=${encodeURIComponent(emailBody)}`);
+        
+        // Update estimate status
+        const estimates = TJSystem.tjData.get('estimates');
+        const index = estimates.findIndex(e => e.id === estimateId);
+        estimates[index].status = 'sent';
+        TJSystem.tjData.save('estimates', estimates);
+        
+        alert('Estimate sent to customer!');
+    }
+
+    static followUpOverdue(invoiceId) {
+        const invoice = TJSystem.tjData.get('invoices').find(i => i.id === invoiceId);
+        const customer = TJSystem.tjData.get('customers').find(c => c.id === invoice.customerId);
+        
+        const emailBody = `Dear ${customer.name},
+
+This is a friendly reminder that Invoice ${invoice.number} is now overdue.
+
+Invoice Amount: ${TJSystem.TJUtils.formatCurrency(invoice.total)}
+Due Date: ${TJSystem.TJUtils.formatDate(invoice.dueDate)}
+
+Please contact us at your earliest convenience to arrange payment.
+
+Thank you,
+T&J Field Services
+(555) 123-4567`;
+
+        window.open(`mailto:${customer.email}?subject=Overdue Invoice ${invoice.number}&body=${encodeURIComponent(emailBody)}`);
+    }
+}
+
+// ===== INVENTORY MANAGEMENT =====
+class InventoryManager {
+    static showAddItemForm() {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        modal.innerHTML = `
+            <div class="bg-white p-8 rounded-lg shadow-xl max-w-md w-full mx-4">
+                <h2 class="text-2xl font-bold mb-6">Add Inventory Item</h2>
+                <form id="inventory-form">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Item Name</label>
+                            <input type="text" id="item-name" class="w-full p-2 border rounded" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Category</label>
+                            <select id="item-category" class="w-full p-2 border rounded" required>
+                                <option value="tools">Tools</option>
+                                <option value="lumber">Lumber</option>
+                                <option value="hardware">Hardware</option>
+                                <option value="finishes">Finishes</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Quantity</label>
+                                <input type="number" id="item-quantity" class="w-full p-2 border rounded" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Unit</label>
+                                <input type="text" id="item-unit" class="w-full p-2 border rounded" placeholder="each, box, gallon" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Price per Unit</label>
+                            <input type="number" id="item-price" class="w-full p-2 border rounded" step="0.01" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Low Stock Alert</label>
+                            <input type="number" id="item-alert" class="w-full p-2 border rounded" value="5">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Supplier</label>
+                            <input type="text" id="item-supplier" class="w-full p-2 border rounded">
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-4 mt-6">
+                        <button type="button" onclick="this.closest('.fixed').remove()" 
+                                class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                            Add Item</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);// T&J Field Services - Customer Communication Functions
+
+class CustomerCommunication {
+    static sendEstimate(estimateId) {
+        const estimate = TJSystem.tjData.get('estimates').find(e => e.id === estimateId);
+        const customer = TJSystem.tjData.get('customers').find(c => c.id === estimate.customerId);
+        
+        const emailBody = this.getEstimateEmailBody(estimate, customer);
+        const subject = `Estimate ${estimate.number} - ${estimate.description}`;
+        
+        // Open email client
+        window.open(`mailto:${customer.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`);
+        
+        // Update estimate status
+        this.updateEstimateStatus(estimateId, 'sent');
+        alert('Estimate sent to customer!');
+    }
+
+    static getEstimateEmailBody(estimate, customer) {
+        return `Dear ${customer.name},
+
+Please find your estimate for ${estimate.description}.
+
+Estimate Details:
+- Number: ${estimate.number}
+- Total Amount: ${TJSystem.TJUtils.formatCurrency(estimate.total)}
+- Valid Until: ${TJSystem.TJUtils.formatDate(estimate.validUntil)}
+
+We look forward to working with you on this project.
+
+Best regards,
+T&J Field Services
+Delmar, Maryland
+(555) 123-4567
+info@tjfieldservices.com`;
+    }
+
+    static followUpOverdue(invoiceId) {
+        const invoice = TJSystem.tjData.get('invoices').find(i => i.id === invoiceId);
+        const customer = TJSystem.tjData.get('customers').find(c => c.id === invoice.customerId);
+        
+        const emailBody = this.getOverdueEmailBody(invoice, customer);
+        const subject = `Payment Reminder - Invoice ${invoice.number}`;
+        
+        window.open(`mailto:${customer.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`);
+    }
+
+    static getOverdueEmailBody(invoice, customer) {
+        return `Dear ${customer.name},
+
+This is a friendly reminder that Invoice ${invoice.number} is now overdue.
+
+Invoice Details:
+- Amount: ${TJSystem.TJUtils.formatCurrency(invoice.total)}
+- Due Date: ${TJSystem.TJUtils.formatDate(invoice.dueDate)}
+
+Please contact us at your earliest convenience to arrange payment.
+
+Thank you,
+T&J Field Services
+(555) 123-4567`;
+    }
+
+    static scheduleFollowUp(customerId, days = 7) {
+        const followUpDate = new Date();
+        followUpDate.setDate(followUpDate.getDate() + days);
+        
+        const customer = TJSystem.tjData.get('customers').find(c => c.id === customerId);
+        
+        // In a real system, this would create a calendar reminder
+        alert(`Follow-up scheduled for ${customer.name} on ${followUpDate.toDateString()}`);
+    }
+
+    static updateEstimateStatus(estimateId, status) {
+        const estimates = TJSystem.tjData.get('estimates');
+        const index = estimates.findIndex(e => e.id === estimateId);
+        if (index !== -1) {
+            estimates[index].status = status;
+            TJSystem.tjData.save('estimates', estimates);
+        }
+    }
+
+    static callCustomer(phone) {
+        // Open phone dialer on mobile devices
+        window.open(`tel:${phone}`);
+    }
+
+    static textCustomer(phone, message = '') {
+        // Open SMS app
+        window.open(`sms:${phone}${message ? `?body=${encodeURIComponent(message)}` : ''}`);
+    }
+}
+
+// Export for global use
+window.CustomerCommunication = CustomerCommunication;
+
 
 
 };
