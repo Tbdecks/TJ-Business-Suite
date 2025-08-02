@@ -2813,5 +2813,737 @@ const BusinessLicense = {
             isBonded: document.getElementById('isBonded').checked,
             bondAmount: document.getElementById('bondAmount').value,
             bondingCompany: document.getElementById('
+// Certification manager component for T&J Field Services
+const CertificationManager = {
+    render() {
+        return `
+            <!-- Certifications -->
+            <div>
+                <h5 class="text-md font-medium mb-3">Professional Certifications</h5>
+                <div class="space-y-3">
+                    <div id="certificationsList">
+                        <!-- Certifications will be loaded here -->
+                    </div>
+                    <button type="button" onclick="CertificationManager.addCertification()" 
+                            class="btn-secondary text-sm">
+                        <i data-lucide="plus" class="inline w-4 h-4 mr-2"></i>
+                        Add Certification
+                    </button>
+                </div>
+            </div>
+        `;
+    },
+    
+    load() {
+        const certifications = Settings.getSetting('certifications', []);
+        this.renderCertifications(certifications);
+        
+        if (certifications.length === 0) {
+            this.addCertification();
+        }
+    },
+    
+    renderCertifications(certifications) {
+        const container = document.getElementById('certificationsList');
+        container.innerHTML = certifications.map((cert, index) => 
+            this.renderCertification(cert, index)
+        ).join('');
+        lucide.createIcons();
+    },
+    
+    renderCertification(cert = {}, index) {
+        return `
+            <div class="certification-item border rounded-lg p-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Certification Name</label>
+                        <input type="text" class="cert-name form-input text-sm" 
+                               value="${cert.name || ''}" 
+                               placeholder="e.g., OSHA 30-Hour">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Issuing Organization</label>
+                        <input type="text" class="cert-issuer form-input text-sm" 
+                               value="${cert.issuer || ''}" 
+                               placeholder="e.g., OSHA">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Issue Date</label>
+                        <input type="date" class="cert-issued form-input text-sm" 
+                               value="${cert.issued || ''}">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Expiration Date</label>
+                        <input type="date" class="cert-expiration form-input text-sm" 
+                               value="${cert.expiration || ''}"
+                               onchange="CertificationManager.checkCertExpiration(this)">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Certificate Number</label>
+                        <input type="text" class="cert-number form-input text-sm" 
+                               value="${cert.number || ''}" 
+                               placeholder="Certificate ID">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                        <select class="cert-status form-select text-sm">
+                            <option value="active" ${cert.status === 'active' ? 'selected' : ''}>Active</option>
+                            <option value="expired" ${cert.status === 'expired' ? 'selected' : ''}>Expired</option>
+                            <option value="pending" ${cert.status === 'pending' ? 'selected' : ''}>Pending Renewal</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button type="button" onclick="CertificationManager.removeCertification(this)" 
+                                class="btn-secondary text-sm text-red-600 hover:text-red-800 mr-2">
+                            <i data-lucide="trash-2" class="inline w-4 h-4 mr-1"></i>
+                            Remove
+                        </button>
+                        <button type="button" onclick="CertificationManager.duplicateCertification(this)" 
+                                class="btn-secondary text-sm text-blue-600 hover:text-blue-800">
+                            <i data-lucide="copy" class="inline w-4 h-4 mr-1"></i>
+                            Duplicate
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Expiration Alert -->
+                <div class="cert-alert mt-3"></div>
+            </div>
+        `;
+    },
+    
+    addCertification() {
+        const container = document.getElementById('certificationsList');
+        container.insertAdjacentHTML('beforeend', this.renderCertification());
+        lucide.createIcons();
+    },
+    
+    removeCertification(button) {
+        if (confirm('Are you sure you want to remove this certification?')) {
+            button.closest('.certification-item').remove();
+        }
+    },
+    
+    duplicateCertification(button) {
+        const item = button.closest('.certification-item');
+        const cert = this.getCertificationData(item);
+        
+        // Clear some fields for the duplicate
+        cert.number = '';
+        cert.issued = '';
+        cert.expiration = '';
+        cert.status = 'pending';
+        
+        const container = document.getElementById('certificationsList');
+        container.insertAdjacentHTML('beforeend', this.renderCertification(cert));
+        lucide.createIcons();
+    },
+    
+    getCertificationData(item) {
+        return {
+            name: item.querySelector('.cert-name').value,
+            issuer: item.querySelector('.cert-issuer').value,
+            issued: item.querySelector('.cert-issued').value,
+            expiration: item.querySelector('.cert-expiration').value,
+            number: item.querySelector('.cert-number').value,
+            status: item.querySelector('.cert-status').value
+        };
+    },
+    
+    checkCertExpiration(input) {
+        const expirationDate = input.value;
+        const alertDiv = input.closest('.certification-item').querySelector('.cert-alert');
+        
+        if (!expirationDate) {
+            alertDiv.innerHTML = '';
+            return;
+        }
+        
+        const expDate = new Date(expirationDate);
+        const today = new Date();
+        const daysUntilExpiration = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+        
+        if (daysUntilExpiration < 0) {
+            alertDiv.innerHTML = `
+                <div class="bg-red-50 border border-red-200 rounded-md p-2">
+                    <div class="flex">
+                        <i data-lucide="alert-circle" class="w-4 h-4 text-red-400 mt-0.5"></i>
+                        <div class="ml-2">
+                            <p class="text-xs text-red-800">This certification has expired</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            // Auto-update status to expired
+            input.closest('.certification-item').querySelector('.cert-status').value = 'expired';
+        } else if (daysUntilExpiration <= 90) {
+            alertDiv.innerHTML = `
+                <div class="bg-yellow-50 border border-yellow-200 rounded-md p-2">
+                    <div class="flex">
+                        <i data-lucide="alert-triangle" class="w-4 h-4 text-yellow-400 mt-0.5"></i>
+                        <div class="ml-2">
+                            <p class="text-xs text-yellow-800">Expires in ${daysUntilExpiration} days</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            // Auto-update status to pending if not already expired
+            const statusSelect = input.closest('.certification-item').querySelector('.cert-status');
+            if (statusSelect.value !== 'expired') {
+                statusSelect.value = 'pending';
+            }
+        } else {
+            alertDiv.innerHTML = '';
+            // Auto-update status to active if not manually set otherwise
+            const statusSelect = input.closest('.certification-item').querySelector('.cert-status');
+            if (statusSelect.value === 'pending' || statusSelect.value === 'expired') {
+                statusSelect.value = 'active';
+            }
+        }
+        
+        lucide.createIcons();
+    },
+    
+    collect() {
+        const certifications = [];
+        document.querySelectorAll('.certification-item').forEach(item => {
+            const cert = this.getCertificationData(item);
+            if (cert.name.trim()) {
+                certifications.push(cert);
+            }
+        });
+        
+        return {
+            certifications: certifications
+        };
+    }
+};// Notification types component for T&J Field Services
+const NotificationTypes = {
+    render() {
+        return `
+            <!-- Notification Types -->
+            <div>
+                <h4 class="text-lg font-medium mb-4">What to be notified about</h4>
+                <div class="space-y-6">
+                    <!-- Project Notifications -->
+                    <div class="border rounded-lg p-4">
+                        <h5 class="font-medium mb-3 flex items-center">
+                            <i data-lucide="briefcase" class="w-5 h-5 text-blue-500 mr-2"></i>
+                            Project Updates
+                        </h5>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="notifyNewProjects" class="form-checkbox">
+                                <span class="ml-3">New project assignments</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="notifyProjectStatusChange" class="form-checkbox">
+                                <span class="ml-3">Project status changes</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="notifyProjectDeadlines" class="form-checkbox">
+                                <span class="ml-3">Upcoming deadlines</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="notifyProjectCompletion" class="form-checkbox">
+                                <span class="ml-3">Project completions</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="notifyProjectOverdue" class="form-checkbox">
+                                <span class="ml-3">Overdue projects</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="notifyProjectBudget" class="form-checkbox">
+                                <span class="ml-3">Budget alerts</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Customer Notifications -->
+                    <div class="border rounded-lg p-4">
+                        <h5 class="font-medium mb-3 flex items-center">
+                            <i data-lucide="users" class="w-5 h-5 text-green-500 mr-2"></i>
+                            Customer Activity
+                        </h5>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="notifyNewCustomers" class="form-checkbox">
+                                <span class="ml-3">New customer registrations</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="notifyCustomerMessages" class="form-checkbox">
+                                <span class="ml-3">Customer messages</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="notifyCustomerReviews" class="form-checkbox">
+                                <span class="ml-3">Customer reviews</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="notifyCustomerPayments" class="form-checkbox">
+                                <span class="ml-3">Payment updates</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Schedule Notifications -->
+                    <div class="border rounded-lg p-4">
+                        <h5 class="font-medium mb-3 flex items-center">
+                            <i data-lucide="calendar" class="w-5 h-5 text-purple-500 mr-2"></i>
+                            Schedule & Appointments
+                        </h5>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="notifyScheduleChanges" class="form-checkbox">
+                                <span class="ml-3">Schedule changes</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="notifyUpcomingAppointments" class="form-checkbox">
+                                <span class="ml-3">Upcoming appointments</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="notifyMissedAppointments" class="form-checkbox">
+                                <span class="ml-3">Missed appointments</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="notifyScheduleConflicts" class="form-checkbox">
+                                <span class="ml-3">Schedule conflicts</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- System Notifications -->
+                    <div class="border rounded-lg p-4">
+                        <h5 class="font-medium mb-3 flex items-center">
+                            <i data-lucide="settings" class="w-5 h-5 text-orange-500 mr-2"></i>
+                            System & Security
+                        </h5>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="notifySystemUpdates" class="form-checkbox">
+                                <span class="ml-3">System updates</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="notifySecurityAlerts" class="form-checkbox">
+                                <span class="ml-3">Security alerts</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="notifyBackupStatus" class="form-checkbox">
+                                <span class="ml-3">Backup status</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="notifyMaintenanceMode" class="form-checkbox">
+                                <span class="ml-3">Maintenance notifications</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    load() {
+        // Project notifications
+        document.getElementById('notifyNewProjects').checked = Settings.getSetting('notifyNewProjects', true);
+        document.getElementById('notifyProjectStatusChange').checked = Settings.getSetting('notifyProjectStatusChange', true);
+        document.getElementById('notifyProjectDeadlines').checked = Settings.getSetting('notifyProjectDeadlines', true);
+        document.getElementById('notifyProjectCompletion').checked = Settings.getSetting('notifyProjectCompletion', true);
+        document.getElementById('notifyProjectOverdue').checked = Settings.getSetting('notifyProjectOverdue', true);
+        document.getElementById('notifyProjectBudget').checked = Settings.getSetting('notifyProjectBudget', false);
+        
+        // Customer notifications
+        document.getElementById('notifyNewCustomers').checked = Settings.getSetting('notifyNewCustomers', true);
+        document.getElementById('notifyCustomerMessages').checked = Settings.getSetting('notifyCustomerMessages', true);
+        document.getElementById('notifyCustomerReviews').checked = Settings.getSetting('notifyCustomerReviews', true);
+        document.getElementById('notifyCustomerPayments').checked = Settings.getSetting('notifyCustomerPayments', true);
+        
+        // Schedule notifications
+        document.getElementById('notifyScheduleChanges').checked = Settings.getSetting('notifyScheduleChanges', true);
+        document.getElementById('notifyUpcomingAppointments').checked = Settings.getSetting('notifyUpcomingAppointments', true);
+        document.getElementById('notifyMissedAppointments').checked = Settings.getSetting('notifyMissedAppointments', true);
+        document.getElementById('notifyScheduleConflicts').checked = Settings.getSetting('notifyScheduleConflicts', true);
+        
+        // System notifications
+        document.getElementById('notifySystemUpdates').checked = Settings.getSetting('notifySystemUpdates', false);
+        document.getElementById('notifySecurityAlerts').checked = Settings.getSetting('notifySecurityAlerts', true);
+        document.getElementById('notifyBackupStatus').checked = Settings.getSetting('notifyBackupStatus', false);
+        document.getElementById('notifyMaintenanceMode').checked = Settings.getSetting('notifyMaintenanceMode', true);
+    },
+    
+    collect() {
+        return {
+            // Project notifications
+            notifyNewProjects: document.getElementById('notifyNewProjects').checked,
+            notifyProjectStatusChange: document.getElementById('notifyProjectStatusChange').checked,
+            notifyProjectDeadlines: document.getElementById('notifyProjectDeadlines').checked,
+            notifyProjectCompletion: document.getElementById('notifyProjectCompletion').checked,
+            notifyProjectOverdue: document.getElementById('notifyProjectOverdue').checked,
+            notifyProjectBudget: document.getElementById('notifyProjectBudget').checked,
+            
+            // Customer notifications
+            notifyNewCustomers: document.getElementById('notifyNewCustomers').checked,
+            notifyCustomerMessages: document.getElementById('notifyCustomerMessages').checked,
+            notifyCustomerReviews: document.getElementById('notifyCustomerReviews').checked,
+            notifyCustomerPayments: document.getElementById('notifyCustomerPayments').checked,
+            
+            // Schedule notifications
+            notifyScheduleChanges: document.getElementById('notifyScheduleChanges').checked,
+            notifyUpcomingAppointments: document.getElementById('notifyUpcomingAppointments').checked,
+            notifyMissedAppointments: document.getElementById('notifyMissedAppointments').checked,
+            notifyScheduleConflicts: document.getElementById('notifyScheduleConflicts').checked,
+            
+            // System notifications
+            notifySystemUpdates: document.getElementById('notifySystemUpdates').checked,
+            notifySecurityAlerts: document.getElementById('notifySecurityAlerts').checked,
+            notifyBackupStatus: document.getElementById('notifyBackupStatus').checked,
+            notifyMaintenanceMode: document.getElementById('notifyMaintenanceMode').checked
+        };
+    }
+};id: tj-notification-schedule
+name: T&J Notification Schedule
+type: code.js
+content: |-
+// Notification schedule component for T&J Field Services
+const NotificationSchedule = {
+    render() {
+        return `
+            <!-- Notification Schedule -->
+            <div>
+                <h4 class="text-lg font-medium mb-4">Notification Schedule</h4>
+                <div class="space-y-6">
+                    <!-- Quiet Hours -->
+                    <div class="border rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h5 class="font-medium">Quiet Hours</h5>
+                                <p class="text-sm text-gray-500">Don't send notifications during these hours</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="enableQuietHours" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                        
+                        <div id="quietHoursSettings" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Start Time</label>
+                                <input type="time" id="quietHoursStart" class="form-input" value="22:00">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">End Time</label>
+                                <input type="time" id="quietHoursEnd" class="form-input" value="08:00">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Weekend Settings -->
+                    <div class="border rounded-lg p-4">
+                        <h5 class="font-medium mb-3">Weekend Notifications</h5>
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="weekendNotifications" class="form-checkbox">
+                                <span class="ml-3">Send notifications on weekends</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="urgentOnlyWeekends" class="form-checkbox">
+                                <span class="ml-3">Only urgent notifications on weekends</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Frequency Settings -->
+                    <div class="border rounded-lg p-4">
+                        <h5 class="font-medium mb-3">Notification Frequency</h5>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email Digest Frequency</label>
+                                <select id="emailDigestFrequency" class="form-select">
+                                    <option value="immediate">Immediate (as they happen)</option>
+                                    <option value="hourly">Hourly digest</option>
+                                    <option value="daily">Daily digest</option>
+                                    <option value="weekly">Weekly digest</option>
+                                    <option value="never">Never send digest</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">SMS Frequency Limit</label>
+                                <select id="smsFrequencyLimit" class="form-select">
+                                    <option value="unlimited">No limit</option>
+                                    <option value="5">Maximum 5 per hour</option>
+                                    <option value="10">Maximum 10 per hour</option>
+                                    <option value="urgent">Urgent only</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Daily Digest Time</label>
+                                <input type="time" id="dailyDigestTime" class="form-input" value="08:00">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Reminder Settings -->
+                    <div class="border rounded-lg p-4">
+                        <h5 class="font-medium mb-3">Reminder Settings</h5>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Appointment Reminders</label>
+                                <div class="space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="reminder24h" class="form-checkbox">
+                                        <span class="ml-3">24 hours before</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="reminder2h" class="form-checkbox">
+                                        <span class="ml-3">2 hours before</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="reminder30m" class="form-checkbox">
+                                        <span class="ml-3">30 minutes before</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Project Deadline Reminders</label>
+                                <div class="space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="deadlineReminder7d" class="form-checkbox">
+                                        <span class="ml-3">7 days before deadline</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="deadlineReminder3d" class="form-checkbox">
+                                        <span class="ml-3">3 days before deadline</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="deadlineReminder1d" class="form-checkbox">
+                                        <span class="ml-3">1 day before deadline</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    load() {
+        document.getElementById('enableQuietHours').checked = Settings.getSetting('enableQuietHours', true);
+        document.getElementById('quietHoursStart').value = Settings.getSetting('quietHoursStart', '22:00');
+        document.getElementById('quietHoursEnd').value = Settings.getSetting('quietHoursEnd', '08:00');
+        
+        document.getElementById('weekendNotifications').checked = Settings.getSetting('weekendNotifications', false);
+        document.getElementById('urgentOnlyWeekends').checked = Settings.getSetting('urgentOnlyWeekends', true);
+        
+        document.getElementById('emailDigestFrequency').value = Settings.getSetting('emailDigestFrequency', 'daily');
+        document.getElementById('smsFrequencyLimit').value = Settings.getSetting('smsFrequencyLimit', '10');
+        document.getElementById('dailyDigestTime').value = Settings.getSetting('dailyDigestTime', '08:00');
+        
+        // Appointment reminders
+        document.getElementById('reminder24h').checked = Settings.getSetting('reminder24h', true);
+        document.getElementById('reminder2h').checked = Settings.getSetting('reminder2h', true);
+        document.getElementById('reminder30m').checked = Settings.getSetting('reminder30m', false);
+        
+        // Deadline reminders
+        document.getElementById('deadlineReminder7d').checked = Settings.getSetting('deadlineReminder7d', true);
+        document.getElementById('deadlineReminder3d').checked = Settings.getSetting('deadlineReminder3d', true);
+        document.getElementById('deadlineReminder1d').checked = Settings.getSetting('deadlineReminder1d', true);
+        
+        // Add event listener for quiet hours toggle
+        document.getElementById('enableQuietHours').addEventListener('change', this.toggleQuietHours);
+        this.toggleQuietHours();
+    },
+    
+    toggleQuietHours() {
+        const enabled = document.getElementById('enableQu// Reminder settings component for T&J Field Services
+const ReminderSettings = {
+    render() {
+        return `
+            <!-- Reminder Settings -->
+            <div class="border rounded-lg p-4">
+                <h5 class="font-medium mb-3">Reminder Settings</h5>
+                <div class="space-y-6">
+                    <!-- Appointment Reminders -->
+                    <div>
+                        <h6 class="text-sm font-medium text-gray-700 mb-3">Appointment Reminders</h6>
+                        <div class="space-y-2">
+                            <label class="flex items-center justify-between">
+                                <span class="flex items-center">
+                                    <input type="checkbox" id="reminder24h" class="form-checkbox">
+                                    <span class="ml-3">24 hours before</span>
+                                </span>
+                                <select id="reminder24hMethod" class="form-select text-sm w-32">
+                                    <option value="email">Email</option>
+                                    <option value="sms">SMS</option>
+                                    <option value="both">Both</option>
+                                </select>
+                            </label>
+                            <label class="flex items-center justify-between">
+                                <span class="flex items-center">
+                                    <input type="checkbox" id="reminder2h" class="form-checkbox">
+                                    <span class="ml-3">2 hours before</span>
+                                </span>
+                                <select id="reminder2hMethod" class="form-select text-sm w-32">
+                                    <option value="email">Email</option>
+                                    <option value="sms">SMS</option>
+                                    <option value="both">Both</option>
+                                </select>
+                            </label>
+                            <label class="flex items-center justify-between">
+                                <span class="flex items-center">
+                                    <input type="checkbox" id="reminder30m" class="form-checkbox">
+                                    <span class="ml-3">30 minutes before</span>
+                                </span>
+                                <select id="reminder30mMethod" class="form-select text-sm w-32">
+                                    <option value="email">Email</option>
+                                    <option value="sms">SMS</option>
+                                    <option value="both">Both</option>
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Project Deadline Reminders -->
+                    <div>
+                        <h6 class="text-sm font-medium text-gray-700 mb-3">Project Deadline Reminders</h6>
+                        <div class="space-y-2">
+                            <label class="flex items-center justify-between">
+                                <span class="flex items-center">
+                                    <input type="checkbox" id="deadlineReminder7d" class="form-checkbox">
+                                    <span class="ml-3">7 days before deadline</span>
+                                </span>
+                                <select id="deadlineReminder7dMethod" class="form-select text-sm w-32">
+                                    <option value="email">Email</option>
+                                    <option value="sms">SMS</option>
+                                    <option value="both">Both</option>
+                                </select>
+                            </label>
+                            <label class="flex items-center justify-between">
+                                <span class="flex items-center">
+                                    <input type="checkbox" id="deadlineReminder3d" class="form-checkbox">
+                                    <span class="ml-3">3 days before deadline</span>
+                                </span>
+                                <select id="deadlineReminder3dMethod" class="form-select text-sm w-32">
+                                    <option value="email">Email</option>
+                                    <option value="sms">SMS</option>
+                                    <option value="both">Both</option>
+                                </select>
+                            </label>
+                            <label class="flex items-center justify-between">
+                                <span class="flex items-center">
+                                    <input type="checkbox" id="deadlineReminder1d" class="form-checkbox">
+                                    <span class="ml-3">1 day before deadline</span>
+                                </span>
+                                <select id="deadlineReminder1dMethod" class="form-select text-sm w-32">
+                                    <option value="email">Email</option>
+                                    <option value="sms">SMS</option>
+                                    <option value="both">Both</option>
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Follow-up Reminders -->
+                    <div>
+                        <h6 class="text-sm font-medium text-gray-700 mb-3">Follow-up Reminders</h6>
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="followUpReminders" class="form-checkbox">
+                                <span class="ml-3">Enable automatic follow-up reminders</span>
+                            </label>
+                            
+                            <div id="followUpSettings" class="ml-6 space-y-2">
+                                <div>
+                                    <label class="block text-xs text-gray-500 mb-1">Follow up after project completion</label>
+                                    <select id="followUpDelay" class="form-select text-sm">
+                                        <option value="1">1 day</option>
+                                        <option value="3">3 days</option>
+                                        <option value="7">1 week</option>
+                                        <option value="14">2 weeks</option>
+                                        <option value="30">1 month</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-xs text-gray-500 mb-1">Follow-up method</label>
+                                    <select id="followUpMethod" class="form-select text-sm">
+                                        <option value="email">Email only</option>
+                                        <option value="sms">SMS only</option>
+                                        <option value="both">Email and SMS</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    load() {
+        // Appointment reminders
+        document.getElementById('reminder24h').checked = Settings.getSetting('reminder24h', true);
+        document.getElementById('reminder24hMethod').value = Settings.getSetting('reminder24hMethod', 'email');
+        document.getElementById('reminder2h').checked = Settings.getSetting('reminder2h', true);
+        document.getElementById('reminder2hMethod').value = Settings.getSetting('reminder2hMethod', 'both');
+        document.getElementById('reminder30m').checked = Settings.getSetting('reminder30m', false);
+        document.getElementById('reminder30mMethod').value = Settings.getSetting('reminder30mMethod', 'sms');
+        
+        // Deadline reminders
+        document.getElementById('deadlineReminder7d').checked = Settings.getSetting('deadlineReminder7d', true);
+        document.getElementById('deadlineReminder7dMethod').value = Settings.getSetting('deadlineReminder7dMethod', 'email');
+        document.getElementById('deadlineReminder3d').checked = Settings.getSetting('deadlineReminder3d', true);
+        document.getElementById('deadlineReminder3dMethod').value = Settings.getSetting('deadlineReminder3dMethod', 'both');
+        document.getElementById('deadlineReminder1d').checked = Settings.getSetting('deadlineReminder1d', true);
+        document.getElementById('deadlineReminder1dMethod').value = Settings.getSetting('deadlineReminder1dMethod', 'both');
+        
+        // Follow-up reminders
+        document.getElementById('followUpReminders').checked = Settings.getSetting('followUpReminders', true);
+        document.getElementById('followUpDelay').value = Settings.getSetting('followUpDelay', '7');
+        document.getElementById('followUpMethod').value = Settings.getSetting('followUpMethod', 'email');
+        
+        // Add event listener for follow-up toggle
+        document.getElementById('followUpReminders').addEventListener('change', this.toggleFollowUpSettings);
+        this.toggleFollowUpSettings();
+    },
+    
+    toggleFollowUpSettings() {
+        const enabled = document.getElementById('followUpReminders').checked;
+        const settings = document.getElementById('followUpSettings');
+        settings.style.opacity = enabled ? '1' : '0.5';
+        settings.querySelectorAll('select').forEach(el => {
+            el.disabled = !enabled;
+        });
+    },
+    
+    collect() {
+        return {
+            // Appointment reminders
+            reminder24h: document.getElementById('reminder24h').checked,
+            reminder24hMethod: document.getElementById('reminder24hMethod').value,
+            reminder2h: document.getElementById('reminder2h').checked,
+            reminder2hMethod: document.getElementById('reminder2hMethod').value,
+            reminder30m: document.getElementById('reminder30m').checked,
+            reminder30mMethod: document.getElementById('reminder30mMethod').value,
+            
+            // Deadline reminders
+            deadlineReminder7d: document.getElementById('deadlineReminder7d').checked,
+            deadlineReminder7dMethod: document.getElementById('deadlineReminder7dMethod').value,
+            deadlineReminder3d: document.getElementById('deadlineReminder3d').checked,
+            deadlineReminder3dMethod: document.getElementById('deadlineReminder3dMethod').value,
+            deadlineReminder1d: document.getElementById('deadlineReminder1d').checked,
+            deadlineReminder1dMethod: document.getElementById('deadlineReminder1dMethod').value,
+            
+            // Follow-up reminders
+            followUpReminders: document.getElementById('followUpReminders').checked,
+            followUpDelay: document.getElementById('followUpDelay').value,
+            followUpMethod: document.getElementById('followUpMethod').value
+        };
+    }
+};
 
 };
