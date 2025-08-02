@@ -12195,6 +12195,545 @@ content: |-
                             return { error: 'Unknown project type' };
                     }
                     const subtotal = calculation.total
+id: tj-complete-system
+name: T&J Complete Management System
+type: html
+content: |-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T&J Field Services - Management System</title>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .sidebar-collapsed { width: 4rem; }
+        .main-content-expanded { margin-left: 4rem; }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .card-hover:hover { transform: translateY(-2px); transition: transform 0.2s; }
+        .modal { backdrop-filter: blur(4px); }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Sidebar -->
+    <div id="sidebar" class="fixed left-0 top-0 h-full w-64 bg-white shadow-lg border-r transition-all duration-300 z-40">
+        <div class="p-6 border-b">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <i data-lucide="hammer" class="w-6 h-6 text-white"></i>
+                </div>
+                <div class="sidebar-text">
+                    <h1 class="text-xl font-bold text-gray-900">T&J Field Services</h1>
+                    <p class="text-sm text-gray-500">Delmar, MD 21875</p>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="p-4">
+            <div class="space-y-2">
+                <a href="#" onclick="showSection('dashboard')" class="nav-item active flex items-center space-x-3 p-3 rounded-lg bg-blue-50 text-blue-600 transition-colors">
+                    <i data-lucide="home" class="w-5 h-5"></i>
+                    <span class="sidebar-text">Dashboard</span>
+                </a>
+                <a href="#" onclick="showSection('customers')" class="nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-colors">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                    <span class="sidebar-text">Customers</span>
+                </a>
+                <a href="#" onclick="showSection('projects')" class="nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-colors">
+                    <i data-lucide="briefcase" class="w-5 h-5"></i>
+                    <span class="sidebar-text">Projects</span>
+                </a>
+                <a href="#" onclick="showSection('estimates')" class="nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-colors">
+                    <i data-lucide="calculator" class="w-5 h-5"></i>
+                    <span class="sidebar-text">Estimates</span>
+                </a>
+                <a href="#" onclick="showSection('calendar')" class="nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-colors">
+                    <i data-lucide="calendar" class="w-5 h-5"></i>
+                    <span class="sidebar-text">Calendar</span>
+                </a>
+                <a href="#" onclick="showSection('inventory')" class="nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-colors">
+                    <i data-lucide="package" class="w-5 h-5"></i>
+                    <span class="sidebar-text">Inventory</span>
+                </a>
+            </div>
+        </nav>
+        
+        <div class="absolute bottom-4 left-4 right-4">
+            <button onclick="toggleSidebar()" class="w-full flex items-center justify-center p-2 text-gray-500 hover:text-gray-700 transition-colors">
+                <i data-lucide="chevron-left" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContent" class="ml-64 transition-all duration-300">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 id="pageTitle" class="text-2xl font-bold text-gray-900">Dashboard</h2>
+                        <p id="pageSubtitle" class="text-gray-600">Welcome back! Here's what's happening with your business.</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button onclick="openQuickEstimate()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2">
+                            <i data-lucide="calculator" class="w-4 h-4"></i>
+                            <span>Quick Estimate</span>
+                        </button>
+                        <button onclick="createNewProject()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>New Project</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <main class="p-6">
+            <div id="contentArea" class="fade-in">
+                <!-- Dashboard Content -->
+                <div id="dashboard-content">
+                    <!-- Quick Stats -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white p-6 rounded-lg shadow-sm border card-hover">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600">Total Projects</p>
+                                    <p id="totalProjects" class="text-3xl font-bold text-gray-900">0</p>
+                                </div>
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="briefcase" class="w-6 h-6 text-blue-600"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white p-6 rounded-lg shadow-sm border card-hover">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600">Active Customers</p>
+                                    <p id="totalCustomers" class="text-3xl font-bold text-gray-900">0</p>
+                                </div>
+                                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="users" class="w-6 h-6 text-green-600"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white p-6 rounded-lg shadow-sm border card-hover">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600">Total Revenue</p>
+                                    <p id="totalRevenue" class="text-3xl font-bold text-gray-900">$0</p>
+                                </div>
+                                <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="dollar-sign" class="w-6 h-6 text-yellow-600"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white p-6 rounded-lg shadow-sm border card-hover">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600">Pending Estimates</p>
+                                    <p id="pendingEstimates" class="text-3xl font-bold text-gray-900">0</p>
+                                </div>
+                                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="calculator" class="w-6 h-6 text-purple-600"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <button onclick="addNewCustomer()" class="flex items-center space-x-3 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-400 hover:bg-green-50 transition-colors">
+                                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="user-plus" class="w-5 h-5 text-green-600"></i>
+                                </div>
+                                <div class="text-left">
+                                    <p class="font-medium text-gray-900">Add Customer</p>
+                                    <p class="text-sm text-gray-600">New customer record</p>
+                                </div>
+                            </button>
+                            
+                            <button onclick="createProject()" class="flex items-center space-x-3 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="plus-circle" class="w-5 h-5 text-blue-600"></i>
+                                </div>
+                                <div class="text-left">
+                                    <p class="font-medium text-gray-900">New Project</p>
+                                    <p class="text-sm text-gray-600">Start new project</p>
+                                </div>
+                            </button>
+                            
+                            <button onclick="quickDeckEstimate()" class="flex items-center space-x-3 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors">
+                                <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="calculator" class="w-5 h-5 text-orange-600"></i>
+                                </div>
+                                <div class="text-left">
+                                    <p class="font-medium text-gray-900">Deck Estimate</p>
+                                    <p class="text-sm text-gray-600">Quick deck pricing</p>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-lg shadow-sm border p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Projects</h3>
+                            <div id="recentProjects" class="space-y-3">
+                                <div class="text-center py-8 text-gray-500">
+                                    <i data-lucide="briefcase" class="w-12 h-12 mx-auto mb-3 text-gray-300"></i>
+                                    <p>No projects yet</p>
+                                    <button onclick="createProject()" class="text-blue-600 hover:text-blue-700 text-sm mt-2">Create your first project</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg shadow-sm border p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Customers</h3>
+                            <div id="recentCustomers" class="space-y-3">
+                                <div class="text-center py-8 text-gray-500">
+                                    <i data-lucide="users" class="w-12 h-12 mx-auto mb-3 text-gray-300"></i>
+                                    <p>No customers yet</p>
+                                    <button onclick="addNewCustomer()" class="text-blue-600 hover:text-blue-700 text-sm mt-2">Add your first customer</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other Sections (Hidden by default) -->
+                <div id="customers-content" class="hidden">
+                    <div class="bg-white rounded-lg shadow-sm border p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold text-gray-900">Customer Management</h3>
+                            <button onclick="addNewCustomer()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2">
+                                <i data-lucide="user-plus" class="w-4 h-4"></i>
+                                <span>Add Customer</span>
+                            </button>
+                        </div>
+                        <div id="customersList" class="space-y-4">
+                            <div class="text-center py-12 text-gray-500">
+                                <i data-lucide="users" class="w-16 h-16 mx-auto mb-4 text-gray-300"></i>
+                                <p class="text-lg mb-2">No customers yet</p>
+                                <p class="text-sm mb-4">Add your first customer to get started</p>
+                                <button onclick="addNewCustomer()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">Add Customer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="projects-content" class="hidden">
+                    <div class="bg-white rounded-lg shadow-sm border p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold text-gray-900">Project Management</h3>
+                            <button onclick="createNewProject()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                                <span>New Project</span>
+                            </button>
+                        </div>
+                        <div id="projectsList" class="space-y-4">
+                            <div class="text-center py-12 text-gray-500">
+                                <i data-lucide="briefcase" class="w-16 h-16 mx-auto mb-4 text-gray-300"></i>
+                                <p class="text-lg mb-2">No projects yet</p>
+                                <p class="text-sm mb-4">Create your first project to get started</p>
+                                <button onclick="createNewProject()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">Create Project</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="estimates-content" class="hidden">
+                    <div class="bg-white rounded-lg shadow-sm border p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold text-gray-900">Estimate Calculator</h3>
+                            <div class="flex space-x-2">
+                                <button onclick="quickDeckEstimate()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">Deck Estimate</button>
+                                <button onclick="quickKitchenEstimate()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">Kitchen Estimate</button>
+                                <button onclick="quickHandymanEstimate()" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">Handyman Estimate</button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-green-400 hover:bg-green-50 transition-colors cursor-pointer" onclick="quickDeckEstimate()">
+                                <i data-lucide="home" class="w-12 h-12 mx-auto mb-3 text-green-600"></i>
+                                <h4 class="font-medium text-gray-900 mb-2">Deck Building</h4>
+                                <p class="text-sm text-gray-600">Calculate deck construction costs</p>
+                            </div>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 hover:bg-blue-50 transition-colors cursor-pointer" onclick="quickKitchenEstimate()">
+                                <i data-lucide="chef-hat" class="w-12 h-12 mx-auto mb-3 text-blue-600"></i>
+                                <h4 class="font-medium text-gray-900 mb-2">Kitchen Remodel</h4>
+                                <p class="text-sm text-gray-600">Estimate kitchen renovation costs</p>
+                            </div>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-400 hover:bg-purple-50 transition-colors cursor-pointer" onclick="quickHandymanEstimate()">
+                                <i data-lucide="wrench" class="w-12 h-12 mx-auto mb-3 text-purple-600"></i>
+                                <h4 class="font-medium text-gray-900 mb-2">Handyman Services</h4>
+                                <p class="text-sm text-gray-600">Price handyman work by the hour</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="calendar-content" class="hidden">
+                    <div class="bg-white rounded-lg shadow-sm border p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-6">Schedule & Calendar</h3>
+                        <div class="text-center py-12 text-gray-500">
+                            <i data-lucide="calendar" class="w-16 h-16 mx-auto mb-4 text-gray-300"></i>
+                            <p class="text-lg mb-2">Calendar coming soon</p>
+                            <p class="text-sm">Schedule and track your appointments</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="inventory-content" class="hidden">
+                    <div class="bg-white rounded-lg shadow-sm border p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold text-gray-900">Inventory Management</h3>
+                            <button onclick="addInventoryItem()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2">
+                                <i data-lucide="package-plus" class="w-4 h-4"></i>
+                                <span>Add Item</span>
+                            </button>
+                        </div>
+                        <div id="inventoryList" class="space-y-4">
+                            <div class="text-center py-12 text-gray-500">
+                                <i data-lucide="package" class="w-16 h-16 mx-auto mb-4 text-gray-300"></i>
+                                <p class="text-lg mb-2">No inventory items yet</p>
+                                <p class="text-sm mb-4">Add materials and tools to track inventory</p>
+                                <button onclick="addInventoryItem()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">Add Item</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // T&J System Data
+        const tjData = {
+            customers: JSON.parse(localStorage.getItem('tj_customers') || '[]'),
+            projects: JSON.parse(localStorage.getItem('tj_projects') || '[]'),
+            estimates: JSON.parse(localStorage.getItem('tj_estimates') || '[]'),
+            inventory: JSON.parse(localStorage.getItem('tj_inventory') || '[]')
+        };
+
+        // Save data function
+        function saveData(key, data) {
+            tjData[key] = data;
+            localStorage.setItem('tj_' + key, JSON.stringify(data));
+            updateDashboard();
+        }
+
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount || 0);
+        }
+
+        // Update dashboard stats
+        function updateDashboard() {
+            document.getElementById('totalProjects').textContent = tjData.projects.length;
+            document.getElementById('totalCustomers').textContent = tjData.customers.length;
+            
+            const totalRevenue = tjData.projects
+                .filter(p => p.status === 'completed')
+                .reduce((sum, p) => sum + (p.budget || 0), 0);
+            document.getElementById('totalRevenue').textContent = formatCurrency(totalRevenue);
+            
+            const pendingEstimates = tjData.estimates.filter(e => e.status === 'pending').length;
+            document.getElementById('pendingEstimates').textContent = pendingEstimates;
+        }
+
+        // Navigation functions
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('[id$="-content"]').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName + '-content').classList.remove('hidden');
+            
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active', 'bg-blue-50', 'text-blue-600');
+                item.classList.add('text-gray-700');
+            });
+            
+            event.target.closest('.nav-item').classList.add('active', 'bg-blue-50', 'text-blue-600');
+            event.target.closest('.nav-item').classList.remove('text-gray-700');
+            
+            // Update page title
+            const titles = {
+                dashboard: 'Dashboard',
+                customers: 'Customer Management',
+                projects: 'Project Management',
+                estimates: 'Estimate Calculator',
+                calendar: 'Schedule & Calendar',
+                inventory: 'Inventory Management'
+            };
+            
+            document.getElementById('pageTitle').textContent = titles[sectionName];
+        }
+
+        // Customer functions
+        function addNewCustomer() {
+            const name = prompt('Customer Name:');
+            if (!name) return;
+            
+            const phone = prompt('Phone Number:');
+            const email = prompt('Email (optional):') || '';
+            const address = prompt('Address (optional):') || '';
+            
+            const newCustomer = {
+                id: Date.now(),
+                name: name,
+                phone: phone,
+                email: email,
+                address: address,
+                created: new Date().toISOString()
+            };
+            
+            tjData.customers.push(newCustomer);
+            saveData('customers', tjData.customers);
+            alert('Customer added successfully!');
+        }
+
+        // Project functions
+        function createProject() {
+            if (tjData.customers.length === 0) {
+                alert('Please add a customer first!');
+                return;
+            }
+            
+            const projectName = prompt('Project Name:');
+            if (!projectName) return;
+            
+            const customerName = prompt('Customer Name:');
+            const budget = parseFloat(prompt('Budget:') || '0');
+            
+            const newProject = {
+                id: Date.now(),
+                name: projectName,
+                customerName: customerName,
+                budget: budget,
+                status: 'active',
+                created: new Date().toISOString()
+            };
+            
+            tjData.projects.push(newProject);
+            saveData('projects', tjData.projects);
+            alert('Project created successfully!');
+        }
+
+        function createNewProject() {
+            createProject();
+        }
+
+        // Estimate functions
+        function quickDeckEstimate() {
+            const length = parseFloat(prompt('Deck Length (feet):') || '0');
+            const width = parseFloat(prompt('Deck Width (feet):') || '0');
+            
+            if (length <= 0 || width <= 0) {
+                alert('Please enter valid dimensions');
+                return;
+            }
+            
+            const sqft = length * width;
+            const materialCost = sqft * 15; // $15 per sq ft for materials
+            const laborCost = sqft * 12; // $12 per sq ft for labor
+            const subtotal = materialCost + laborCost;
+            const tax = subtotal * 0.06; // 6% Maryland tax
+            const total = subtotal + tax;
+            
+            const estimate = {
+                id: Date.now(),
+                type: 'Deck',
+                dimensions: `${length}' x ${width}'`,
+                sqft: sqft,
+                materialCost: materialCost,
+                laborCost: laborCost,
+                tax: tax,
+                total: total,
+                status: 'pending',
+                created: new Date().toISOString()
+            };
+            
+            tjData.estimates.push(estimate);
+            saveData('estimates', tjData.estimates);
+            
+            alert(`Deck Estimate:\n${length}' x ${width}' (${sqft} sq ft)\nMaterials: ${formatCurrency(materialCost)}\nLabor: ${formatCurrency(laborCost)}\nTax: ${formatCurrency(tax)}\nTotal: ${formatCurrency(total)}`);
+        }
+
+        function quickKitchenEstimate() {
+            const size = prompt('Kitchen Size (Small/Medium/Large):').toLowerCase();
+            let baseCost = 0;
+            
+            switch(size) {
+                case 'small': baseCost = 15000; break;
+                case 'medium': baseCost = 25000; break;
+                case 'large': baseCost = 40000; break;
+                default: 
+                    alert('Please enter Small, Medium, or Large');
+                    return;
+            }
+            
+            const tax = baseCost * 0.06;
+            const total = baseCost + tax;
+            
+            alert(`Kitchen Remodel Estimate (${size}):\nBase Cost: ${formatCurrency(baseCost)}\nTax: ${formatCurrency(tax)}\nTotal: ${formatCurrency(total)}`);
+        }
+
+        function quickHandymanEstimate() {
+            const hours = parseFloat(prompt('Estimated Hours:') || '0');
+            const hourlyRate = 75; // $75/hour
+            
+            if (hours <= 0) {
+                alert('Please enter valid hours');
+                return;
+            }
+            
+            const subtotal = hours * hourlyRate;
+            const tax = subtotal * 0.06;
+            const total = subtotal + tax;
+            
+            alert(`Handyman Estimate:\n${hours} hours @ ${formatCurrency(hourlyRate)}/hour\nSubtotal: ${formatCurrency(subtotal)}\nTax: ${formatCurrency(tax)}\nTotal: ${formatCurrency(total)}`);
+        }
+
+        function openQuickEstimate() {
+            quickDeckEstimate();
+        }
+
+        // Inventory functions
+        function addInventoryItem() {
+            const itemName = prompt('Item Name:');
+            if (!itemName) return;
+            
+            const quantity = parseInt(prompt('Quantity:') || '0');
+            const cost = parseFloat(prompt('Cost per unit:') || '0');
+            
+            const newItem = {
+                id: Date.now(),
+                name: itemName,
+                quantity: quantity,
+                cost: cost,
+                total: quantity * cost,
+                created: new Date().toISOString()
+            };
+            
+            tjData.inventory.push(newItem);
+            saveData('inventory', tjData.inventory);
+            alert('Inventory item added!');
+        }
+
+        // Sidebar toggle
+        function toggleS
 
 
 };
